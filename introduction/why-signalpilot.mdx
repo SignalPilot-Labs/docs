@@ -1,0 +1,74 @@
+---
+title: "Why SignalPilot?"
+description: "Compare SignalPilot vs ChatGPT, GitHub Copilot, and other AI coding assistants"
+---
+
+# Why SignalPilot vs ChatGPT + Jupyter?
+
+<Info>
+SignalPilot is the only tool that can answer questions like "Why did X spike?" by aggregating context across your entire data stack + organizational knowledge.
+</Info>
+
+## The Problem with Traditional AI Coding Assistants
+
+When you ask ChatGPT or Copilot:
+> "Why did remote assist interventions spike last week?"
+
+They can't answer because:
+- ❌ No access to your dbt model lineage
+- ❌ No access to recent Jira tickets about changes
+- ❌ No access to Slack threads where issues were discussed
+- ❌ No access to query history showing anomalies
+- ❌ No memory of past investigations
+
+**They can only see the code you copy-paste.**
+
+## SignalPilot's Unique Advantages
+
+| Capability | ChatGPT + Jupyter | GitHub Copilot | SignalPilot |
+|------------|-------------------|----------------|-------------|
+| **Code completion** | ❌ Manual | ✅ Inline | ✅ Tab autocomplete |
+| **Database schema awareness** | ❌ Copy-paste | ❌ | ✅ Auto via MCP |
+| **dbt lineage** | ❌ | ❌ | ✅ Full graph |
+| **Slack/Jira context** | ❌ | ❌ | ✅ MCP subagents |
+| **Multi-step planning** | ❌ Single-shot | ❌ | ✅ Orchestrated loop |
+| **Multi-session memory** | ❌ | ❌ | ✅ Persistent |
+| **Query history analysis** | ❌ | ❌ | ✅ Via MCP |
+| **Institutional knowledge** | ❌ | ❌ | ✅ Via memory + MCP |
+
+## What This Means in Practice
+
+<AccordionGroup>
+<Accordion title="For Data Analysts">
+  - **Before:** Spend hours re-collecting context from Slack, Jira, dbt docs
+  - **After:** SignalPilot automatically aggregates relevant context for your investigation
+  - **Impact:** 80% reduction in investigation prep time
+</Accordion>
+
+<Accordion title="For Data Engineers">
+  - **Before:** Junior analysts constantly ask "which table should I use for revenue?"
+  - **After:** SignalPilot knows your lineage and can guide analysts to the right models
+  - **Impact:** Fewer interruptions, more consistent analysis
+</Accordion>
+
+<Accordion title="For Analytics Leaders">
+  - **Before:** Analysis quality depends on analyst tenure and tribal knowledge
+  - **After:** SignalPilot captures institutional knowledge in multi-session memory
+  - **Impact:** Faster onboarding, higher quality insights
+</Accordion>
+</AccordionGroup>
+
+## Bottom Line
+
+<Card title="SignalPilot is purpose-built for data investigation" icon="lightbulb">
+  While ChatGPT and Copilot excel at general coding, SignalPilot is optimized for the unique workflow of data analysis — where 80% of the work is gathering context and only 20% is writing code.
+</Card>
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="gears" href="/introduction/how-it-works">
+    Understand the MCP sidecar architecture
+  </Card>
+  <Card title="Get started" icon="rocket" href="/getting-started/installation">
+    Install SignalPilot in under 3 minutes
+  </Card>
+</CardGroup>

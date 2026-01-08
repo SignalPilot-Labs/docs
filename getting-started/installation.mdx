@@ -1,0 +1,241 @@
+---
+title: "Installation"
+description: "Get SignalPilot up and running in under 3 minutes"
+---
+
+# Installation
+
+<Info>
+Get SignalPilot up and running in under 3 minutes with a single command.
+</Info>
+
+## What You're Installing
+
+SignalPilot is a **Jupyter Lab extension** (soon VSCode) with:
+
+<CardGroup cols={2}>
+  <Card title="AI Agent" icon="robot">
+    Full organizational context (dbt, databases, Slack, etc.)
+  </Card>
+  <Card title="MCP-Powered Context" icon="plug">
+    Context aggregation from multiple sources
+  </Card>
+  <Card title="Multi-Step Planning" icon="list-check">
+    Planning and execution workflows
+  </Card>
+  <Card title="Cell-Level Editing" icon="pencil">
+    Inline editing and tab autocomplete
+  </Card>
+</CardGroup>
+
+### The SignalPilot CLI
+
+The SignalPilot CLI is a **bootstrap tool** that:
+
+1. Creates your workspace (`~/SignalPilotHome`)
+2. Installs Jupyter Lab + SignalPilot extension
+3. Manages Python environments and packages
+4. Launches Jupyter with SignalPilot pre-configured
+
+<Warning>
+The CLI is an **installer**, not the product itself. The actual product is the Jupyter extension.
+</Warning>
+
+---
+
+## Quick Start
+
+<Steps>
+<Step title="Run the installer">
+  No installation needed — runs via `uvx`:
+
+  ```bash
+  uvx signalpilot
+  ```
+
+  <Check>
+  **What happens:**
+  - Creates `~/SignalPilotHome` workspace
+  - Installs Python 3.12 + Jupyter Lab + SignalPilot extension
+  - Sets up data science packages (pandas, numpy, matplotlib, plotly)
+  - Launches Jupyter Lab in your browser
+  </Check>
+
+  **Time:** ~2-3 minutes
+</Step>
+
+<Step title="Open Jupyter Lab">
+  Your browser will open automatically at `http://localhost:8888`
+
+  You'll see the SignalPilot panel on the left sidebar.
+</Step>
+
+<Step title="Connect your first database">
+  Follow the [database connection guide](/integrations/databases/postgresql) to connect to your data warehouse.
+</Step>
+</Steps>
+
+---
+
+## Advanced: Working in Different Directories
+
+### Use `--here` to work in current directory
+
+```bash
+# Work in your existing project directory
+cd ~/projects/my-data-analysis
+uvx signalpilot --here
+```
+
+<Tip>
+Use `--here` when you want to work with existing notebooks in your project directory.
+</Tip>
+
+### Use `--project` to specify a custom workspace
+
+```bash
+# Create a custom workspace
+uvx signalpilot --project ~/my-signalpilot-workspace
+```
+
+---
+
+## CLI Reference
+
+### `uvx signalpilot` or `sp init`
+
+Initialize and launch SignalPilot.
+
+**Options:**
+- `--here`: Use current directory instead of `~/SignalPilotHome`
+- `--project <path>`: Use custom workspace directory
+
+**Example:**
+```bash
+uvx signalpilot --project ~/analytics-workspace
+```
+
+### `sp lab [--here|--project]`
+
+Launch Jupyter Lab with SignalPilot.
+
+**Options:**
+- `--here`: Launch in current directory
+- `--project <path>`: Launch in specific workspace
+
+**Example:**
+```bash
+sp lab --here
+```
+
+### `sp doctor`
+
+Diagnose installation issues.
+
+```bash
+sp doctor
+```
+
+**Checks:**
+- Python version (requires 3.12+)
+- Jupyter Lab installation
+- SignalPilot extension status
+- MCP server connectivity
+
+### `sp upgrade`
+
+Upgrade SignalPilot to the latest version.
+
+```bash
+sp upgrade
+```
+
+---
+
+## Package Management
+
+SignalPilot uses **uv** for fast, reliable package management.
+
+### Add a package
+
+```bash
+uv add <package-name>
+```
+
+**Example:**
+```bash
+uv add scikit-learn
+```
+
+### Remove a package
+
+```bash
+uv remove <package-name>
+```
+
+### List installed packages
+
+```bash
+uv pip list
+```
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Jupyter Lab won't start">
+  **Symptoms:** Browser doesn't open or shows error
+
+  **Solutions:**
+  1. Check Python version: `python --version` (must be 3.12+)
+  2. Run `sp doctor` to diagnose issues
+  3. Try reinstalling: `sp upgrade --force`
+</Accordion>
+
+<Accordion title="SignalPilot extension not showing">
+  **Symptoms:** No SignalPilot panel in Jupyter Lab sidebar
+
+  **Solutions:**
+  1. Verify extension is installed: `jupyter labextension list`
+  2. Rebuild Jupyter Lab: `jupyter lab build`
+  3. Clear browser cache and refresh
+</Accordion>
+
+<Accordion title="MCP server connection failed">
+  **Symptoms:** "Cannot connect to MCP server" error
+
+  **Solutions:**
+  1. Check network connectivity
+  2. Verify firewall allows connections
+  3. Run `sp doctor` to test MCP connectivity
+</Accordion>
+
+<Accordion title="Permission denied errors">
+  **Symptoms:** Cannot create workspace directory
+
+  **Solutions:**
+  1. Check directory permissions
+  2. Use `--project` to specify a writable location
+  3. Run with appropriate permissions (avoid sudo)
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart Tutorial" icon="rocket" href="/getting-started/quickstart">
+    Complete your first analysis in 5 minutes
+  </Card>
+  <Card title="Connect a Database" icon="database" href="/integrations/databases/postgresql">
+    Connect to your data warehouse
+  </Card>
+  <Card title="Key Concepts" icon="book" href="/getting-started/key-concepts">
+    Understand SignalPilot's core concepts
+  </Card>
+  <Card title="dbt Integration" icon="diagram-project" href="/integrations/dbt-integration">
+    Connect to your dbt project
+  </Card>
+</CardGroup>

@@ -1,0 +1,274 @@
+---
+title: "Key Concepts"
+description: "Understand SignalPilot's core concepts: context aggregation, agents & modes, planning, @ mentions, and hooks"
+---
+
+# Key Concepts
+
+<Info>
+Learn the foundational concepts that make SignalPilot a powerful context orchestration engine.
+</Info>
+
+## Context Aggregation
+
+### What is Context?
+
+In SignalPilot, **context** refers to all the information the AI agent can access to help with your analysis:
+
+<CardGroup cols={2}>
+  <Card title="Kernel State" icon="memory">
+    Variables, dataframes, and objects in your Jupyter kernel
+  </Card>
+  <Card title="Database Schemas" icon="database">
+    Table metadata, column types, relationships
+  </Card>
+  <Card title="dbt Models" icon="diagram-project">
+    Model definitions, lineage, documentation
+  </Card>
+  <Card title="Query History" icon="clock-rotate-left">
+    Past queries, performance stats
+  </Card>
+  <Card title="Collaboration Tools" icon="users">
+    Slack threads, Jira tickets, design docs
+  </Card>
+  <Card title="Analysis History" icon="notebook">
+    Past investigations, conclusions
+  </Card>
+</CardGroup>
+
+### Where Does Context Come From?
+
+SignalPilot uses **MCP (Model Context Protocol)** to aggregate context:
+
+<Tabs>
+<Tab title="Internal MCP">
+  Built-in context sources:
+  - Jupyter kernel (variables, state)
+  - Local files (notebooks, CSVs)
+  - Database connections (via SQL)
+</Tab>
+
+<Tab title="External MCP">
+  External MCP servers you configure:
+  - dbt Cloud/Core
+  - Slack
+  - Jira
+  - Snowflake/Databricks query logs
+</Tab>
+</Tabs>
+
+### How is Context Used?
+
+When you ask a question, SignalPilot:
+
+1. **Resolves relevant context** (parallel, non-blocking)
+2. **Aggregates it** into the system prompt
+3. **Passes it to the LLM** for reasoning
+4. **Uses it to generate code** grounded in reality
+
+<Tip>
+This is why SignalPilot doesn't hallucinate table names — it has real schema metadata.
+</Tip>
+
+---
+
+## Agents & Modes
+
+SignalPilot has three modes that control how autonomous the agent is:
+
+### Agent Mode (Fully Autonomous)
+
+<Card title="Agent Mode" icon="robot">
+  The agent can **plan, write, and execute code** autonomously in your notebook.
+
+  **Use when:**
+  - Exploring new datasets
+  - Iterating on analysis
+  - You trust the agent to execute code
+
+  **Control:**
+  - Planning Mode: Requires approval before execution
+  - Hooks: Enforce custom constraints
+</Card>
+
+### Hands-On Mode (Suggested Code)
+
+<Card title="Hands-On Mode" icon="hand">
+  The agent **suggests code**, but you **manually execute** it in cells.
+
+  **Use when:**
+  - Learning SignalPilot
+  - Working with sensitive data
+  - You want full control over execution
+
+  **Workflow:**
+  1. Ask a question
+  2. Agent writes code in a cell
+  3. You review and execute manually
+</Card>
+
+### Ask Mode (Read-Only)
+
+<Card title="Ask Mode" icon="question">
+  The agent **only answers questions** — no code execution.
+
+  **Use when:**
+  - Asking conceptual questions
+  - Getting explanations
+  - Understanding your data model
+
+  **Example:**
+  "What's the difference between `revenue` and `revenue_net` in my schema?"
+</Card>
+
+<Tip>
+Switch modes in the SignalPilot panel based on your task.
+</Tip>
+
+---
+
+## Planning & Iteration
+
+SignalPilot supports **multi-step workflows** with planning and iteration:
+
+### Planning Mode
+
+<Steps>
+<Step title="Agent creates a plan">
+  You ask: *"Why did revenue drop last week?"*
+
+  Agent responds with:
+  ```
+  Plan:
+  1. Load revenue data for last 2 weeks
+  2. Compare to previous periods
+  3. Check for anomalies in key segments
+  4. Cross-reference with deployment logs
+  ```
+</Step>
+
+<Step title="You approve or modify">
+  Review the plan and approve, or ask for changes.
+</Step>
+
+<Step title="Agent executes the plan">
+  The agent executes each step, streaming results in real-time.
+</Step>
+</Steps>
+
+<Warning>
+Use Planning Mode for high-stakes analysis or production queries.
+</Warning>
+
+### Iteration
+
+SignalPilot can iterate on analysis:
+
+```
+You: Analyze revenue trends
+Agent: [Creates visualization]
+
+You: Break it down by product category
+Agent: [Adds category breakdown, updates viz]
+
+You: What's driving the spike in Category B?
+Agent: [Investigates Category B specifically]
+```
+
+Each question builds on previous context — SignalPilot remembers the conversation.
+
+---
+
+## @ Mentions (Context Scoping)
+
+Use **@ mentions** to scope context to specific sources:
+
+### Mention a Table
+
+```
+@revenue_table show me top 10 customers by revenue
+```
+
+SignalPilot will focus on the `revenue_table` schema.
+
+### Mention a dbt Model
+
+```
+@dbt:fct_revenue what's the lineage for this model?
+```
+
+SignalPilot will load the dbt model definition and lineage.
+
+### Mention a Slack Thread
+
+```
+@slack:data-team-channel what did we decide about revenue calculations?
+```
+
+SignalPilot will search the Slack channel for relevant discussions.
+
+<Tip>
+@ mentions are especially useful when working with multiple data sources.
+</Tip>
+
+---
+
+## Hooks (Custom Rules)
+
+**Hooks** let you enforce custom constraints and validations:
+
+### Pre-Execution Hooks
+
+Run checks before code execution:
+
+```python
+# Only allow prod queries during business hours
+def validate_query(query, context):
+    if is_prod_db(context) and not is_business_hours():
+        raise ValidationError("Production queries only allowed 9am-5pm EST")
+```
+
+### Post-Execution Hooks
+
+Run checks after code execution:
+
+```python
+# Warn if row count changes significantly
+def check_row_count(result, context):
+    if abs(result.row_count - context.expected_count) > 0.2:
+        warning("Row count changed by >20% — verify data quality")
+```
+
+### Code Quality Hooks
+
+Enforce coding standards:
+
+```python
+# Require vectorized pandas operations
+def validate_code(code):
+    if "for " in code and "df" in code:
+        raise ValidationError("Use vectorized pandas operations, not loops")
+```
+
+<Card title="Learn More" icon="wrench" href="/guides/customizing-hooks">
+  See the full guide on customizing hooks
+</Card>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/getting-started/installation">
+    Install SignalPilot
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/getting-started/quickstart">
+    First analysis in 5 minutes
+  </Card>
+  <Card title="How It Works" icon="gears" href="/introduction/how-it-works">
+    Deep dive into architecture
+  </Card>
+  <Card title="Task Guides" icon="map" href="/guides/investigating-revenue-drops">
+    Follow real-world examples
+  </Card>
+</CardGroup>

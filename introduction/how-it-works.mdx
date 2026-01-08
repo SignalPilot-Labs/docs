@@ -1,0 +1,153 @@
+---
+title: "How SignalPilot Works"
+description: "Understanding the MCP sidecar architecture, agent orchestration loop, and multi-session memory"
+---
+
+# How SignalPilot Works
+
+<Info>
+SignalPilot is a **context orchestration engine** that gives AI agents access to your full organizational knowledge.
+</Info>
+
+## Three Core Innovations
+
+SignalPilot solves data investigation challenges through three interconnected systems:
+
+<CardGroup cols={3}>
+  <Card title="MCP Sidecar" icon="plug">
+    Multi-source context aggregation from databases, dbt, Slack, Jira
+  </Card>
+  <Card title="Agent Loop" icon="rotate">
+    Production-ready orchestration with planning, iteration, and execution
+  </Card>
+  <Card title="Memory + Hooks" icon="brain">
+    Institutional knowledge capture and custom constraints
+  </Card>
+</CardGroup>
+
+---
+
+## 1. Multi-Source Context Aggregation (MCP Sidecar)
+
+SignalPilot connects to your data stack via **MCP (Model Context Protocol):**
+
+### Internal MCP Sidecar
+- **Kernel Ops:** Execute code, introspect state
+- **DB Queries:** Access schemas, query history
+- **Schema Introspection:** Metadata, lineage
+- **Kernel Variables:** Dataframes, in-memory state
+- **Local Files:** Notebooks, CSVs, config
+
+### External MCP Servers
+- **dbt Cloud/Core:** Lineage, documentation
+- **Slack:** Threads, decisions, discussions
+- **Jira:** Tickets, issues, changes
+- **GDocs/Notion:** Design docs, wikis
+- **Snowflake/Databricks:** Query logs, statistics
+
+<Check>
+**Result:** SignalPilot can reason across database schemas, dbt lineage, past Slack discussions, Jira tickets, and historical investigations
+</Check>
+
+---
+
+## 2. Production-Ready Agent Orchestration Loop
+
+Unlike single-shot completions, SignalPilot runs a **continuous orchestration loop:**
+
+<Steps>
+<Step title="Resolve Contexts (PARALLEL)">
+  - Fetch relevant schemas
+  - Load dbt lineage
+  - Find related Slack threads
+  - Retrieve past investigation notebooks
+</Step>
+
+<Step title="Build System Prompt">
+  Aggregate all context into a unified system prompt
+</Step>
+
+<Step title="Call LLM (Stream Response)">
+  - Extended thinking (Claude Sonnet 4.5)
+  - Tool use (execute code, query DB)
+</Step>
+
+<Step title="Execute Tools (PARALLEL)">
+  - Kernel ops, DB queries, schema checks
+</Step>
+
+<Step title="Stream Results + Completion Check">
+  Loop until done or user stops
+</Step>
+</Steps>
+
+### Key Innovations
+
+<Tip>
+- **Parallel context resolution:** Fast, doesn't block LLM
+- **Continuous completion checking:** Knows when to stop
+- **Tool execution in parallel:** Efficient
+- **Multi-step iteration:** Not single-shot
+</Tip>
+
+---
+
+## 3. Multi-Session Memory & Hooks
+
+### Memory
+
+SignalPilot captures and reuses institutional knowledge:
+
+- **Analysis history:** What hypotheses were tested? Ruled out?
+- **Validated assumptions:** "Revenue calculation uses net, not gross"
+- **Known data quirks:** "Orders table has duplicates before 2024"
+- **Past solutions:** "Last time this spiked, it was timezone issues"
+
+### Hooks
+
+Custom constraints and validations:
+
+- **Pre-execution validation:** "Only query prod DB during office hours"
+- **Data quality checks:** "Warn if row count changed >20%"
+- **Custom rules:** "Always use vectorized pandas, never loops"
+- **Audit logging:** Track what data was accessed and when
+
+---
+
+## Security & Control
+
+Despite broad access, you maintain full control:
+
+<AccordionGroup>
+<Accordion title="Read-Only MCP Connections">
+  No writes to production systems — all connections are read-only
+</Accordion>
+
+<Accordion title="Scope Control">
+  Choose which schemas/projects to connect — granular permissions
+</Accordion>
+
+<Accordion title="Approval Workflows">
+  Planning Mode requires explicit confirmation before execution
+</Accordion>
+
+<Accordion title="Hooks Constraints">
+  Enforce custom rules via pre-execution hooks
+</Accordion>
+
+<Accordion title="Local-First Execution">
+  Code runs in your environment — never on SignalPilot servers
+</Accordion>
+
+<Accordion title="Zero Data Retention">
+  No data stored on SignalPilot servers — full privacy
+</Accordion>
+
+<Accordion title="Audit Trail">
+  See what context was accessed and when
+</Accordion>
+</AccordionGroup>
+
+<Card title="Learn more about security" icon="shield" href="/introduction/security-and-privacy">
+  Deep dive into security architecture and privacy controls
+</Card>

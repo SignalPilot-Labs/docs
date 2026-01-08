@@ -1,0 +1,79 @@
+---
+title: "What is SignalPilot?"
+description: "Context Orchestration for AI-native Data Teams"
+---
+
+# What is SignalPilot?
+
+<Info>
+This page establishes SignalPilot as a **Context Orchestration Engine** rather than just a Jupyter extension.
+</Info>
+
+## Context Orchestration for AI-native Data Teams
+
+When leadership asks "why did remote assist interventions spike last week?" — the answer lives across your dbt models, S3 transformation logic, design docs, Jira tickets about recent changes, and Slack threads where your team already debugged a related issue.
+
+### The Problem
+
+Analysts spend 80% of investigation time re-collecting context that already exists somewhere. Claude, Cursor, and Copilot accelerate the last mile of writing code — but can't help with the first mile of knowing *what* to look for and *where* the truth lives.
+
+### The Solution
+
+SignalPilot is a Jupyter-native AI agent with a **context orchestration layer** purpose-built for data investigation. It can reason about your data because it has access to your full organizational context.
+
+## We Connect (Read-Only) To:
+
+<CardGroup cols={2}>
+  <Card title="Data Warehouses" icon="database">
+    Snowflake, Databricks, Postgres: schemas, query history, data profiles
+  </Card>
+  <Card title="dbt Projects" icon="diagram-project">
+    Model definitions, lineage, transformation logic
+  </Card>
+  <Card title="Collaboration Tools" icon="users">
+    Slack, GDocs, Notion, Jira via MCP: past decisions, threads
+  </Card>
+  <Card title="Analysis History" icon="clock-rotate-left">
+    Notebooks & prior investigations: conclusions, validated assumptions
+  </Card>
+</CardGroup>
+
+## How It Works at Your Company
+
+<Steps>
+<Step title="Analyst receives question">
+  *"Why did on-road event detection rates change after last week's deploy?"*
+</Step>
+
+<Step title="SignalPilot agent investigates">
+  - Identifies relevant dbt models and upstream S3 sources
+  - Pulls the Jira ticket for the recent deploy and linked design doc
+  - Finds a Slack thread where a teammate flagged a related anomaly
+  - Checks transformation lineage for schema drift
+</Step>
+
+<Step title="Agent plans, iterates, and executes">
+  Runs targeted queries to validate hypotheses — grounded in actual context, not hallucinated table names
+</Step>
+
+<Step title="Delivers actionable report">
+  Investigation report your C-suite can act on — with provenance back to source systems
+</Step>
+</Steps>
+
+## Why This Isn't Another Tool to Manage
+
+Claude and Cursor are general-purpose coding assistants, while SignalPilot is purpose-built for data investigation — it runs where your analysis already lives (Jupyter, soon VS Code) and connects to context those tools can't access.
+
+<Tip>
+**Think of it as:** The difference between giving an intern a database connection vs. giving them 6 months of institutional knowledge about how your data actually works.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="See comparison table" icon="balance-scale" href="/introduction/why-signalpilot">
+    Compare SignalPilot vs ChatGPT, Copilot, and other tools
+  </Card>
+  <Card title="Understand the architecture" icon="sitemap" href="/introduction/how-it-works">
+    Deep dive into MCP sidecar and agent orchestration
+  </Card>
+</CardGroup>

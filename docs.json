@@ -1,123 +1,104 @@
 {
   "$schema": "https://mintlify.com/docs.json",
+  "name": "SignalPilot",
   "theme": "mint",
-  "name": "Mint Starter Kit",
-  "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
   },
-  "navbar": {
-    "links": [
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#6D28D9",
+    "light": "#C4B5FD",
+    "dark": "#6D28D9"
+  },
+  "navigation": {
+    "groups": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "group": "Introduction",
+        "pages": [
+          "index",
+          "introduction/what-is-signalpilot",
+          "introduction/why-signalpilot",
+          "introduction/how-it-works",
+          "introduction/security-and-privacy"
+        ]
+      },
+      {
+        "group": "Getting Started",
+        "pages": [
+          "getting-started/installation",
+          "getting-started/quickstart",
+          "getting-started/key-concepts"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "guides/investigating-revenue-drops",
+          "guides/debugging-data-quality",
+          "guides/analyzing-timeseries",
+          "guides/working-with-dbt",
+          "guides/customizing-hooks"
+        ]
+      },
+      {
+        "group": "Integrations",
+        "pages": [
+          "integrations/mcp-overview"
+        ]
+      },
+      {
+        "group": "Database Connections",
+        "pages": [
+          "integrations/databases/postgresql",
+          "integrations/databases/snowflake",
+          "integrations/databases/databricks",
+          "integrations/databases/mysql"
+        ]
+      },
+      {
+        "group": "Collaboration Tools",
+        "pages": [
+          "integrations/dbt-integration",
+          "integrations/collaboration/slack",
+          "integrations/collaboration/jira"
+        ]
+      },
+      {
+        "group": "Agent Modes",
+        "pages": [
+          "reference/agent-modes/agent-mode",
+          "reference/agent-modes/hands-on-mode",
+          "reference/agent-modes/ask-mode"
+        ]
+      },
+      {
+        "group": "Cell-Level Editing",
+        "pages": [
+          "reference/cell-editing/inline-edit",
+          "reference/cell-editing/tab-autocomplete"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/cli-commands",
+          "reference/configuration",
+          "reference/troubleshooting"
+        ]
+      },
+      {
+        "group": "Deep Dives",
+        "pages": [
+          "deep-dives/context-aggregation",
+          "deep-dives/agent-orchestration-loop",
+          "deep-dives/multi-session-memory",
+          "deep-dives/hooks-system",
+          "deep-dives/extended-thinking"
+        ]
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   },
   "appearance": {
     "default": "dark"

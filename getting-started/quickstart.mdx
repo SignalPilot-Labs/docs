@@ -1,0 +1,158 @@
+---
+title: "Quickstart: First Analysis in 5 Minutes"
+description: "Go from installation to your first data insight in under 5 minutes"
+---
+
+# Quickstart: First Analysis in 5 Minutes
+
+<Info>
+**Time commitment:** 5 minutes
+**Outcome:** Complete a real data analysis with SignalPilot's AI agent
+</Info>
+
+## Prerequisites
+
+<Check>
+Ensure you have SignalPilot installed. If not, run:
+```bash
+uvx signalpilot
+```
+</Check>
+
+---
+
+## Step-by-Step Tutorial
+
+<Steps>
+<Step title="Launch SignalPilot">
+  ```bash
+  uvx signalpilot
+  ```
+
+  Your browser will open Jupyter Lab at `http://localhost:8888`
+
+  <Check>
+  **Expected:** SignalPilot panel visible in left sidebar
+  </Check>
+</Step>
+
+<Step title="Create a new notebook">
+  Click **File → New → Notebook** and select **Python 3**
+
+  Name it `revenue-analysis.ipynb`
+</Step>
+
+<Step title="Load sample data">
+  In the first cell, load a sample dataset:
+
+  ```python
+  import pandas as pd
+  import numpy as np
+
+  # Create sample revenue data
+  dates = pd.date_range('2025-01-01', '2025-12-31', freq='D')
+  revenue = pd.DataFrame({
+      'date': dates,
+      'revenue': np.random.randint(1000, 5000, len(dates)) +
+                 (np.sin(np.arange(len(dates)) / 7) * 500).astype(int)
+  })
+
+  revenue.head()
+  ```
+
+  <Check>
+  **Expected:** DataFrame with date and revenue columns displayed
+  </Check>
+</Step>
+
+<Step title="Ask SignalPilot to analyze">
+  Open the SignalPilot chat panel (left sidebar) and ask:
+
+  ```
+  Analyze this revenue data. Show me:
+  1. Total revenue for the year
+  2. Average daily revenue
+  3. A time-series plot showing trends
+  4. Identify any anomalies or patterns
+  ```
+
+  <Check>
+  **Expected:** SignalPilot creates multiple cells with:
+  - Aggregation queries
+  - Visualization code
+  - Statistical analysis
+  - Interpretation of results
+  </Check>
+</Step>
+
+<Step title="Iterate on the analysis">
+  Ask a follow-up question:
+
+  ```
+  What's the week-over-week revenue growth rate? Show me a chart.
+  ```
+
+  <Check>
+  **Expected:** SignalPilot adds new cells calculating WoW growth and visualizing it
+  </Check>
+</Step>
+</Steps>
+
+---
+
+## What You Just Learned
+
+<AccordionGroup>
+<Accordion title="Context Awareness">
+  SignalPilot automatically understood the `revenue` dataframe in your kernel and used it without you having to copy-paste or describe it.
+</Accordion>
+
+<Accordion title="Multi-Step Planning">
+  The agent broke down your request into multiple steps: aggregation, visualization, and interpretation.
+</Accordion>
+
+<Accordion title="Iteration">
+  You asked a follow-up question, and SignalPilot used context from the previous analysis to build on it.
+</Accordion>
+
+<Accordion title="Code Generation">
+  SignalPilot wrote executable pandas and matplotlib code directly into notebook cells.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Connect Real Data" icon="database" href="/integrations/databases/postgresql">
+    Connect to your data warehouse
+  </Card>
+  <Card title="Learn Key Concepts" icon="book" href="/getting-started/key-concepts">
+    Understand agents, modes, and context
+  </Card>
+  <Card title="Investigate Revenue Drops" icon="chart-line-down" href="/guides/investigating-revenue-drops">
+    Follow a real-world investigation guide
+  </Card>
+  <Card title="dbt Integration" icon="diagram-project" href="/integrations/dbt-integration">
+    Connect to your dbt project for lineage
+  </Card>
+</CardGroup>
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="SignalPilot doesn't see my dataframe">
+  **Solution:** Ensure you've executed the cell that creates the dataframe. SignalPilot reads from the active kernel state.
+</Accordion>
+
+<Accordion title="Code isn't executing">
+  **Solution:** Check that you're in **Agent Mode** (not Ask Mode). You can switch modes in the SignalPilot panel.
+</Accordion>
+
+<Accordion title="Chart not displaying">
+  **Solution:** Ensure matplotlib is installed: `uv add matplotlib`
+</Accordion>
+</AccordionGroup>

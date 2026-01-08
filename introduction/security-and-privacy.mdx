@@ -1,0 +1,188 @@
+---
+title: "Security & Privacy"
+description: "How SignalPilot protects your data with read-only MCP, scope control, and zero data retention"
+---
+
+# Security & Privacy
+
+<Info>
+SignalPilot is designed with security-first principles: read-only access, local-first execution, and zero data retention.
+</Info>
+
+## Core Security Principles
+
+<CardGroup cols={2}>
+  <Card title="Read-Only Access" icon="lock">
+    All MCP connections are read-only — no writes to production systems
+  </Card>
+  <Card title="Local-First Execution" icon="computer">
+    Code runs in your environment — never on SignalPilot servers
+  </Card>
+  <Card title="Zero Data Retention" icon="trash">
+    No data stored on SignalPilot servers — full privacy
+  </Card>
+  <Card title="Audit Trail" icon="list-check">
+    Track what context was accessed and when
+  </Card>
+</CardGroup>
+
+---
+
+## MCP Read-Only Access Model
+
+SignalPilot uses the **Model Context Protocol (MCP)** to connect to your data stack:
+
+### Internal MCP Sidecar
+
+The internal sidecar runs **within your Jupyter environment**:
+
+- ✅ **Kernel introspection:** Read variables, dataframes
+- ✅ **Schema queries:** Read table metadata
+- ✅ **Query history:** Read past queries (no execution)
+- ❌ **Database writes:** Not possible
+- ❌ **File system writes:** Not possible (except notebooks)
+
+### External MCP Servers
+
+External MCP servers are **read-only by design**:
+
+| Integration | What SignalPilot Can Read | What It Cannot Do |
+|-------------|--------------------------|-------------------|
+| **dbt** | Model definitions, lineage, docs | Modify models, run dbt commands |
+| **Slack** | Public channel threads, messages | Post messages, access private DMs |
+| **Jira** | Tickets, comments, metadata | Create/modify tickets |
+| **Snowflake/Databricks** | Query logs, metadata | Execute queries, modify data |
+
+<Warning>
+SignalPilot can **read sensitive information** from connected systems. Use scope control to limit access.
+</Warning>
+
+---
+
+## Approval Workflows
+
+SignalPilot includes built-in approval mechanisms:
+
+<Steps>
+<Step title="Agent/Planning Mode">
+  Agent creates a plan and **waits for your approval** before execution
+
+  <Tip>
+  Use Planning Mode for high-stakes investigations or production queries
+  </Tip>
+</Step>
+
+<Step title="Hands-On Mode">
+  Agent suggests code, but **you execute manually** in cells
+</Step>
+
+<Step title="Ask Mode">
+  Agent is **read-only** — no code execution, only answers questions
+</Step>
+</Steps>
+
+---
+
+## Hooks: Custom Constraints
+
+Enforce your own rules via pre-execution hooks:
+
+### Example: Production Query Hours
+
+```python
+# Only allow prod queries during business hours
+def validate_query(query, context):
+    if is_prod_db(context) and not is_business_hours():
+        raise ValidationError("Production queries only allowed 9am-5pm EST")
+```
+
+### Example: Row Count Changes
+
+```python
+# Warn if row count changes significantly
+def check_row_count(result, context):
+    if abs(result.row_count - context.expected_count) > 0.2:
+        warning("Row count changed by >20% — verify data quality")
+```
+
+### Example: Vectorization Enforcement
+
+```python
+# Require vectorized pandas operations
+def validate_code(code):
+    if "for " in code and "df" in code:
+        raise ValidationError("Use vectorized pandas operations, not loops")
+```
+
+---
+
+## Data Retention & Privacy
+
+<AccordionGroup>
+<Accordion title="What SignalPilot Stores">
+  - **Session metadata:** Timestamps, user IDs (anonymized)
+  - **Error logs:** Stack traces (no data values)
+  - **Usage metrics:** Feature usage, performance
+</Accordion>
+
+<Accordion title="What SignalPilot Does NOT Store">
+  - ❌ **Query results:** Never stored on our servers
+  - ❌ **Database schemas:** Read in real-time, not cached
+  - ❌ **Slack messages:** Read via MCP, not stored
+  - ❌ **Source code:** Notebooks stay local
+</Accordion>
+
+<Accordion title="Data in Transit">
+  - **TLS 1.3:** All connections encrypted
+  - **API keys:** Stored locally, never transmitted
+  - **MCP connections:** Encrypted via SSH/TLS
+</Accordion>
+</AccordionGroup>
+
+---
+
+## SOC 2 Compliance
+
+<Info>
+SignalPilot is **SOC 2 Type II compliant** (status: in progress as of 2026).
+</Info>
+
+We follow industry best practices for:
+- Access controls and authentication
+- Data encryption (at rest and in transit)
+- Incident response and monitoring
+- Vendor risk management
+
+---
+
+## Audit Trail
+
+Track all context access via the audit log:
+
+```json
+{
+  "timestamp": "2026-01-07T14:32:00Z",
+  "user": "analyst@company.com",
+  "action": "mcp_query",
+  "resource": "snowflake.analytics.revenue",
+  "query": "SELECT date, SUM(revenue) FROM revenue GROUP BY 1",
+  "status": "success"
+}
+```
+
+<Tip>
+Export audit logs to your SIEM for compliance monitoring
+</Tip>
+
+---
+
+## Questions?
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="gears" href="/introduction/how-it-works">
+    Understand the MCP architecture
+  </Card>
+  <Card title="Get started" icon="rocket" href="/getting-started/installation">
+    Install SignalPilot securely
+  </Card>
+</CardGroup>
