@@ -13,87 +13,136 @@
     "dark": "#6D28D9"
   },
   "navigation": {
-    "groups": [
+    "tabs": [
       {
-        "group": "Introduction",
-        "pages": [
-          "index",
-          "introduction/why-signalpilot",
-          "introduction/how-it-works",
-          "introduction/security-and-privacy"
+        "tab": "Docs",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": [
+              "index",
+              "introduction/why-signalpilot",
+              "introduction/how-it-works",
+              "introduction/security-and-privacy"
+            ]
+          },
+          {
+            "group": "Getting Started",
+            "pages": [
+              "getting-started/quickstart",
+              "getting-started/installation",
+              "getting-started/key-concepts"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              {
+                "group": "Database Connections",
+                "pages": [
+                  "integrations/databases/postgresql",
+                  "integrations/databases/snowflake",
+                  "integrations/databases/databricks",
+                  "integrations/databases/mysql"
+                ]
+              },
+              {
+                "group": "External Tools (MCP)",
+                "pages": [
+                  "integrations/mcp-overview",
+                  "integrations/dbt-integration",
+                  "integrations/collaboration/slack",
+                  "integrations/collaboration/jira"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Core",
+            "pages": [
+              {
+                "group": "Agent Modes",
+                "pages": [
+                  "reference/agent-modes/agent-mode",
+                  "reference/agent-modes/hands-on-mode",
+                  "reference/agent-modes/ask-mode"
+                ]
+              },
+              {
+                "group": "Cell-Level Editing",
+                "pages": [
+                  "reference/cell-editing/inline-edit",
+                  "reference/cell-editing/tab-autocomplete"
+                ]
+              }
+            ]
+          }
         ]
       },
       {
-        "group": "Getting Started",
-        "pages": [
-          "getting-started/quickstart",
-          "getting-started/installation",
-          "getting-started/key-concepts"
-        ]
-      },
-      {
-        "group": "Guides",
-        "pages": [
-          "guides/investigating-revenue-drops",
-          "guides/debugging-data-quality",
-          "guides/analyzing-timeseries",
-          "guides/working-with-dbt",
-          "guides/customizing-hooks"
-        ]
-      },
-      {
-        "group": "Database Connections",
-        "pages": [
-          "integrations/databases/postgresql",
-          "integrations/databases/snowflake",
-          "integrations/databases/databricks",
-          "integrations/databases/mysql"
-        ]
-      },
-      {
-        "group": "Integrations",
-        "pages": [
-          "integrations/mcp-overview",
-          "integrations/dbt-integration",
-          "integrations/collaboration/slack",
-          "integrations/collaboration/jira"
-        ]
-      },
-      
-      {
-        "group": "Agent Modes",
-        "pages": [
-          "reference/agent-modes/agent-mode",
-          "reference/agent-modes/hands-on-mode",
-          "reference/agent-modes/ask-mode"
-        ]
-      },
-      {
-        "group": "Cell-Level Editing",
-        "pages": [
-          "reference/cell-editing/inline-edit",
-          "reference/cell-editing/tab-autocomplete"
-        ]
-      },
-      {
-        "group": "Reference",
-        "pages": [
-          "reference/cli-commands",
-          "reference/configuration",
-          "reference/troubleshooting"
-        ]
-      },
-      {
-        "group": "Deep Dives",
-        "pages": [
-          "deep-dives/context-aggregation",
-          "deep-dives/agent-orchestration-loop",
-          "deep-dives/multi-session-memory",
-          "deep-dives/hooks-system",
-          "deep-dives/extended-thinking"
+        "tab": "Use Cases",
+        "groups": [
+          {
+            "group": "Real-World Examples",
+            "pages": [
+              "guides/investigating-revenue-drops",
+              "guides/debugging-data-quality",
+              "guides/analyzing-timeseries",
+              "guides/working-with-dbt",
+              "guides/customizing-hooks"
+            ]
+          }
         ]
       }
-    ]
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Homepage",
+          "href": "https://signalpilot.ai",
+          "icon": "house"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://signalpilot.ai/blog",
+          "icon": "newspaper"
+        },
+        {
+          "anchor": "Community",
+          "href": "https://discord.gg/signalpilot",
+          "icon": "discord"
+        },
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/SignalPilot-Labs",
+          "icon": "github"
+        }
+      ]
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@signalpilot.ai"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "See Demo Now",
+      "href": "https://signalpilot.ai/use-cases"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/signalpilot",
+      "github": "https://github.com/signalpilot",
+      "linkedin": "https://linkedin.com/company/signalpilot",
+      "discord": "https://discord.gg/signalpilot"
+    }
+  },
+  "background": {
+    "decoration": "gradient"
   },
   "appearance": {
     "default": "dark"
