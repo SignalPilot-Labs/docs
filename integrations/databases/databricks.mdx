@@ -1,14 +1,167 @@
 ---
-title: "Databricks Integration"
-description: "Connect SignalPilot to Databricks"
+title: "Databricks"
+description: "Connect SignalPilot to Databricks for lakehouse analysis with Unity Catalog support"
 ---
 
-# Databricks Integration
+# Databricks Connection
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 2 implementation.
-</Warning>
+Connect your Databricks workspace to enable AI-powered analysis across your lakehouse data with full catalog, schema, and table introspection.
 
-<Card title="Coming Soon" icon="database">
-Full Databricks integration guide will be added during Phase 2 of documentation restructuring.
-</Card>
+<Info>
+**What you'll need:** Workspace URL, authentication (access token or service principal), SQL warehouse HTTP path, and catalog/schema names.
+</Info>
+
+## Quick Setup
+
+<Steps>
+<Step title="Get connection details from SQL Warehouse">
+  In Databricks:
+  1. Go to **SQL Warehouses** → Select your warehouse
+  2. Click **Connection Details** tab
+  3. Copy **Server hostname** and **HTTP path**
+</Step>
+
+<Step title="Generate authentication">
+  **Access Token:** **Settings** → **Developer** → **Access tokens** → **Generate new token**
+
+  Or use Service Principal (see Authentication section)
+</Step>
+
+<Step title="Connect in SignalPilot">
+  **Database** icon → **Add Connection** → **Databricks**
+
+  Enter URL, auth, HTTP path, catalog → **Test Connection**
+
+  <Check>
+  SignalPilot discovers all accessible catalogs, schemas, and tables.
+  </Check>
+</Step>
+</Steps>
+
+## Connection Fields
+
+| Field | Required | Description | Example |
+|-------|----------|-------------|---------|
+| **Connection Name** | ✅ | Friendly label | `Databricks Production` |
+| **Connection URL** | ✅ | Workspace URL | `https://adb-123456789012.3.azuredatabricks.net` |
+| **Authentication** | ✅ | Access Token or Service Principal | See below |
+| **HTTP Path** | ✅ | SQL warehouse path | `/sql/1.0/warehouses/abc123def456` |
+| **Catalog** | ✅ | Unity Catalog name | `main`, `prod` |
+| **Schema** | Optional | Default schema | `analytics` |
+
+<Note>
+Credentials are encrypted locally using **AES-256**.
+</Note>
+
+## Authentication
+
+<Tabs>
+<Tab title="Access Token">
+  **For:** Individual use, development
+
+  **How to create:**
+  1. **Settings** → **Developer** → **Access tokens**
+  2. **Generate new token** → Set description and lifetime
+  3. Copy token immediately
+
+  **Paste in:** Databricks Access Token field
+</Tab>
+
+<Tab title="Service Principal">
+  **For:** Teams, production
+
+  **How to create:**
+  1. **Admin Console** → **Service Principals** → **Add**
+  2. Name it (e.g., "SignalPilot")
+  3. **OAuth secrets** → **Generate secret**
+  4. Copy **Application ID** (Client ID) and **Secret**
+
+  **Enter:**
+  - **Client ID:** Application ID
+  - **Client Secret:** OAuth secret
+</Tab>
+</Tabs>
+
+## Key Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Unity Catalog" icon="books">
+    Three-level namespace: catalog.schema.table
+  </Card>
+
+  <Card title="Delta Lake" icon="table">
+    Query Delta tables with time travel support
+  </Card>
+
+  <Card title="Schema Discovery" icon="magnifying-glass">
+    Auto-introspect catalogs, schemas, tables, columns
+  </Card>
+
+  <Card title="Optimized SQL" icon="bolt">
+    Generate Databricks SQL with proper syntax
+  </Card>
+</CardGroup>
+
+## Security Best Practices
+
+<AccordionGroup>
+<Accordion title="Read-only service principal" icon="user-shield">
+  ```sql
+  -- Grant catalog access
+  GRANT USE CATALOG ON CATALOG main TO `sp-id`;
+  GRANT USE SCHEMA ON SCHEMA main.analytics TO `sp-id`;
+  GRANT SELECT ON SCHEMA main.analytics TO `sp-id`;
+  ```
+</Accordion>
+
+<Accordion title="Rotate tokens regularly" icon="rotate">
+  - Set expiration when generating tokens
+  - Rotate OAuth secrets every 6-12 months
+  - Revoke old credentials after rotation
+</Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Connection timeout" icon="clock">
+  **Solutions:**
+  - Verify workspace URL format: `https://adb-<id>.<region>.azuredatabricks.net`
+  - Ensure SQL Warehouse is running
+  - Check network/firewall settings
+</Accordion>
+
+<Accordion title="Authentication failed" icon="lock">
+  **Solutions:**
+  - Generate new access token
+  - Verify service principal has catalog permissions
+  - Check token hasn't expired
+</Accordion>
+
+<Accordion title="'Catalog does not exist'" icon="ban">
+  **Solutions:**
+  - List catalogs: `SHOW CATALOGS`
+  - Use `hive_metastore` if Unity Catalog isn't enabled
+  - Grant access: `GRANT USE CATALOG ON CATALOG main TO user`
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Query Your Lakehouse" icon="play" href="/getting-started/quickstart">
+    Start analyzing Databricks data
+  </Card>
+
+  <Card title="dbt + Databricks" icon="diagram-project" href="/integrations/dbt-integration">
+    Connect dbt for Unity Catalog lineage
+  </Card>
+
+  <Card title="Snowflake" icon="snowflake" href="/integrations/databases/snowflake">
+    Add data warehouse connection
+  </Card>
+
+  <Card title="MCP Overview" icon="plug" href="/integrations/mcp-overview">
+    External context connections
+  </Card>
+</CardGroup>

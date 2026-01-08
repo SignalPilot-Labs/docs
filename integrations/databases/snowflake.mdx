@@ -1,14 +1,296 @@
 ---
-title: "Snowflake Integration"
-description: "Connect SignalPilot to Snowflake"
+title: "Snowflake"
+description: "Connect SignalPilot to Snowflake for data warehouse analysis with full schema introspection"
 ---
 
-# Snowflake Integration
+# Snowflake Connection
+
+Connect your Snowflake data warehouse to enable AI-powered analysis across all your databases, schemas, and tables.
+
+<Info>
+**What you'll need:** Snowflake account URL, username, password, and optional warehouse/database/role configuration.
+</Info>
+
+## Quick Setup
+
+<Steps>
+<Step title="Open Database Connections">
+  In SignalPilot, click **Database** icon → **Add Connection** → Select **Snowflake**
+</Step>
+
+<Step title="Get your Snowflake account URL">
+  In Snowflake:
+  1. Go to **Admin** → **Accounts**
+  2. Click the three dots (**…**) next to your account
+  3. Select **Manage URLs** → Copy the **Current URL**
+
+  <Frame>
+  <img src="/images/snowflake-url.png" alt="Finding Snowflake account URL" />
+  </Frame>
+</Step>
+
+<Step title="Enter credentials and test">
+  Fill in Connection URL, Username, Password, and optional fields
+
+  Click **Test Connection** → **Create Connection**
+
+  <Check>
+  SignalPilot discovers all accessible databases and schemas automatically.
+  </Check>
+</Step>
+</Steps>
+
+## Connection Fields
+
+| Field | Required | Description | Example |
+|-------|----------|-------------|---------|
+| **Connection Name** | ✅ | Friendly label | `Finance Warehouse`, `Snowflake Analytics` |
+| **Connection URL** | ✅ | Your Snowflake account URL | `https://abcdefg-do12345.snowflakecomputing.com` |
+| **Username** | ✅ | Snowflake login username | `db_user` |
+| **Password** | ✅ | User password | `••••••••` |
+| **Database** | Optional | Default database to use | `ANALYTICS_DB` |
+| **Warehouse** | Optional | Compute warehouse for queries | `COMPUTE_WH` |
+| **Role** | Optional | Snowflake role to assume | `SYSADMIN`, `ANALYST_ROLE` |
+| **Description** | Optional | Notes about this connection | `Production data warehouse` |
+
+<Note>
+Credentials are encrypted locally using **AES-256** before storage.
+</Note>
+
+## Field Details
+
+<AccordionGroup>
+<Accordion title="Connection URL" icon="link">
+  **Format:** `https://<account_locator>-<account_name>.snowflakecomputing.com`
+
+  **Where to find it:**
+  - Snowflake UI: **Admin** → **Accounts** → **Manage URLs**
+  - URL bar when logged into Snowflake
+  - From your database admin
+
+  **Examples:**
+  - `https://xy12345.us-east-1.snowflakecomputing.com`
+  - `https://abc-def123.snowflakecomputing.com`
+</Accordion>
+
+<Accordion title="Database (Optional)" icon="database">
+  **What it does:** Sets the default database context for queries
+
+  **When to specify:**
+  - You only need access to one database
+  - You want to limit schema discovery to specific database
+
+  **When to leave blank:**
+  - You want SignalPilot to access all databases
+  - You work across multiple databases
+
+  If blank, SignalPilot pulls schema from every accessible database (may be slower for large accounts).
+</Accordion>
+
+<Accordion title="Warehouse (Optional)" icon="server">
+  **What it does:** Specifies the compute warehouse for query execution
+
+  **Required for:** Schema introspection and running queries
+
+  **If not specified:** SignalPilot will use your account's default warehouse or prompt you to select one
+
+  **Example:** `COMPUTE_WH`, `ANALYTICS_WH`, `DEV_WH`
+
+  <Tip>
+  Use a small warehouse (X-SMALL or SMALL) for development work to minimize costs.
+  </Tip>
+</Accordion>
+
+<Accordion title="Role (Optional)" icon="user">
+  **What it does:** Determines which databases and tables you can access
+
+  **Common roles:**
+  - `SYSADMIN` - Full access to all objects
+  - `PUBLIC` - Default role with minimal access
+  - Custom roles - Team-specific access
+
+  **If not specified:** Uses your account's default role
+
+  <Warning>
+  Ensure the role has SELECT permissions on the databases/schemas you need. Contact your Snowflake admin to grant access.
+  </Warning>
+</Accordion>
+</AccordionGroup>
+
+## What SignalPilot Can Do
+
+Once connected, the AI agent can:
+
+<CardGroup cols={2}>
+  <Card title="Multi-Database Access" icon="layer-group">
+    Query across all accessible Snowflake databases seamlessly
+  </Card>
+
+  <Card title="Schema Discovery" icon="magnifying-glass">
+    Automatically introspect databases, schemas, tables, and columns
+  </Card>
+
+  <Card title="Query Generation" icon="code">
+    Generate optimized Snowflake SQL with context-aware suggestions
+  </Card>
+
+  <Card title="Performance Insights" icon="gauge">
+    Access query history and performance metadata
+  </Card>
+</CardGroup>
+
+**Example interaction:**
+```
+You: "What databases are available?"
+
+Agent: [Lists all accessible databases]
+        "Found 3 databases:
+        - PRODUCTION_DB (345 tables)
+        - ANALYTICS_DB (127 tables)
+        - STAGING_DB (89 tables)"
+
+You: "Show me revenue by product from ANALYTICS_DB for last month"
+
+Agent: [Generates and executes Snowflake SQL]
+        [Loads results into dataframe]
+```
+
+## Security Best Practices
 
 <Warning>
-This page is a placeholder. Content will be added during Phase 2 implementation.
+**Never commit Snowflake credentials to git**. SignalPilot encrypts and stores them locally only.
 </Warning>
 
-<Card title="Coming Soon" icon="database">
-Full Snowflake integration guide will be added during Phase 2 of documentation restructuring.
-</Card>
+<AccordionGroup>
+<Accordion title="Use service accounts with limited roles" icon="user-shield">
+  Create a dedicated Snowflake user for SignalPilot:
+
+  ```sql
+  -- Create read-only role
+  CREATE ROLE signalpilot_readonly;
+
+  -- Grant database access
+  GRANT USAGE ON DATABASE ANALYTICS_DB TO ROLE signalpilot_readonly;
+  GRANT USAGE ON ALL SCHEMAS IN DATABASE ANALYTICS_DB TO ROLE signalpilot_readonly;
+  GRANT SELECT ON ALL TABLES IN DATABASE ANALYTICS_DB TO ROLE signalpilot_readonly;
+  GRANT SELECT ON FUTURE TABLES IN DATABASE ANALYTICS_DB TO ROLE signalpilot_readonly;
+
+  -- Create user and assign role
+  CREATE USER signalpilot PASSWORD='secure_password';
+  GRANT ROLE signalpilot_readonly TO USER signalpilot;
+  ```
+
+  This prevents accidental data modifications.
+</Accordion>
+
+<Accordion title="Use network policies to restrict access" icon="network-wired">
+  Limit Snowflake access to specific IPs:
+
+  ```sql
+  CREATE NETWORK POLICY signalpilot_policy
+    ALLOWED_IP_LIST = ('your.signalpilot.ip/32');
+
+  ALTER USER signalpilot SET NETWORK POLICY = signalpilot_policy;
+  ```
+
+  Contact your Snowflake admin to implement this.
+</Accordion>
+
+<Accordion title="Monitor usage with resource monitors" icon="chart-line">
+  Set up alerts for unexpected compute usage:
+
+  ```sql
+  CREATE RESOURCE MONITOR signalpilot_monitor
+    WITH CREDIT_QUOTA = 100
+    TRIGGERS ON 75 PERCENT DO NOTIFY;
+
+  ALTER WAREHOUSE COMPUTE_WH SET RESOURCE MONITOR = signalpilot_monitor;
+  ```
+
+  Prevents runaway queries from excessive costs.
+</Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Connection timeout or 'Account not found'" icon="clock">
+  **Causes:**
+  - Incorrect account URL
+  - Network connectivity issues
+  - Snowflake account suspended
+
+  **Solutions:**
+  - Verify URL matches Snowflake UI (**Admin** → **Accounts** → **Manage URLs**)
+  - Ensure URL includes `https://` and `.snowflakecomputing.com`
+  - Test connectivity: `ping your-account.snowflakecomputing.com`
+  - Check if your Snowflake trial expired
+</Accordion>
+
+<Accordion title="Authentication failed" icon="lock">
+  **Causes:**
+  - Wrong username or password
+  - MFA enabled (not yet supported)
+  - Account locked
+
+  **Solutions:**
+  - Double-check credentials (Snowflake usernames are case-insensitive)
+  - Disable MFA for service account (or use key-pair authentication - coming soon)
+  - Check account status in Snowflake: `SHOW USERS LIKE 'your_username'`
+</Accordion>
+
+<Accordion title="'Warehouse does not exist' or queries fail" icon="exclamation-triangle">
+  **Causes:**
+  - Warehouse name incorrect
+  - Warehouse suspended
+  - Role doesn't have USAGE permission on warehouse
+
+  **Solutions:**
+  - List available warehouses: `SHOW WAREHOUSES`
+  - Resume warehouse: `ALTER WAREHOUSE COMPUTE_WH RESUME`
+  - Grant access: `GRANT USAGE ON WAREHOUSE COMPUTE_WH TO ROLE your_role`
+</Accordion>
+
+<Accordion title="'Database does not exist' or can't see tables" icon="database">
+  **Causes:**
+  - Database name incorrect
+  - Role lacks USAGE permission on database/schema
+  - Empty database
+
+  **Solutions:**
+  - List accessible databases: `SHOW DATABASES`
+  - Check role permissions: `SHOW GRANTS TO ROLE your_role`
+  - Grant access: `GRANT USAGE ON DATABASE db_name TO ROLE your_role`
+</Accordion>
+
+<Accordion title="Slow schema discovery" icon="hourglass">
+  **Causes:**
+  - Large Snowflake account with many databases
+  - Warehouse too small
+
+  **Solutions:**
+  - Specify a **Database** in connection config to limit discovery
+  - Use a larger warehouse (SMALL or MEDIUM) for initial discovery
+  - After first connection, schema is cached for faster subsequent loads
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Query Your Warehouse" icon="play" href="/getting-started/quickstart">
+    Start analyzing Snowflake data with AI agents
+  </Card>
+
+  <Card title="dbt + Snowflake" icon="diagram-project" href="/integrations/dbt-integration">
+    Connect dbt for model lineage and documentation
+  </Card>
+
+  <Card title="Connect Databricks" icon="databricks" href="/integrations/databases/databricks">
+    Add a lakehouse connection
+  </Card>
+
+  <Card title="MCP Overview" icon="plug" href="/integrations/mcp-overview">
+    Learn about external context connections
+  </Card>
+</CardGroup>

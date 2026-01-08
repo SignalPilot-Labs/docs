@@ -1,14 +1,179 @@
 ---
-title: "MySQL Integration"
-description: "Connect SignalPilot to MySQL"
+title: "MySQL"
+description: "Connect SignalPilot to MySQL databases for schema introspection and query execution"
 ---
 
-# MySQL Integration
+# MySQL Connection
+
+Connect your MySQL database to give SignalPilot access to schemas, tables, and data for AI-powered analysis.
+
+<Info>
+**What you'll need:** Database host, port (default 3306), database name, and credentials.
+</Info>
+
+## Quick Setup
+
+<Steps>
+<Step title="Open Database Connections">
+  In SignalPilot: **Database** icon → **Add Connection** → **MySQL**
+</Step>
+
+<Step title="Enter connection details">
+  Choose your method:
+  - **Configuration form** (recommended)
+  - **Connection URL** (faster with full string)
+</Step>
+
+<Step title="Test and save">
+  **Test Connection** → **Create Connection**
+
+  <Check>
+  SignalPilot validates credentials and discovers schema.
+  </Check>
+</Step>
+</Steps>
+
+## Connection Methods
+
+<Tabs>
+<Tab title="Configuration Form">
+  | Field | Description | Example |
+  |-------|-------------|---------|
+  | **Connection Name** | Friendly label | `Staging DB`, `Customer DB` |
+  | **Host** | Server address | `localhost` or `mydb.abc123.us-east-1.rds.amazonaws.com` |
+  | **Port** | Default: `3306` | `3306` |
+  | **Database** | Database name | `customer_data` |
+  | **Username** | MySQL user | `db_user` |
+  | **Password** | User password | `••••••••` |
+
+  <Note>
+  Credentials encrypted locally using **AES-256**.
+  </Note>
+</Tab>
+
+<Tab title="Connection URL">
+  **Format:**
+  ```
+  mysql://<username>:<password>@<host>:<port>/<database>
+  ```
+
+  **Example:**
+  ```
+  mysql://db_user:mysecretpassword@mydb.abc123.us-east-1.rds.amazonaws.com:3306/customer_data
+  ```
+</Tab>
+</Tabs>
+
+## Finding Connection Details
+
+<AccordionGroup>
+<Accordion title="AWS RDS" icon="aws">
+  1. **RDS Console** → **Databases** → Select instance
+  2. **Endpoint** = host, **Port** = 3306 (default)
+  3. Database name in **Configuration** tab
+  4. Username/password from RDS creation
+</Accordion>
+
+<Accordion title="Local MySQL" icon="server">
+  **Host:** `localhost` or `127.0.0.1`
+
+  **Port:** `3306` (default)
+
+  **Database:** List with `SHOW DATABASES;`
+
+  **Username:** Often `root` or custom user
+</Accordion>
+
+<Accordion title="Google Cloud SQL" icon="google">
+  1. **Cloud SQL** → Select instance
+  2. **Overview** shows public IP (host)
+  3. May need to whitelist IPs or use Cloud SQL Proxy
+</Accordion>
+</AccordionGroup>
+
+## Key Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Schema Inspection" icon="table">
+    Auto-discover tables, columns, and data types
+  </Card>
+
+  <Card title="Query Generation" icon="code">
+    Generate MySQL-specific SQL queries
+  </Card>
+
+  <Card title="Context Awareness" icon="brain">
+    Use schema for accurate code suggestions
+  </Card>
+
+  <Card title="Join Intelligence" icon="link">
+    Infer relationships between tables
+  </Card>
+</CardGroup>
+
+## Security Best Practices
 
 <Warning>
-This page is a placeholder. Content will be added during Phase 2 implementation.
+**Never commit MySQL credentials to git**. SignalPilot encrypts them locally only.
 </Warning>
 
-<Card title="Coming Soon" icon="database">
-Full MySQL integration guide will be added during Phase 2 of documentation restructuring.
-</Card>
+<AccordionGroup>
+<Accordion title="Read-only user" icon="eye">
+  ```sql
+  CREATE USER 'signalpilot_readonly'@'%' IDENTIFIED BY 'secure_password';
+  GRANT SELECT ON customer_data.* TO 'signalpilot_readonly'@'%';
+  FLUSH PRIVILEGES;
+  ```
+</Accordion>
+
+<Accordion title="Network security" icon="shield">
+  - Use IP whitelisting in firewall/security groups
+  - Enable SSL connections when possible
+  - Consider VPN or SSH tunneling
+</Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Connection timeout" icon="clock">
+  **Solutions:**
+  - Verify host and port are correct
+  - Check firewall allows MySQL port (3306)
+  - Ensure MySQL is running: `mysqladmin ping -h <host>`
+</Accordion>
+
+<Accordion title="Access denied" icon="lock">
+  **Solutions:**
+  - Check username/password (no trailing spaces)
+  - Verify user has access: `GRANT SELECT ON database.* TO 'user'@'%'`
+  - Check host permissions in `mysql.user` table
+</Accordion>
+
+<Accordion title="'Unknown database'" icon="exclamation-circle">
+  **Solutions:**
+  - List databases: `SHOW DATABASES;`
+  - Create if needed: `CREATE DATABASE customer_data;`
+  - Check spelling (MySQL is case-sensitive on Linux)
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Query Your Data" icon="play" href="/getting-started/quickstart">
+    Start analyzing MySQL data with AI
+  </Card>
+
+  <Card title="PostgreSQL" icon="database" href="/integrations/databases/postgresql">
+    Connect a PostgreSQL database
+  </Card>
+
+  <Card title="dbt Integration" icon="diagram-project" href="/integrations/dbt-integration">
+    Connect dbt for lineage
+  </Card>
+
+  <Card title="MCP Overview" icon="plug" href="/integrations/mcp-overview">
+    External context connections
+  </Card>
+</CardGroup>

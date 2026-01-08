@@ -1,14 +1,245 @@
 ---
-title: "PostgreSQL Integration"
-description: "Connect SignalPilot to PostgreSQL"
+title: "PostgreSQL"
+description: "Connect SignalPilot to your PostgreSQL database for schema introspection and query execution"
 ---
 
-# PostgreSQL Integration
+## PostgreSQL Connection
+
+Connect your PostgreSQL database to give SignalPilot access to schemas, tables, and data for AI-powered analysis.
+
+<Info>
+**What you'll need:** Database host, port, credentials, and network access from your SignalPilot environment.
+</Info>
+
+## Quick Setup
+
+<Steps>
+<Step title="Open Database Connections">
+  In SignalPilot, click **Database** icon in the sidebar → **Add Connection** → Select **PostgreSQL**
+</Step>
+
+<Step title="Enter connection details">
+  Choose your preferred method:
+  - **Configuration form** (recommended for beginners)
+  - **Connection URL** (faster if you have the full string)
+</Step>
+
+<Step title="Test and save">
+  Click **Test Connection** to verify, then **Create Connection**
+
+  <Check>
+  SignalPilot will validate credentials and discover your database schema.
+  </Check>
+</Step>
+</Steps>
+
+## Connection Methods
+
+<Tabs>
+<Tab title="Configuration Form">
+  **Fill in these fields:**
+
+  | Field | Description | Example |
+  |-------|-------------|---------|
+  | **Connection Name** | Friendly label for reference | `Production DB`, `Analytics` |
+  | **Host** | Server address | `localhost` or `mydb.abc123.us-east-1.rds.amazonaws.com` |
+  | **Port** | Default: `5432` | `5432` |
+  | **Database** | Database name | `analytics` |
+  | **Username** | PostgreSQL user | `db_user` |
+  | **Password** | User password | `••••••••` |
+  | **Description** (optional) | Notes about this connection | `Production analytics warehouse` |
+
+  <Note>
+  Credentials are encrypted locally using **AES-256** before storage.
+  </Note>
+</Tab>
+
+<Tab title="Connection URL">
+  **Paste your full connection string:**
+
+  ```
+  postgresql://<username>:<password>@<host>:<port>/<database>
+  ```
+
+  **Example:**
+  ```
+  postgresql://db_user:mysecretpassword@mydb.abc123.us-east-1.rds.amazonaws.com:5432/analytics
+  ```
+
+  <Tip>
+  This method is faster if you already have a connection string from your cloud provider or database admin.
+  </Tip>
+</Tab>
+</Tabs>
+
+## Finding Your Connection Details
+
+<AccordionGroup>
+<Accordion title="AWS RDS" icon="aws">
+  1. Go to **RDS Console** → **Databases**
+  2. Click your PostgreSQL instance
+  3. Find **Endpoint** (this is your host) and **Port**
+  4. Database name is in **Configuration** tab
+  5. Username/password were set during RDS creation
+
+  **Example endpoint:** `mydb.abc123.us-east-1.rds.amazonaws.com`
+</Accordion>
+
+<Accordion title="Local PostgreSQL" icon="server">
+  **Host:** `localhost` or `127.0.0.1`
+
+  **Port:** `5432` (default)
+
+  **Database:** Check with:
+  ```bash
+  psql -l  # List all databases
+  ```
+
+  **Username:** Your PostgreSQL user (often `postgres` by default)
+</Accordion>
+
+<Accordion title="Heroku Postgres" icon="cloud">
+  1. Go to your Heroku app → **Resources** → **Heroku Postgres**
+  2. Click **Settings** → **View Credentials**
+  3. Copy the **URI** (this is your connection URL)
+
+  Or use individual fields: Host, Database, User, Password, Port
+</Accordion>
+
+<Accordion title="Google Cloud SQL" icon="google">
+  1. Go to **Cloud SQL** → Select your instance
+  2. **Overview** tab shows connection name
+  3. Click **Connect to this instance** for details
+  4. Use **Public IP** as host (or set up Cloud SQL Proxy)
+
+  **Note:** You may need to whitelist SignalPilot's IP or use Cloud SQL Proxy for secure connections.
+</Accordion>
+</AccordionGroup>
+
+## What SignalPilot Can Do
+
+Once connected, the AI agent can:
+
+<CardGroup cols={2}>
+  <Card title="Inspect Schema" icon="table">
+    View tables, columns, data types, and relationships automatically
+  </Card>
+
+  <Card title="Query Data" icon="database">
+    Generate and execute SQL queries based on your requests
+  </Card>
+
+  <Card title="Understand Context" icon="brain">
+    Use schema information to provide accurate suggestions
+  </Card>
+
+  <Card title="Join Tables" icon="link">
+    Automatically infer relationships between tables for complex queries
+  </Card>
+</CardGroup>
+
+**Example interaction:**
+```
+You: "Show me total revenue by region for Q4 2024"
+
+Agent: [Inspects schema, finds revenue_data table with region and date columns]
+        [Generates SQL query with appropriate filters]
+        [Executes query and loads results into dataframe]
+```
+
+## Security Best Practices
 
 <Warning>
-This page is a placeholder. Content will be added during Phase 2 implementation.
+**Never commit database credentials to git or share them in notebooks**. SignalPilot stores encrypted credentials locally.
 </Warning>
 
-<Card title="Coming Soon" icon="database">
-Full PostgreSQL integration guide will be added during Phase 2 of documentation restructuring.
-</Card>
+<AccordionGroup>
+<Accordion title="Use read-only credentials when possible" icon="eye">
+  Create a dedicated PostgreSQL user with SELECT permissions only:
+
+  ```sql
+  CREATE USER signalpilot_readonly WITH PASSWORD 'secure_password';
+  GRANT CONNECT ON DATABASE analytics TO signalpilot_readonly;
+  GRANT USAGE ON SCHEMA public TO signalpilot_readonly;
+  GRANT SELECT ON ALL TABLES IN SCHEMA public TO signalpilot_readonly;
+  ```
+
+  This prevents accidental data modifications through SignalPilot.
+</Accordion>
+
+<Accordion title="Restrict network access" icon="shield">
+  - Use **IP whitelisting** in your firewall/security group
+  - Enable **SSL/TLS connections** (add `?sslmode=require` to connection URL)
+  - Consider **VPN or SSH tunneling** for extra security
+</Accordion>
+
+<Accordion title="Use separate credentials per environment" icon="users">
+  - **Production**: Read-only access, restricted tables
+  - **Staging**: Read-write if needed
+  - **Development**: Broader access to test environments
+
+  Avoid using production credentials in development notebooks.
+</Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Connection timeout" icon="clock">
+  **Causes:**
+  - Firewall blocking connection
+  - Incorrect host/port
+  - Database not running
+
+  **Solutions:**
+  - Verify host and port are correct
+  - Check firewall rules allow connections from SignalPilot
+  - Confirm database is running: `pg_isready -h <host> -p <port>`
+</Accordion>
+
+<Accordion title="Authentication failed" icon="lock">
+  **Causes:**
+  - Wrong username or password
+  - User doesn't have access to specified database
+
+  **Solutions:**
+  - Double-check credentials (watch for trailing spaces)
+  - Verify user has CONNECT permission: `GRANT CONNECT ON DATABASE <db> TO <user>`
+  - Check `pg_hba.conf` allows connections from your IP
+</Accordion>
+
+<Accordion title="SSL/TLS errors" icon="certificate">
+  **For self-signed certificates:**
+  Add `?sslmode=require` to connection URL (not `verify-full`)
+
+  **For proper SSL:**
+  Ensure your PostgreSQL server has valid SSL certificates configured
+</Accordion>
+
+<Accordion title="'Database does not exist'" icon="exclamation-circle">
+  **Solutions:**
+  - List available databases: `psql -h <host> -U <user> -l`
+  - Create the database if needed: `CREATE DATABASE analytics;`
+  - Check spelling of database name (case-sensitive)
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Query Your Data" icon="play" href="/getting-started/quickstart">
+    Start analyzing your PostgreSQL data with AI agents
+  </Card>
+
+  <Card title="Connect Snowflake" icon="snowflake" href="/integrations/databases/snowflake">
+    Add a data warehouse connection
+  </Card>
+
+  <Card title="dbt Integration" icon="diagram-project" href="/integrations/dbt-integration">
+    Connect dbt for model lineage awareness
+  </Card>
+
+  <Card title="MCP Overview" icon="plug" href="/integrations/mcp-overview">
+    Learn about external context connections
+  </Card>
+</CardGroup>
