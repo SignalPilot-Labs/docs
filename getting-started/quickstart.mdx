@@ -3,40 +3,61 @@ title: "Quickstart: First Analysis in 5 Minutes"
 description: "Go from installation to your first data insight in under 5 minutes"
 ---
 
-# Quickstart: First Analysis in 5 Minutes
-
 <Info>
 **Time commitment:** 5 minutes
 **Outcome:** Complete a real data analysis with SignalPilot's AI agent
 </Info>
 
-## Prerequisites
+## Step 1: Install SignalPilot
 
-<Check>
-Ensure you have SignalPilot installed. If not, run:
+**Prerequisites:** macOS, Linux, or Windows (WSL) • Internet connection
+
+**Install SignalPilot:**
 ```bash
 uvx signalpilot
 ```
-</Check>
 
----
+<Accordion title="Don't have uv?" icon="question">
+  Install `uv` first (takes 10 seconds):
 
-## Step-by-Step Tutorial
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ```
 
-<Steps>
-<Step title="Launch SignalPilot">
+  Then run SignalPilot:
   ```bash
   uvx signalpilot
   ```
 
-  Your browser will open Jupyter Lab at `http://localhost:8888`
+  *See [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) for other methods (Homebrew, Windows, etc.)*
+</Accordion>
 
-  <Check>
-  **Expected:** SignalPilot panel visible in left sidebar
-  </Check>
-</Step>
+**What happens:**
+```bash
+✓ Creating workspace at ~/SignalPilotHome
+✓ Installing isolated Python 3.12 + Jupyter Lab + SignalPilot extension
+✓ Installing data packages (pandas, numpy, matplotlib, plotly...)
+⚡ Setup complete in ~2 minutes
 
+→ Launching Jupyter Lab at http://localhost:8888
+```
+
+<Accordion title="More installation options" icon="book">
+  See the [Installation Guide](/getting-started/installation) for:
+  - Manual installation with uv or pip/conda
+  - Working in custom directories (`--here`, `--project`)
+  - Troubleshooting
+  - Alternative installation methods
+</Accordion>
+
+## Step 2: Create Your First Notebook
+
+<Steps>
 <Step title="Create a new notebook">
+  Your browser opened Jupyter Lab at `http://localhost:8888`
+
+  You'll see the **SignalPilot panel** in the left and right sidebar.
+
   Click **File → New → Notebook** and select **Python 3**
 
   Name it `revenue-analysis.ipynb`
@@ -98,7 +119,6 @@ uvx signalpilot
 </Step>
 </Steps>
 
----
 
 ## What You Just Learned
 
@@ -120,8 +140,6 @@ uvx signalpilot
 </Accordion>
 </AccordionGroup>
 
----
-
 ## Next Steps
 
 <CardGroup cols={2}>
@@ -138,8 +156,6 @@ uvx signalpilot
     Connect to your dbt project for lineage
   </Card>
 </CardGroup>
-
----
 
 ## Troubleshooting
 

@@ -26,8 +26,8 @@
       {
         "group": "Getting Started",
         "pages": [
-          "getting-started/installation",
           "getting-started/quickstart",
+          "getting-started/installation",
           "getting-started/key-concepts"
         ]
       },
