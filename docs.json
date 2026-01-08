@@ -45,7 +45,7 @@
               {
                 "group": "External Tools (MCP)",
                 "pages": [
-                  "integrations/skills_and_mcp_servers",
+                  "integrations/skills-and-mcp-servers",
                   "integrations/dbt-integration",
                   "integrations/collaboration/slack",
                   "integrations/collaboration/jira"
