@@ -1,14 +1,255 @@
 ---
 title: "Agent Mode"
-description: "Fully autonomous agent with planning and execution capabilities"
+description: "Fully autonomous agent with planning, execution, and analyst-in-the-loop approval"
 ---
 
 # Agent Mode
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
-</Warning>
+**Maximum automation** — the AI automatically manages context, generates a multi-step plan, and executes code end-to-end with your approval.
 
-<Card title="Coming Soon" icon="robot">
-Full Agent Mode reference will be added during Phase 3 of documentation restructuring.
-</Card>
+<Info>
+**Best for:** Running full analyses with minimal manual intervention. Perfect when you want to give a high-level goal and let the agent handle the details.
+</Info>
+
+## How Agent Mode Works
+
+Agent Mode is the most autonomous workflow in SignalPilot's agentic harness. When you make a request, the agent:
+
+<Steps>
+<Step title="Analyzes context">
+  Reviews your current notebook, available datasets, database connections, and kernel state to understand what's already available.
+</Step>
+
+<Step title="Drafts a plan">
+  Breaks down your request into a step-by-step sequence with clear to-dos, handling dependencies automatically (e.g., load data before analysis).
+</Step>
+
+<Step title="Asks for approval">
+  Shows you the complete plan before executing anything. You can approve, edit, reorder steps, or refine your instructions.
+
+  <Check>
+  **Analyst-in-the-loop approval** ensures you stay in control while the agent handles execution.
+  </Check>
+</Step>
+
+<Step title="Executes step by step">
+  Generates code, creates cells, runs queries, and produces visualizations. Each step is marked as done once completed.
+
+  <Frame>
+  <img src="/images/agent-mode-execution.png" alt="Agent Mode executing plan with progress tracking" />
+  </Frame>
+</Step>
+
+<Step title="Updates dynamically">
+  If results change, errors occur, or you refine your request mid-execution, the plan is revised in real time.
+
+  <Note>
+  You can stop the agent at any moment, edit the plan, and it will regenerate with your changes.
+  </Note>
+</Step>
+</Steps>
+
+## Example Workflow
+
+**Prompt:** "Do dollar cost averaging investment in SPY every month with $1000 for the last 5 years"
+
+**What the agent does:**
+
+1. **Plans the analysis:**
+   - Download historical SPY data for 5 years
+   - Calculate monthly investment amounts ($1000 each)
+   - Compute cumulative shares purchased
+   - Calculate final portfolio value
+   - Generate performance visualization
+
+2. **Shows the plan for approval** — you review and click "Approve"
+
+3. **Executes automatically:**
+   - Creates cells for data download
+   - Writes pandas code for calculations
+   - Generates plotly chart with results
+   - Explains findings in markdown cell
+
+<Check>
+**Result:** Complete analysis in your notebook, ready to review, iterate, or share.
+</Check>
+
+## Planning & Chat Integration
+
+Agent Mode combines two powerful capabilities:
+
+<AccordionGroup>
+<Accordion title="Multi-Step Planning" icon="list-check">
+  Planning makes complex workflows manageable. Instead of juggling multiple instructions, you give one high-level goal and the agent:
+
+  - **Handles dependencies** (e.g., load data before running analysis)
+  - **Tracks progress** with to-do checkboxes
+  - **Adapts to errors** by pausing, showing the issue, and suggesting fixes
+  - **Persists across sessions** — the plan is saved in the notebook
+
+  <Tip>
+  If a step fails, the plan pauses, shows the error, and suggests fixes before continuing. You can also manually edit the plan at any time.
+  </Tip>
+</Accordion>
+
+<Accordion title="Conversational Chat" icon="comments">
+  Chat is the interface for working with the agent. You describe what you want in plain language, and the agent responds with code, explanations, or edits.
+
+  **Key features:**
+  - **Natural language in, code out** — type your request in the chat panel
+  - **Context-aware** — remembers your datasets, connections, and prior steps in the session
+  - **Interactive loop** — accept, reject, or modify suggestions before execution
+  - **@mention context** — explicitly add cells, datasets, or database connections to context
+
+  **Example interactions:**
+  - "Load my CSV file and show me the first 5 rows."
+  - "Connect to my Postgres database and get total sales by region."
+  - "Fix the error in the last cell and explain what went wrong."
+  - "Make the plot use a log scale on the y-axis."
+</Accordion>
+</AccordionGroup>
+
+## Agent Tools
+
+In Agent Mode, the AI has access to these tools to work autonomously:
+
+<Tabs>
+<Tab title="Notebook Operations">
+  **Code generation & execution:**
+  - `read_cells` — inspect existing notebook cells
+  - `edit_cell` — modify code in existing cells
+  - `run_cell` — execute cells and capture output
+  - `delete_cells` — remove cells from notebook
+  - `read_notebook_summary` — understand notebook structure
+</Tab>
+
+<Tab title="Data Access">
+  **Dataset management:**
+  - `search_dataset` — find datasets online (e.g., Yahoo Finance)
+  - `download_dataset` — fetch external data
+  - `read_dataset` — load files from data folder
+  - `list_datasets` — show available local datasets
+
+  **Kernel inspection:**
+  - `inspect_variable` — examine variables and their values from the active kernel
+</Tab>
+
+<Tab title="Planning">
+  **Plan management:**
+  - `read_plan` — view the current notebook plan
+  - `update_plan` — revise the plan based on new information or errors
+</Tab>
+
+<Tab title="External Context (MCP)">
+  **Via Model Context Protocol:**
+  - Database queries (schemas, performance, history)
+  - dbt lineage (Cloud/Core models, documentation, tests)
+  - Slack discussions (relevant threads)
+  - Jira tickets (related issues)
+  - Local files (notebooks, CSVs, configs)
+
+  <Card title="Learn about MCP" icon="plug" href="/integrations/mcp-overview">
+    See how SignalPilot connects to your data stack via MCP
+  </Card>
+</Tab>
+</Tabs>
+
+## Why Agent Mode Matters
+
+Agent Mode transforms your notebook into a collaborative environment where AI works as a true partner:
+
+<CardGroup cols={2}>
+  <Card title="Handle boilerplate" icon="code">
+    No more writing repetitive data loading, cleaning, or transformation code
+  </Card>
+
+  <Card title="Automate workflows" icon="rotate">
+    Multi-step analyses that would take hours are done in minutes
+  </Card>
+
+  <Card title="Stay in control" icon="shield-check">
+    Analyst-in-the-loop approval means you review plans before execution
+  </Card>
+
+  <Card title="Learn & adapt" icon="brain">
+    The agent remembers context within sessions and adapts plans based on results
+  </Card>
+</CardGroup>
+
+## Switching Modes
+
+You can switch between Agent Mode, Hands-On Mode, and Ask Mode anytime using the **mode selector** in the SignalPilot panel.
+
+<Tip>
+Start with Agent Mode for fully automated workflows. If you prefer more granular control over what gets executed, switch to [Hands-On Mode](/reference/agent-modes/hands-on-mode).
+</Tip>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Is Agent Mode safe?" icon="shield-halved">
+  Yes. SignalPilot shows you the plan before execution. You can always:
+  - Stop the agent at any point
+  - Edit or reorder plan steps
+  - Roll back changes
+  - Review generated code before it runs
+
+  The agent never executes code without showing you the plan first.
+</Accordion>
+
+<Accordion title="Why does the agent ask for confirmation first?" icon="question">
+  To give you control. Analyst-in-the-loop approval means you review the full plan before any code runs. This prevents unexpected changes and ensures the agent's approach aligns with your goals.
+</Accordion>
+
+<Accordion title="What happens if a step fails?" icon="exclamation-triangle">
+  The plan pauses, shows the error with context, and suggests fixes. You can:
+  - Accept the suggested fix and continue
+  - Manually edit the code
+  - Refine your original request
+  - Skip the failing step
+
+  The agent won't proceed until the issue is resolved or you approve skipping it.
+</Accordion>
+
+<Accordion title="Can I update the plan mid-execution?" icon="pen">
+  Yes. You can stop the agent at any moment, edit the plan or refine your instructions, and the agent will regenerate the plan with your changes incorporated.
+</Accordion>
+
+<Accordion title="Does the plan persist across sessions?" icon="floppy-disk">
+  Yes. The plan is saved as part of the notebook metadata. When you reopen the notebook, the agent remembers the plan and execution state.
+</Accordion>
+
+<Accordion title="Can the agent remember my data and connections?" icon="database">
+  Yes, within the active session. SignalPilot agents keep track of:
+  - Active datasets in kernel memory
+  - Database connections you've configured
+  - Variables and dataframes you've created
+  - Prior steps in the current analysis
+
+  SignalPilot follows a **zero data retention policy** — no data is stored outside your notebook environment.
+</Accordion>
+
+<Accordion title="Can I use the agent for both coding and debugging?" icon="bug">
+  Yes. SignalPilot agents generate, refactor, explain, and debug code — all in the same workflow. Just describe the issue and the agent will trace errors, explain stack traces, and propose fixes.
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Try Hands-On Mode" icon="hand" href="/reference/agent-modes/hands-on-mode">
+    More granular control over context and execution
+  </Card>
+
+  <Card title="Explore Ask Mode" icon="question" href="/reference/agent-modes/ask-mode">
+    Read-only mode for questions and explanations
+  </Card>
+
+  <Card title="Connect Your Data" icon="database" href="/integrations/databases/postgresql">
+    Add database connections for richer context
+  </Card>
+
+  <Card title="Real-World Example" icon="chart-line-down" href="/guides/investigating-revenue-drops">
+    Follow a complete investigation workflow
+  </Card>
+</CardGroup>

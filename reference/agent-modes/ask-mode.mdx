@@ -1,14 +1,342 @@
 ---
 title: "Ask Mode"
-description: "Read-only question answering mode"
+description: "Read-only question answering mode for exploration, explanations, and learning without modifying your notebook"
 ---
 
 # Ask Mode
 
+**No notebook changes** — the AI answers questions about your notebook, explains code, and provides guidance without modifying anything.
+
+<Info>
+**Best for:** Exploration, explanations, learning, and getting advice without altering your cells. Perfect when you want to understand before you act.
+</Info>
+
+## How Ask Mode Works
+
+Ask Mode is purely conversational. The AI has read-only access to your notebook and can help you understand what's happening without making any changes:
+
+<Steps>
+<Step title="AI reads your notebook">
+  The AI can see:
+  - All cells and their outputs
+  - Current kernel state (variables, dataframes)
+  - Database connections
+  - Previous execution results
+
+  <Note>
+  The AI can **read** everything but cannot **modify** anything.
+  </Note>
+</Step>
+
+<Step title="You ask questions">
+  Ask anything about your notebook:
+  - "What does this code do?"
+  - "Why is this cell producing an error?"
+  - "How can I optimize this query?"
+  - "Explain the logic in cell 7"
+  - "What's the difference between these two approaches?"
+</Step>
+
+<Step title="AI provides explanations">
+  The AI responds with:
+  - Clear explanations in natural language
+  - Code breakdowns and logic walkthroughs
+  - Debugging suggestions
+  - Performance optimization ideas
+  - Alternative approaches
+
+  <Check>
+  No code is generated or executed. It's purely advisory.
+  </Check>
+</Step>
+
+<Step title="You decide what to do">
+  Armed with the AI's explanation, you:
+  - Manually edit cells based on suggestions
+  - Run experiments to test ideas
+  - Switch to Hands-On or Agent Mode if you want AI to implement changes
+</Step>
+</Steps>
+
+## Example Interactions
+
+<AccordionGroup>
+<Accordion title="Understanding code" icon="code">
+  **You:** "What does cell 5 do?"
+
+  **AI:** "Cell 5 performs a left join between the `customers` and `orders` dataframes on the `customer_id` column. It then filters for orders from 2024 and groups by region to calculate total revenue. The result is sorted by revenue in descending order."
+
+  <Tip>
+  Ask Mode is perfect for onboarding to unfamiliar notebooks or understanding code written by teammates.
+  </Tip>
+</Accordion>
+
+<Accordion title="Debugging without changes" icon="bug">
+  **You:** "Why is the last cell showing a KeyError?"
+
+  **AI:** "The KeyError on `revenue_usd` suggests that column doesn't exist in your dataframe. Looking at cell 3, the column is actually named `revenue_dollars`. You have two options:
+
+  1. Rename the column in cell 3 to `revenue_usd`
+  2. Update cell 7 to use `revenue_dollars`
+
+  I recommend option 2 to maintain consistency with your earlier analysis."
+
+  The AI explains the problem but doesn't automatically fix it. You decide which approach to take.
+</Accordion>
+
+<Accordion title="Learning and exploration" icon="graduation-cap">
+  **You:** "How would I calculate a rolling average in pandas?"
+
+  **AI:** "To calculate a rolling average in pandas, use the `.rolling()` method:
+
+  ```python
+  df['rolling_avg'] = df['value'].rolling(window=7).mean()
+  ```
+
+  This computes a 7-period moving average. You can adjust `window` to change the period. For your `daily_revenue` dataframe, you could do:
+
+  ```python
+  daily_revenue['7day_avg'] = daily_revenue['revenue'].rolling(window=7).mean()
+  ```
+
+  Would you like me to explain how rolling windows handle edge cases?"
+
+  <Note>
+  The AI provides educational explanations without modifying your notebook. Perfect for learning new techniques.
+  </Note>
+</Accordion>
+
+<Accordion title="Performance optimization" icon="gauge">
+  **You:** "Is there a faster way to do this groupby operation?"
+
+  **AI:** "Yes! Your current approach loops through groups, which is slow for large datasets. Here's a vectorized alternative:
+
+  **Current approach (slow):**
+  ```python
+  for group in df.groupby('category'):
+      # process each group
+  ```
+
+  **Faster vectorized approach:**
+  ```python
+  df.groupby('category').agg({'revenue': 'sum', 'quantity': 'mean'})
+  ```
+
+  For your dataset with 1M rows, this could be 10-100x faster. The vectorized version lets pandas optimize operations internally instead of Python looping."
+
+  The AI explains the optimization but lets you implement it.
+</Accordion>
+
+<Accordion title="Data quality checks" icon="clipboard-check">
+  **You:** "Are there any issues with my data that I should be aware of?"
+
+  **AI:** "I notice a few potential issues in your `sales_data` dataframe:
+
+  1. **Missing values:** 342 rows have null `customer_id` (8% of total)
+  2. **Negative revenue:** 17 rows have negative `revenue` values (likely refunds?)
+  3. **Date range gap:** No data between March 15-22, 2024
+  4. **Outliers:** 5 transactions over $100k (99th percentile is $8,500)
+
+  Would you like suggestions on how to handle these issues?"
+
+  <Check>
+  The AI proactively identifies data quality concerns without making assumptions about how to fix them.
+  </Check>
+</Accordion>
+</AccordionGroup>
+
+## When to Use Ask Mode
+
+<CardGroup cols={2}>
+  <Card title="Before making changes" icon="shield-check">
+    Use Ask Mode to understand the current state before modifying anything. Get a clear picture of what exists, then switch modes to implement changes.
+  </Card>
+
+  <Card title="Code review" icon="magnifying-glass">
+    Review notebooks from teammates or understand legacy code without risking accidental modifications.
+  </Card>
+
+  <Card title="Learning new techniques" icon="book">
+    Ask how to implement something or understand a coding pattern. The AI teaches without writing code for you.
+  </Card>
+
+  <Card title="Sanity checks" icon="clipboard-check">
+    Verify your logic, check for edge cases, or get a second opinion on your approach.
+  </Card>
+</CardGroup>
+
+## Limitations
+
 <Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
+**Ask Mode cannot:**
+- Generate new code cells
+- Edit existing cells
+- Execute code
+- Create visualizations
+- Modify kernel state
+- Run database queries
+
+For any of these actions, switch to [Hands-On Mode](/reference/agent-modes/hands-on-mode) or [Agent Mode](/reference/agent-modes/agent-mode).
 </Warning>
 
-<Card title="Coming Soon" icon="question">
-Full Ask Mode reference will be added during Phase 3 of documentation restructuring.
-</Card>
+## Switching from Ask Mode
+
+When you're ready to implement changes, switching is seamless:
+
+<Tabs>
+<Tab title="To Hands-On Mode">
+  **When to switch:** You understand what needs to change and want to approve each suggestion.
+
+  **What happens:**
+  - Conversation history is preserved
+  - Context from Ask Mode carries over
+  - AI starts suggesting code instead of just explaining
+
+  **Example flow:**
+  1. Ask Mode: "Why is this slow?"
+  2. AI explains the issue
+  3. Switch to Hands-On Mode
+  4. AI suggests optimized code
+  5. You review and approve
+</Tab>
+
+<Tab title="To Agent Mode">
+  **When to switch:** You want the AI to implement a complete solution autonomously.
+
+  **What happens:**
+  - AI creates a plan based on your conversation
+  - Shows you the full plan for approval
+  - Executes everything after you approve
+
+  **Example flow:**
+  1. Ask Mode: "How would I analyze customer churn?"
+  2. AI explains the approach
+  3. Switch to Agent Mode: "Implement that analysis"
+  4. AI creates multi-step plan
+  5. You approve and it executes
+</Tab>
+
+<Tab title="Manual Implementation">
+  **When to switch:** You want to implement changes yourself based on AI advice.
+
+  **What happens:**
+  - You manually edit cells
+  - Use AI explanations as guidance
+  - Run code yourself
+  - Stay in full control
+
+  **Best for:** Learning, practicing, or when you need custom adjustments beyond AI suggestions.
+</Tab>
+</Tabs>
+
+## Conversation Continuity
+
+One of Ask Mode's strengths is that conversations carry context:
+
+```
+You: "What does this analysis calculate?"
+
+AI: "This calculates monthly recurring revenue (MRR) by summing active subscriptions..."
+
+You: "What's the retention rate?"
+
+AI: "Based on the MRR calculation we just discussed, I can see retention in cell 12..."
+
+You: "How can I improve the accuracy?"
+
+AI: "To improve the MRR accuracy, consider these adjustments..."
+```
+
+The AI remembers the conversation flow and builds on previous answers.
+
+<Tip>
+Use Ask Mode for extended exploratory conversations. Once you understand the full picture, switch modes to implement changes efficiently.
+</Tip>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Does Ask Mode use my data?" icon="database">
+  Yes, Ask Mode reads your notebook state to answer questions accurately. It can see:
+  - Cell contents and outputs
+  - Kernel variables and dataframes
+  - Database connections
+  - Execution history
+
+  But as always, SignalPilot follows a **zero data retention policy**. Your data never leaves your environment.
+</Accordion>
+
+<Accordion title="Can I ask about database schemas in Ask Mode?" icon="table">
+  Yes! If you have database connections configured, Ask Mode can:
+  - Describe table schemas
+  - Explain relationships between tables
+  - Suggest queries
+  - Identify performance issues
+
+  It can read database metadata but cannot execute queries (read-only mode).
+</Accordion>
+
+<Accordion title="Will Ask Mode tell me if my code has bugs?" icon="bug">
+  Yes. Ask Mode can:
+  - Identify logical errors
+  - Spot common pitfalls (e.g., division by zero, type mismatches)
+  - Warn about performance issues
+  - Suggest edge cases to test
+
+  But it won't automatically fix bugs — it explains them so you can decide how to fix them.
+</Accordion>
+
+<Accordion title="Can I use Ask Mode with MCP servers?" icon="plug">
+  Yes! Ask Mode can read from MCP servers to provide context:
+  - dbt model documentation
+  - Slack discussion history
+  - Jira ticket details
+  - Query history
+
+  This helps the AI give more informed answers based on your full organizational context.
+
+  <Card title="Learn about MCP" icon="plug" href="/integrations/mcp-overview">
+    See how SignalPilot connects to external tools via Model Context Protocol
+  </Card>
+</Accordion>
+
+<Accordion title="Can I ask hypothetical questions?" icon="lightbulb">
+  Absolutely! Ask Mode is perfect for:
+  - "What would happen if I changed this parameter?"
+  - "How would this perform on a larger dataset?"
+  - "What's the trade-off between these two approaches?"
+  - "If I modify this cell, what else needs to change?"
+
+  The AI can reason about hypotheticals without executing anything.
+</Accordion>
+
+<Accordion title="Is Ask Mode faster than other modes?" icon="bolt">
+  Generally yes, because:
+  - No code generation required
+  - No execution overhead
+  - Simpler interactions
+  - Lighter context processing
+
+  Ask Mode responses are typically 2-3x faster than code-generating modes.
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Try Hands-On Mode" icon="hand" href="/reference/agent-modes/hands-on-mode">
+    Get code suggestions with granular approval control
+  </Card>
+
+  <Card title="Try Agent Mode" icon="robot" href="/reference/agent-modes/agent-mode">
+    Let the AI plan and execute full analyses autonomously
+  </Card>
+
+  <Card title="Cell-Level Editing" icon="pen" href="/reference/cell-editing/inline-edit">
+    Learn about inline edits and tab autocomplete
+  </Card>
+
+  <Card title="5-Minute Quickstart" icon="rocket" href="/getting-started/quickstart">
+    Complete your first analysis with SignalPilot
+  </Card>
+</CardGroup>

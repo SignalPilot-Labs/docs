@@ -1,0 +1,395 @@
+---
+title: "Context Orchestration"
+description: "How SignalPilot aggregates and manages context from notebooks, databases, dbt, Slack, and other sources"
+---
+
+# Context Orchestration
+
+**Context is the foundation** — SignalPilot's agentic harness aggregates information from multiple sources to give AI agents the full picture of your data environment.
+
+<Info>
+Context orchestration is what separates SignalPilot from general-purpose AI assistants like ChatGPT or IDE copilots. The AI doesn't just see your code — it sees your data, your transformations, your discussions, and your institutional knowledge.
+</Info>
+
+## What is Context?
+
+Context is all the information the AI needs to understand your request and provide accurate, relevant assistance:
+
+<CardGroup cols={2}>
+  <Card title="Notebook State" icon="book">
+    - Cell code and outputs
+    - Kernel variables and dataframes
+    - Execution history
+    - Markdown documentation
+  </Card>
+
+  <Card title="Data Sources" icon="database">
+    - Database schemas and metadata
+    - Table relationships
+    - Query performance history
+    - Data quality metrics
+  </Card>
+
+  <Card title="Transformations" icon="diagram-project">
+    - dbt models and lineage
+    - SQL transformations
+    - Documentation and tests
+    - Column-level lineage
+  </Card>
+
+  <Card title="Institutional Knowledge" icon="comments">
+    - Slack discussions about data
+    - Jira tickets and requirements
+    - Past investigation notes
+    - Known data quirks
+  </Card>
+</CardGroup>
+
+## How Context Works Across Modes
+
+Different agent modes use context differently:
+
+<Tabs>
+<Tab title="Agent Mode">
+  **Context collection:** Automatic
+
+  **What the AI sees:**
+  - All notebook cells and outputs
+  - Full kernel state (variables, dataframes)
+  - All database connections
+  - All MCP server connections (dbt, Slack, Jira)
+
+  **Control:** You approve the plan upfront, then the agent has full context to execute
+
+  **Best for:** Complex investigations where you want the AI to have complete information
+</Tab>
+
+<Tab title="Hands-On Mode">
+  **Context collection:** Explicit (you choose)
+
+  **What the AI sees:**
+  - Only cells you select
+  - Only variables/datasets you @mention
+  - Only databases you explicitly connect
+  - Only MCP resources you approve
+
+  **Control:** Granular — you decide exactly what to share
+
+  **Best for:** Sensitive data, focused tasks, learning workflows
+</Tab>
+
+<Tab title="Ask Mode">
+  **Context collection:** Read-only
+
+  **What the AI sees:**
+  - Same as Agent Mode (full notebook visibility)
+  - Can read database metadata (but not execute queries)
+  - Can access MCP servers for background info
+
+  **Control:** The AI can see everything but cannot modify anything
+
+  **Best for:** Understanding and exploration before making changes
+</Tab>
+</Tabs>
+
+## The Context Aggregation Stack
+
+SignalPilot uses a multi-layered approach to gather context:
+
+<Steps>
+<Step title="Layer 1: Notebook Context">
+  **Always available** — Local notebook state
+
+  - **Cell code:** All code cells and their contents
+  - **Cell outputs:** Results, dataframes, visualizations
+  - **Kernel state:** Active variables, imported libraries
+  - **Execution order:** Which cells ran, when, and with what results
+
+  <Note>
+  This is the baseline context available in all modes.
+  </Note>
+</Step>
+
+<Step title="Layer 2: Data Warehouse Context">
+  **Configured connections** — Database metadata and query history
+
+  - **Schema information:** Tables, columns, data types
+  - **Relationships:** Foreign keys, joins, dependencies
+  - **Performance metrics:** Query execution times, table sizes
+  - **Query history:** Past queries and their patterns
+
+  <Tip>
+  Connect your data warehouse in [Database Integrations](/integrations/databases/postgresql) to enable this layer.
+  </Tip>
+</Step>
+
+<Step title="Layer 3: Transformation Context (via MCP)">
+  **dbt integration** — Model lineage and documentation
+
+  - **Model definitions:** SQL transformations
+  - **Column-level lineage:** Where data comes from and goes to
+  - **Tests and assertions:** Data quality rules
+  - **Documentation:** Model and column descriptions
+
+  <Card title="Configure dbt" icon="diagram-project" href="/integrations/dbt-integration">
+    Connect dbt Cloud or Core for transformation context
+  </Card>
+</Step>
+
+<Step title="Layer 4: Collaboration Context (via MCP)">
+  **Slack, Jira, Notion** — Institutional knowledge and discussions
+
+  - **Slack threads:** Relevant discussions about data or analyses
+  - **Jira tickets:** Requirements, known issues, feature requests
+  - **Notion docs:** Team documentation and procedures
+  - **Past investigations:** Previous analysis notebooks
+
+  <Card title="MCP Servers" icon="plug" href="/integrations/mcp-overview">
+    Learn how to connect collaboration tools
+  </Card>
+</Step>
+</Steps>
+
+## Context Management in Practice
+
+### Automatic Context (Agent Mode)
+
+In Agent Mode, SignalPilot automatically aggregates all available context:
+
+```
+User: "Why did revenue drop 8% last week?"
+
+SignalPilot gathers:
+✓ Revenue dataframe in current notebook (Layer 1)
+✓ Schema for revenue_daily table in Snowflake (Layer 2)
+✓ dbt model that creates revenue_daily (Layer 3)
+✓ Slack thread about A/B test launched last week (Layer 4)
+
+Agent responds:
+"I see you have revenue_daily loaded. I also found a Slack discussion
+mentioning an A/B test that started last Tuesday. Let me investigate
+both the data drop and potential A/B test impact..."
+```
+
+### Explicit Context (Hands-On Mode)
+
+In Hands-On Mode, you control what context the AI can access:
+
+<Tabs>
+<Tab title="Select Cells">
+  **Checkbox selection:**
+  - Click checkboxes next to cells to add them to context
+  - Only selected cells are visible to AI
+  - Unselect to remove from context
+
+  **Use case:** Focus AI on specific analysis without exposing exploratory work
+</Tab>
+
+<Tab title="@Mention Context">
+  **In chat, type @ to mention:**
+  - `@revenue_data` — Share specific dataframe
+  - `@cell-5` — Reference specific cell
+  - `@postgres-prod` — Connect to specific database
+  - `@dbt-models` — Access dbt lineage
+
+  **Use case:** Surgical precision for context sharing
+</Tab>
+
+<Tab title="Grant Permissions">
+  **When AI requests context:**
+  - AI: "I need access to the Slack thread from last week"
+  - You: Approve or deny
+  - AI proceeds with approved context only
+
+  **Use case:** Maintain control while allowing AI to request what it needs
+</Tab>
+</Tabs>
+
+## Context and MCP (Model Context Protocol)
+
+SignalPilot uses MCP to connect to external context sources:
+
+<AccordionGroup>
+<Accordion title="What is MCP?" icon="plug">
+  MCP (Model Context Protocol) is a standard for connecting AI agents to external data sources. Instead of copy-pasting information, the AI can directly query:
+  - dbt Cloud/Core for model lineage
+  - Slack for relevant discussions
+  - Jira for tickets and requirements
+  - Database metadata servers
+  - Custom internal tools
+
+  <Card title="MCP Deep Dive" icon="book" href="/integrations/mcp-overview">
+    Learn how MCP works and how to configure servers
+  </Card>
+</Accordion>
+
+<Accordion title="Internal vs External MCP" icon="server">
+  **Internal MCP Sidecar** (automatically available):
+  - Kernel operations (execute code, introspect state)
+  - Database queries (schemas, performance, history)
+  - Local files (notebooks, CSVs, configs)
+
+  **External MCP Servers** (you configure):
+  - dbt Cloud/Core
+  - Slack
+  - Jira
+  - Notion
+  - Custom tools via MCP specification
+</Accordion>
+
+<Accordion title="Privacy and Security" icon="shield-halved">
+  **MCP connections are:**
+  - Read-only by default
+  - Explicitly authorized by you
+  - Zero data retention (SignalPilot never stores data)
+  - Local-first (queries run from your environment)
+
+  **You control:**
+  - Which MCP servers to connect
+  - What permissions to grant
+  - When to allow external context
+
+  <Card title="Security Details" icon="lock" href="/introduction/security-and-privacy">
+    Read about SignalPilot's security architecture
+  </Card>
+</Accordion>
+</AccordionGroup>
+
+## Viewing Active Context
+
+SignalPilot shows your current context in real-time:
+
+<Steps>
+<Step title="Open Context Panel">
+  Click the **Context** tab in the SignalPilot sidebar to see:
+  - Selected cells
+  - Active dataframes
+  - Connected databases
+  - MCP server connections
+</Step>
+
+<Step title="Review What's Shared">
+  The panel shows exactly what the AI can see:
+  - ✓ Green checkmarks for active context
+  - ○ Gray circles for available but not shared
+  - 🔒 Lock icons for permission-required resources
+</Step>
+
+<Step title="Modify Context">
+  Click items to add/remove them from context:
+  - Toggle cell selection
+  - Disconnect databases
+  - Revoke MCP permissions
+  - Clear all context to start fresh
+</Step>
+</Steps>
+
+<Tip>
+In Hands-On Mode, review the Context Panel before each request to ensure you're sharing exactly what you intend.
+</Tip>
+
+## Context Best Practices
+
+<AccordionGroup>
+<Accordion title="Start minimal, expand as needed" icon="arrow-up-right">
+  **Don't:** Share everything upfront "just in case"
+
+  **Do:** Start with the minimum context needed, then add more if the AI needs it
+
+  **Why:** Focused context leads to more relevant, faster responses. The AI won't get distracted by unrelated information.
+</Accordion>
+
+<Accordion title="Use @mentions for precision" icon="at">
+  **Instead of:** Selecting all cells that mention `revenue_data`
+
+  **Do:** Type `@revenue_data` in chat to explicitly share that dataframe
+
+  **Why:** @mentions are more explicit and easier to track than cell selection
+</Accordion>
+
+<Accordion title="Review before sharing sensitive data" icon="shield-check">
+  **Before sharing:** Check what's in selected cells, especially if they contain:
+  - Customer PII
+  - Financial data
+  - API keys or credentials
+  - Proprietary business logic
+
+  **Remember:** Even with zero data retention, it's good practice to minimize sensitive data exposure
+</Accordion>
+
+<Accordion title="Use Ask Mode to explore context needs" icon="magnifying-glass">
+  **Workflow:**
+  1. Start in Ask Mode: "What context would help analyze this issue?"
+  2. AI explains what it would need
+  3. Switch to Hands-On Mode and share that specific context
+  4. AI provides targeted assistance
+
+  **Why:** Lets you understand context requirements before sharing anything
+</Accordion>
+</AccordionGroup>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Does the AI remember context between sessions?" icon="brain">
+  **Within a session:** Yes, context persists as long as the notebook is open and the kernel is running.
+
+  **Between sessions:** No, context resets when you close the notebook. This is by design for privacy.
+
+  **Exception:** Plans and notebook state are saved, so the AI can resume work where you left off.
+</Accordion>
+
+<Accordion title="Can I share context from one notebook to another?" icon="share">
+  Not directly. Each notebook has isolated context. However, you can:
+  - Export dataframes to files and load them in other notebooks
+  - Reference shared databases from multiple notebooks
+  - Use dbt models as common context across analyses
+</Accordion>
+
+<Accordion title="What if I accidentally share sensitive data?" icon="exclamation-triangle">
+  **Immediate action:**
+  1. Clear the context panel
+  2. Start a new chat thread
+  3. Review what was shared
+
+  **Remember:** SignalPilot follows **zero data retention**. No conversation history or data is stored on SignalPilot servers. Everything stays local.
+
+  **Prevention:** Use Hands-On Mode for sensitive data and review context panel before each request.
+</Accordion>
+
+<Accordion title="How much context is too much?" icon="gauge">
+  **Signs of too much context:**
+  - Slow response times (processing large context)
+  - Irrelevant suggestions (AI distracted by unrelated info)
+  - Generic responses (AI overwhelmed by options)
+
+  **Solution:** Reduce context to the minimum needed for your current task. You can always add more later.
+</Accordion>
+
+<Accordion title="Can I save context configurations?" icon="floppy-disk">
+  Not yet, but this is on the roadmap. For now:
+  - Document your typical context needs in a markdown cell
+  - Create templates with common cell selections
+  - Use @mention patterns consistently
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Chat Interface" icon="comments" href="/reference/agent-modes/chat">
+    Learn how to use chat to work with context
+  </Card>
+
+  <Card title="Planning" icon="list-check" href="/reference/agent-modes/planning">
+    See how planning uses context for multi-step tasks
+  </Card>
+
+  <Card title="Available Tools" icon="wrench" href="/reference/agent-modes/tools">
+    Discover what tools the AI can use with your context
+  </Card>
+
+  <Card title="MCP Overview" icon="plug" href="/integrations/mcp-overview">
+    Connect external context sources via MCP
+  </Card>
+</CardGroup>

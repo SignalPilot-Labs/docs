@@ -2,10 +2,6 @@
   "$schema": "https://mintlify.com/docs.json",
   "name": "SignalPilot",
   "theme": "mint",
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
   "favicon": "/favicon.svg",
   "colors": {
     "primary": "#6D28D9",
@@ -58,7 +54,7 @@
             ]
           },
           {
-            "group": "Core",
+            "group": "Core Concepts",
             "pages": [
               {
                 "group": "Agent Modes",
@@ -66,6 +62,15 @@
                   "reference/agent-modes/agent-mode",
                   "reference/agent-modes/hands-on-mode",
                   "reference/agent-modes/ask-mode"
+                ]
+              },
+              {
+                "group": "Context Orchestration",
+                "pages": [
+                  "reference/agent-modes/context",
+                  "reference/agent-modes/chat",
+                  "reference/agent-modes/planning",
+                  "reference/agent-modes/tools"
                 ]
               },
               {
@@ -104,13 +109,8 @@
         },
         {
           "anchor": "Blog",
-          "href": "https://signalpilot.ai/blog",
+          "href": "https://blog.signalpilot.ai",
           "icon": "newspaper"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://discord.gg/signalpilot",
-          "icon": "discord"
         },
         {
           "anchor": "GitHub",
@@ -124,7 +124,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:support@signalpilot.ai"
+        "href": "mailto:info@signalpilot.ai"
       }
     ],
     "primary": {
@@ -137,8 +137,7 @@
     "socials": {
       "x": "https://x.com/signalpilot",
       "github": "https://github.com/signalpilot",
-      "linkedin": "https://linkedin.com/company/signalpilot",
-      "discord": "https://discord.gg/signalpilot"
+      "linkedin": "https://linkedin.com/company/signalpilot"
     }
   },
   "background": {

@@ -1,14 +1,445 @@
 ---
 title: "Tab Autocomplete"
-description: "Context-aware code suggestions"
+description: "AI-powered, context-aware code completion with multi-line suggestions for faster notebook development"
 ---
 
 # Tab Autocomplete
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
-</Warning>
+**Context-aware code completion** — SignalPilot's Tab Autocomplete uses AI to suggest code based on your notebook context, not just syntax matching.
 
-<Card title="Coming Soon" icon="keyboard">
-Full Tab Autocomplete reference will be added during Phase 3 of documentation restructuring.
-</Card>
+<Info>
+Unlike standard Jupyter autocomplete, SignalPilot's AI autocomplete understands your variables, imported libraries, dataframe schemas, and coding patterns to generate smarter, multi-line suggestions.
+</Info>
+
+## How to Enable
+
+<Steps>
+<Step title="Open SignalPilot Settings">
+  Click the **Settings** icon in the SignalPilot sidebar (bottom right corner of the notebook interface).
+
+  <Frame>
+  <img src="/images/settings-panel.png" alt="SignalPilot settings panel" />
+  </Frame>
+</Step>
+
+<Step title="Enable Tab Autocomplete">
+  Find the **Tab Autocomplete** section and toggle it on.
+
+  <Check>
+  The setting is saved automatically.
+  </Check>
+</Step>
+
+<Step title="Reload your notebook">
+  Close and reopen your notebook for changes to take effect (or reload the browser page).
+
+  <Tip>
+  Keyboard shortcut: `Cmd+R` (Mac) or `Ctrl+R` (Windows/Linux)
+  </Tip>
+</Step>
+</Steps>
+
+## How It Works
+
+<Steps>
+<Step title="Focus on a code cell">
+  Click inside any code cell to edit it.
+</Step>
+
+<Step title="Pause typing for ~1 second">
+  After you stop typing, the AI analyzes your context:
+  - Variables already defined in the kernel
+  - Imported libraries and their usage patterns
+  - Code from other cells
+  - Common patterns for the current task
+
+  <Note>
+  The AI needs a brief pause to generate suggestions. Keep typing if you don't want autocomplete.
+  </Note>
+</Step>
+
+<Step title="Review the suggestion">
+  A grayed-out completion appears inline with your cursor:
+
+  <Frame>
+  <img src="/images/tab-autocomplete-demo.gif" alt="Tab autocomplete in action" />
+  </Frame>
+
+  The suggestion might be:
+  - A single line completing your current statement
+  - Multiple lines for common patterns (e.g., for loops, try-except blocks)
+  - Function calls with appropriate parameters
+</Step>
+
+<Step title="Accept or ignore">
+  - **Accept:** Press `Tab` to insert the suggestion
+  - **Accept partial:** Press `→` (right arrow) to accept word by word
+  - **Ignore:** Keep typing or press `Esc` to dismiss
+
+  <Check>
+  Accepted completions become part of your code immediately.
+  </Check>
+</Step>
+</Steps>
+
+## Example Completions
+
+<Tabs>
+<Tab title="DataFrame Operations">
+  **You type:**
+  ```python
+  df.gro
+  ```
+
+  **AI suggests:**
+  ```python
+  df.groupby('category').agg({'revenue': 'sum', 'quantity': 'mean'})
+  ```
+
+  **Why this is smart:**
+  - Knows `df` is a DataFrame (from kernel inspection)
+  - Knows the column names (`category`, `revenue`, `quantity`)
+  - Suggests appropriate aggregation functions
+  - Uses common pandas patterns
+</Tab>
+
+<Tab title="Multi-Line Patterns">
+  **You type:**
+  ```python
+  for
+  ```
+
+  **AI suggests:**
+  ```python
+  for item in revenue_data.iterrows():
+      print(item['date'], item['revenue'])
+  ```
+
+  **Why this is smart:**
+  - Knows `revenue_data` exists in the kernel
+  - Suggests iterating over rows (common notebook pattern)
+  - Includes column names from the dataframe schema
+  - Provides complete loop structure
+</Tab>
+
+<Tab title="Library Usage">
+  **You type:**
+  ```python
+  plt.
+  ```
+
+  **AI suggests:**
+  ```python
+  plt.figure(figsize=(12, 6))
+  plt.plot(df['date'], df['revenue'])
+  plt.xlabel('Date')
+  plt.ylabel('Revenue')
+  plt.title('Revenue Over Time')
+  plt.show()
+  ```
+
+  **Why this is smart:**
+  - Knows `matplotlib` is imported as `plt`
+  - Knows you have date and revenue columns
+  - Generates a complete, reasonable plot
+  - Uses appropriate labels and titles
+</Tab>
+
+<Tab title="Context from Other Cells">
+  **Previous cell:**
+  ```python
+  sales_data = pd.read_csv('sales.csv')
+  sales_data['date'] = pd.to_datetime(sales_data['date'])
+  ```
+
+  **You type in new cell:**
+  ```python
+  monthly
+  ```
+
+  **AI suggests:**
+  ```python
+  monthly_sales = sales_data.groupby(pd.Grouper(key='date', freq='M')).sum()
+  ```
+
+  **Why this is smart:**
+  - Remembers `sales_data` from previous cell
+  - Knows the date column was converted to datetime
+  - Suggests time-based grouping (common next step)
+  - Variable name `monthly_sales` matches the pattern
+</Tab>
+</Tabs>
+
+## Tab Autocomplete vs Standard Autocomplete
+
+<Tabs>
+<Tab title="Standard Jupyter Autocomplete">
+  **How it works:**
+  - Matches local names and imported modules
+  - Simple syntax completion
+  - No context awareness
+  - Single-line suggestions only
+
+  **Example:**
+  ```python
+  df.gro  →  df.groupby
+  ```
+
+  **Limitations:**
+  - Doesn't know column names
+  - Doesn't suggest parameters
+  - Can't generate multi-line patterns
+  - No understanding of your data
+</Tab>
+
+<Tab title="SignalPilot AI Autocomplete">
+  **How it works:**
+  - Uses full notebook context
+  - Understands data schemas
+  - Multi-line suggestions
+  - Pattern-aware completions
+
+  **Example:**
+  ```python
+  df.gro  →  df.groupby('category').agg({'revenue': 'sum'})
+  ```
+
+  **Advantages:**
+  - Knows your dataframe columns
+  - Suggests appropriate aggregations
+  - Can generate complete code blocks
+  - Learns from your coding patterns
+</Tab>
+</Tabs>
+
+## When Tab Autocomplete Helps Most
+
+<AccordionGroup>
+<Accordion title="Repetitive pandas operations" icon="table">
+  **Common scenarios:**
+  - Grouping and aggregation
+  - Filtering with multiple conditions
+  - Joining dataframes
+  - Reshaping (pivot, melt, stack)
+
+  **Example:**
+  Type `df[` and get suggested filter based on your actual columns.
+</Accordion>
+
+<Accordion title="Boilerplate code" icon="copy">
+  **Common scenarios:**
+  - Try-except blocks
+  - For loops over dataframes
+  - Function definitions with common signatures
+  - Import statements for standard libraries
+
+  **Example:**
+  Type `try:` and get a complete try-except block template.
+</Accordion>
+
+<Accordion title="Visualization code" icon="chart-line">
+  **Common scenarios:**
+  - Matplotlib plot setup
+  - Plotly figure configuration
+  - Seaborn styling
+  - Chart labeling and formatting
+
+  **Example:**
+  Type `plt.plot` and get suggested plot with your dataframe columns.
+</Accordion>
+
+<Accordion title="Working with unfamiliar APIs" icon="code">
+  **Common scenarios:**
+  - SQL query building
+  - API request construction
+  - Configuration file parsing
+  - Data export formats
+
+  **Example:**
+  Type `df.to_` and get suggestions for common export formats (CSV, Excel, Parquet) with appropriate parameters.
+</Accordion>
+</AccordionGroup>
+
+## Configuration Options
+
+<Tabs>
+<Tab title="Enable/Disable">
+  **Location:** Settings panel → Tab Autocomplete toggle
+
+  **When to disable:**
+  - You find suggestions distracting
+  - Working in a very slow environment
+  - Prefer manual code writing for learning
+
+  **Quick toggle:** Settings are saved per-notebook (coming soon: global preference)
+</Tab>
+
+<Tab title="Suggestion Delay">
+  **Current:** ~1 second pause triggers suggestions
+
+  **Coming soon:** Adjustable delay (500ms - 2000ms)
+
+  **Why it matters:** Shorter delays = faster suggestions but more interruptions. Longer delays = less distraction but slower completions.
+</Tab>
+
+<Tab title="Suggestion Length">
+  **Current:** Up to 5 lines per suggestion
+
+  **Coming soon:** Adjustable max length (1-10 lines)
+
+  **Why it matters:** Longer suggestions can save time but might include unnecessary code. Shorter suggestions are easier to review.
+</Tab>
+</Tabs>
+
+## Tips for Better Completions
+
+<AccordionGroup>
+<Accordion title="Use descriptive variable names" icon="signature">
+  **Good:** `monthly_revenue = ...`
+
+  **Bad:** `df2 = ...`
+
+  The AI uses variable names as hints for suggestions. Descriptive names lead to better completions.
+</Accordion>
+
+<Accordion title="Keep cells focused" icon="bullseye">
+  **Good:** One logical operation per cell
+
+  **Bad:** Mixing data loading, cleaning, and analysis in one cell
+
+  Cleaner cell structure helps the AI understand context and suggest relevant completions.
+</Accordion>
+
+<Accordion title="Import libraries consistently" icon="book">
+  **Good:**
+  ```python
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import numpy as np
+  ```
+
+  **Bad:**
+  ```python
+  from pandas import *
+  import matplotlib.pyplot
+  ```
+
+  Standard import conventions help the AI recognize patterns and suggest appropriate code.
+</Accordion>
+
+<Accordion title="Pause intentionally for complex completions" icon="hourglass">
+  If you want multi-line suggestions (like entire function bodies), pause for 1-2 seconds instead of continuing to type.
+
+  The AI will generate more complete suggestions when given time.
+</Accordion>
+</AccordionGroup>
+
+## Privacy and Performance
+
+<AccordionGroup>
+<Accordion title="Does autocomplete send my data to servers?" icon="shield-halved">
+  **No.** Autocomplete uses:
+  - Local notebook context (cell code)
+  - Variable names and types from kernel
+  - Imported library information
+
+  **Your actual data values are never sent** to SignalPilot servers. The AI sees variable names and types, not the data itself.
+
+  Example: The AI knows you have a dataframe called `revenue_data` with columns `['date', 'region', 'amount']`, but it doesn't see the actual revenue numbers.
+</Accordion>
+
+<Accordion title="Does it slow down my notebook?" icon="gauge">
+  **Minimal impact.** Autocomplete runs:
+  - Asynchronously (doesn't block typing)
+  - Only after pauses (not while you're actively typing)
+  - With cached context (fast subsequent suggestions)
+
+  **If you notice slowness:**
+  - Increase the pause delay in settings (coming soon)
+  - Disable autocomplete temporarily
+  - Check your internet connection (suggestions require API calls)
+</Accordion>
+
+<Accordion title="Does it work offline?" icon="wifi-slash">
+  **No.** Tab autocomplete requires:
+  - Active internet connection
+  - SignalPilot API access
+
+  **Fallback:** Standard Jupyter autocomplete still works offline.
+</Accordion>
+</AccordionGroup>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Can I disable it later?" icon="toggle-off">
+  Yes. Go back to Settings → Tab Autocomplete and toggle it off. Changes take effect immediately (no reload required for disabling).
+</Accordion>
+
+<Accordion title="Does it work in all cells?" icon="file-code">
+  **Code cells:** Yes, full support
+
+  **Markdown cells:** No, autocomplete is code-specific
+
+  **Raw cells:** No
+
+  Future versions may support markdown completions for documentation.
+</Accordion>
+
+<Accordion title="Why are some suggestions not relevant?" icon="question">
+  The AI makes suggestions based on:
+  - Available context
+  - Common patterns
+  - Statistical likelihood
+
+  If suggestions seem off:
+  1. **Check variable names:** Are they descriptive?
+  2. **Run cells above:** The AI needs executed cells for kernel context
+  3. **Be more specific:** Type a bit more before pausing
+  4. **Use Inline Edit instead:** For very specific changes, `⌘K` / `Ctrl K` might be better
+</Accordion>
+
+<Accordion title="Can it complete SQL queries?" icon="database">
+  Yes! If you're writing SQL in Python strings (e.g., for SQLAlchemy or database connections), the AI can suggest query completions based on:
+  - Your database schema (if connected)
+  - Common SQL patterns
+  - Table and column names
+
+  **Example:**
+  ```python
+  query = "SELECT "
+  # AI suggests: "SELECT * FROM users WHERE created_at > '2024-01-01'"
+  ```
+</Accordion>
+
+<Accordion title="Does it learn from my coding style?" icon="brain">
+  **Within a session:** Yes, the AI adapts to patterns it sees in your current notebook.
+
+  **Across sessions:** Not yet. Future versions will support:
+  - Team-specific coding patterns
+  - Personal style preferences
+  - Common libraries and functions you use
+
+  Vote on this feature in our [GitHub discussions](https://github.com/SignalPilot-Labs/signalpilot).
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Inline Edit" icon="pen" href="/reference/cell-editing/inline-edit">
+    Make targeted cell edits with natural language
+  </Card>
+
+  <Card title="Agent Mode" icon="robot" href="/reference/agent-modes/agent-mode">
+    Use AI for multi-cell generation and execution
+  </Card>
+
+  <Card title="Chat Interface" icon="comments" href="/reference/agent-modes/chat">
+    Describe what you want and let AI write the code
+  </Card>
+
+  <Card title="5-Minute Quickstart" icon="rocket" href="/getting-started/quickstart">
+    Complete your first analysis with SignalPilot
+  </Card>
+</CardGroup>

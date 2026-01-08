@@ -1,14 +1,381 @@
 ---
 title: "Inline Edit"
-description: "Single cell modifications with AI assistance"
+description: "Make targeted single-cell edits with AI assistance using natural language instructions"
 ---
 
 # Inline Edit
 
+**Targeted AI editing** — update a single code cell directly with natural language instructions instead of manually rewriting code.
+
+<Info>
+**Best for:** Small fixes, local refactors, quick adjustments, and improving readability without leaving the cell or opening chat.
+</Info>
+
+## How to Use Inline Edit
+
+<Steps>
+<Step title="Focus on the cell">
+  Click inside the cell you want to modify. The cell should be in edit mode (showing the code editor).
+</Step>
+
+<Step title="Trigger Inline Edit">
+  Press the keyboard shortcut:
+  - **macOS:** `⌘ K`
+  - **Windows/Linux:** `Ctrl K`
+
+  Or click the **Inline Edit** button in the SignalPilot toolbar.
+
+  <Frame>
+  <img src="/images/inline-edit-trigger.png" alt="Inline Edit button in toolbar" />
+  </Frame>
+</Step>
+
+<Step title="Type your edit instruction">
+  A prompt appears where you describe the change you want:
+
+  ```
+  Examples:
+  - "change the loop to a list comprehension"
+  - "rename variable x to customer_id"
+  - "add error handling for missing keys"
+  - "add comments explaining each step"
+  ```
+
+  <Tip>
+  Be specific about what you want changed. The AI only modifies the current cell.
+  </Tip>
+</Step>
+
+<Step title="Review and apply">
+  The AI shows you the updated code. You can:
+  - **Accept** — apply the change
+  - **Reject** — keep the original
+  - **Modify** — edit the instruction and try again
+
+  <Check>
+  The change is applied only to the selected cell. Other cells remain untouched.
+  </Check>
+</Step>
+
+<Step title="Execute the cell">
+  After accepting the edit, run the cell to apply the changes:
+  - `Shift+Enter` to run and advance
+  - `Ctrl+Enter` to run in place
+
+  <Note>
+  The edit updates the **code**, but you must execute it to update the **output**.
+  </Note>
+</Step>
+</Steps>
+
+## Example Workflow
+
+<Tabs>
+<Tab title="Example 1: Change Time Period">
+  **Original cell:**
+  ```python
+  # Download SPY data for last 5 years
+  spy_data = yf.download('SPY', period='5y')
+  ```
+
+  **Inline Edit instruction:**
+  ```
+  Download last 1 year prices instead
+  ```
+
+  **Updated cell:**
+  ```python
+  # Download SPY data for last 1 year
+  spy_data = yf.download('SPY', period='1y')
+  ```
+
+  <Check>
+  Only the time period and comment were updated. Everything else stayed the same.
+  </Check>
+</Tab>
+
+<Tab title="Example 2: Add Error Handling">
+  **Original cell:**
+  ```python
+  df = pd.read_csv('sales_data.csv')
+  total_revenue = df['revenue'].sum()
+  ```
+
+  **Inline Edit instruction:**
+  ```
+  add error handling for missing file and missing column
+  ```
+
+  **Updated cell:**
+  ```python
+  try:
+      df = pd.read_csv('sales_data.csv')
+      if 'revenue' not in df.columns:
+          raise ValueError("Column 'revenue' not found in data")
+      total_revenue = df['revenue'].sum()
+  except FileNotFoundError:
+      print("Error: sales_data.csv not found")
+      total_revenue = 0
+  ```
+
+  <Check>
+  The AI added comprehensive error handling while preserving the original logic.
+  </Check>
+</Tab>
+
+<Tab title="Example 3: Refactor to List Comprehension">
+  **Original cell:**
+  ```python
+  filtered_data = []
+  for item in data:
+      if item['revenue'] > 1000:
+          filtered_data.append(item)
+  ```
+
+  **Inline Edit instruction:**
+  ```
+  change the loop to a list comprehension
+  ```
+
+  **Updated cell:**
+  ```python
+  filtered_data = [item for item in data if item['revenue'] > 1000]
+  ```
+
+  <Check>
+  More concise, Pythonic code with the same functionality.
+  </Check>
+</Tab>
+
+<Tab title="Example 4: Add Documentation">
+  **Original cell:**
+  ```python
+  def calculate_mrr(subscriptions):
+      active = [s for s in subscriptions if s['status'] == 'active']
+      return sum(s['price'] for s in active)
+  ```
+
+  **Inline Edit instruction:**
+  ```
+  add docstring and inline comments
+  ```
+
+  **Updated cell:**
+  ```python
+  def calculate_mrr(subscriptions):
+      """
+      Calculate Monthly Recurring Revenue from subscription data.
+
+      Args:
+          subscriptions (list): List of subscription dicts with 'status' and 'price'
+
+      Returns:
+          float: Total MRR from all active subscriptions
+      """
+      # Filter for only active subscriptions
+      active = [s for s in subscriptions if s['status'] == 'active']
+
+      # Sum up monthly prices
+      return sum(s['price'] for s in active)
+  ```
+
+  <Check>
+  Added comprehensive documentation without changing the logic.
+  </Check>
+</Tab>
+</Tabs>
+
+## When to Use Inline Edit
+
+<CardGroup cols={2}>
+  <Card title="Small fixes" icon="wrench">
+    **Use for:** Typos, parameter changes, simple logic adjustments
+
+    **Example:** "change timeout from 30 to 60 seconds"
+  </Card>
+
+  <Card title="Local refactors" icon="code">
+    **Use for:** Renaming variables, converting loops, improving code style
+
+    **Example:** "rename all instances of df to sales_data"
+  </Card>
+
+  <Card title="Quick adjustments" icon="bolt">
+    **Use for:** Adding logging, error handling, type hints
+
+    **Example:** "add try-except for API request"
+  </Card>
+
+  <Card title="Improving readability" icon="book">
+    **Use for:** Adding comments, docstrings, breaking long lines
+
+    **Example:** "add comments explaining each step"
+  </Card>
+</CardGroup>
+
 <Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
+For broader changes involving **multiple cells**, use [Chat](/reference/agent-modes/agent-mode) or [Planning](/reference/agent-modes/agent-mode#planning--chat-integration) instead.
 </Warning>
 
-<Card title="Coming Soon" icon="pencil">
-Full Inline Edit reference will be added during Phase 3 of documentation restructuring.
-</Card>
+## Inline Edit vs Chat
+
+<Tabs>
+<Tab title="Inline Edit">
+  **Scope:** Single cell only
+
+  **When to use:**
+  - Quick, focused changes
+  - You know exactly which cell to modify
+  - The change is self-contained
+  - You want to stay in the cell editor
+
+  **Workflow:**
+  1. Focus cell
+  2. Press `⌘K` / `Ctrl K`
+  3. Describe change
+  4. Accept or reject
+
+  **Best for:** "Change X to Y in this cell"
+</Tab>
+
+<Tab title="Chat (Agent/Hands-On Mode)">
+  **Scope:** Multiple cells, notebook-wide
+
+  **When to use:**
+  - Changes span multiple cells
+  - You need to add new cells
+  - The change requires context from other cells
+  - You want AI to plan multi-step modifications
+
+  **Workflow:**
+  1. Open chat panel
+  2. Describe broader goal
+  3. AI suggests changes across cells
+  4. Review and approve
+
+  **Best for:** "Refactor this analysis to use a different data source"
+</Tab>
+</Tabs>
+
+## Keyboard Shortcuts
+
+<Info>
+**Trigger Inline Edit:**
+- macOS: `⌘ K`
+- Windows/Linux: `Ctrl K`
+
+**Accept suggestion:** `Enter` or `Tab`
+
+**Reject suggestion:** `Esc`
+
+**Modify instruction:** Click the edit icon in the prompt
+</Info>
+
+## Tips for Better Results
+
+<AccordionGroup>
+<Accordion title="Be specific about what to change" icon="bullseye">
+  **Good:** "rename variable df to customer_data"
+
+  **Bad:** "make it better"
+
+  The more specific your instruction, the more accurate the edit.
+</Accordion>
+
+<Accordion title="Focus on one change at a time" icon="1">
+  **Good:** "add error handling for file not found"
+
+  **Bad:** "add error handling, improve variable names, and add comments"
+
+  For multiple changes, use separate Inline Edits or switch to Chat.
+</Accordion>
+
+<Accordion title="Include context if needed" icon="info">
+  **Good:** "change the date range to last 90 days instead of last year"
+
+  **Better than:** "change the date"
+
+  Mentioning what you're changing *from* helps the AI understand the context.
+</Accordion>
+
+<Accordion title="Undo is always available" icon="rotate-left">
+  Don't worry about making mistakes. You can:
+  - Use Jupyter's undo (`⌘Z` / `Ctrl Z`)
+  - Reject the suggestion before applying
+  - Re-run the original cell from history
+  - Use notebook version control
+</Accordion>
+</AccordionGroup>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="What's the difference between Inline Edit and Chat?" icon="comment-question">
+  **Inline Edit** updates one cell only. **Chat** can add, modify, or generate code across multiple cells.
+
+  Use Inline Edit for focused, single-cell changes. Use Chat for broader modifications or multi-cell workflows.
+</Accordion>
+
+<Accordion title="Can Inline Edit break other cells?" icon="shield-halved">
+  No. Inline Edit applies changes only to the selected cell. The rest of your notebook remains untouched.
+
+  However, if the cell defines variables or functions used elsewhere, changing them could affect downstream cells. Always review the impact.
+</Accordion>
+
+<Accordion title="Do I need to re-run the cell after Inline Edit?" icon="play">
+  Yes. Inline Edit updates the **code** but doesn't automatically **execute** it. You must run the cell to see the new output.
+
+  This gives you a chance to review the code before execution.
+</Accordion>
+
+<Accordion title="Can I undo an Inline Edit?" icon="rotate-left">
+  Yes. You can:
+  - Use Jupyter's undo feature (`⌘Z` / `Ctrl Z`)
+  - Access cell history in Jupyter
+  - Use notebook version control (if enabled)
+  - Reject the suggestion before applying it
+</Accordion>
+
+<Accordion title="Does Inline Edit use my data?" icon="database">
+  Inline Edit only sees the code in the current cell. It doesn't access:
+  - Other cells (unless needed for context)
+  - Kernel state (unless you mention variables)
+  - External data sources
+
+  And as always, SignalPilot follows a **zero data retention policy**.
+</Accordion>
+
+<Accordion title="Can I use Inline Edit in markdown cells?" icon="markdown">
+  Currently, Inline Edit works best with **code cells**. For markdown cells, you can use Chat mode to request edits or edit them manually.
+</Accordion>
+
+<Accordion title="What if the AI doesn't understand my instruction?" icon="circle-question">
+  Try:
+  1. **Be more specific:** "change the timeout parameter to 60" instead of "make it slower"
+  2. **Add context:** "in the API request, change the timeout to 60 seconds"
+  3. **Use simpler language:** "rename x to customer_id" instead of "refactor the variable nomenclature"
+  4. **Try again:** Click modify and rephrase your instruction
+
+  If it still doesn't work, consider using Chat mode for more complex edits.
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Tab Autocomplete" icon="keyboard" href="/reference/cell-editing/tab-autocomplete">
+    Enable AI-powered autocomplete for faster coding
+  </Card>
+
+  <Card title="Agent Mode" icon="robot" href="/reference/agent-modes/agent-mode">
+    Use AI for multi-cell modifications and full analyses
+  </Card>
+
+  <Card title="Hands-On Mode" icon="hand" href="/reference/agent-modes/hands-on-mode">
+    Get AI suggestions with granular approval control
+  </Card>
+
+  <Card title="5-Minute Quickstart" icon="rocket" href="/getting-started/quickstart">
+    Complete your first analysis with SignalPilot
+  </Card>
+</CardGroup>

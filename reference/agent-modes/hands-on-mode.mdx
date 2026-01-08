@@ -1,14 +1,322 @@
 ---
 title: "Hands-On Mode"
-description: "Agent suggests code, you execute manually"
+description: "Shared control where you decide what context the AI can access and approve changes cell by cell"
 ---
 
 # Hands-On Mode
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
-</Warning>
+**Shared control** — the AI suggests code, edits, and analyses, but you explicitly choose what context it sees and approve what gets added or executed.
 
-<Card title="Coming Soon" icon="hand">
-Full Hands-On Mode reference will be added during Phase 3 of documentation restructuring.
-</Card>
+<Info>
+**Best for:** Users who want AI assistance without giving up fine-grained control. Perfect when you need to review and approve every change before it's applied.
+</Info>
+
+## How Hands-On Mode Works
+
+Hands-On Mode gives you granular control over the AI's actions. Unlike Agent Mode where the AI works autonomously, here you're actively involved in every step:
+
+<Steps>
+<Step title="You control the context">
+  Explicitly choose what the AI can see:
+  - Select specific cells to add to context
+  - Choose which datasets to share
+  - Decide which database connections to expose
+  - Use `@mention` to add specific elements
+
+  <Frame>
+  <img src="/images/hands-on-context-selection.png" alt="Selecting cells to add to AI context in Hands-On Mode" />
+  </Frame>
+
+  <Tip>
+  Only share the minimum context needed for your current task. This keeps the AI focused and prevents unintended changes.
+  </Tip>
+</Step>
+
+<Step title="The AI suggests code">
+  Based on your request and the context you've shared, the AI proposes:
+  - New code cells
+  - Edits to existing cells
+  - Visualizations
+  - Data transformations
+
+  <Note>
+  The AI **does not** automatically execute anything. It shows you the suggested code first.
+  </Note>
+</Step>
+
+<Step title="You review and approve">
+  For each suggestion, you can:
+  - **Accept** — add the code to your notebook
+  - **Reject** — discard the suggestion
+  - **Modify** — edit the suggested code before accepting
+  - **Ask for alternatives** — request different approaches
+
+  <Check>
+  You maintain full control over what enters your notebook.
+  </Check>
+</Step>
+
+<Step title="You execute manually">
+  After accepting code, you run cells yourself using standard Jupyter controls:
+  - `Shift+Enter` to run and advance
+  - `Ctrl+Enter` to run in place
+  - Run All, Run Selected, etc.
+
+  This gives you complete visibility into execution order and results.
+</Step>
+</Steps>
+
+## Example Workflow
+
+**Scenario:** You want to modify a planning cell without affecting other cells.
+
+<Tabs>
+<Tab title="Step 1: Select Context">
+  You select only the planning cell and add it to context using the SignalPilot panel.
+
+  <Frame>
+  <img src="/images/hands-on-planning-cell.png" alt="Adding only the planning cell to context" />
+  </Frame>
+
+  **Context shared with AI:**
+  - One specific cell (the planning cell)
+  - Current kernel state (optional)
+  - No other cells or data
+</Tab>
+
+<Tab title="Step 2: Make Request">
+  **Your prompt:** "Add a step to calculate weekly returns before the final analysis"
+
+  **AI understands:**
+  - You only want to modify the plan
+  - No code execution needed yet
+  - Focus on updating the to-do list
+</Tab>
+
+<Tab title="Step 3: Review Suggestion">
+  The AI suggests an updated planning cell with the new step inserted in the correct position:
+
+  ```markdown
+  ## Analysis Plan
+  - [x] Download SPY data
+  - [x] Calculate monthly investments
+  - [ ] Calculate weekly returns  <-- New step
+  - [ ] Compute final portfolio value
+  - [ ] Generate visualization
+  ```
+
+  You review the change and approve it.
+</Tab>
+
+<Tab title="Step 4: Apply Changes">
+  You click **Accept** and the planning cell is updated. No other cells are affected.
+
+  <Check>
+  Only the specific change you approved was applied.
+  </Check>
+</Tab>
+</Tabs>
+
+## Key Differences from Agent Mode
+
+<CardGroup cols={2}>
+  <Card title="Agent Mode" icon="robot">
+    **Autonomous execution**
+    - AI manages all context automatically
+    - Creates and executes full plan
+    - You approve the plan upfront
+    - Agent handles all code execution
+  </Card>
+
+  <Card title="Hands-On Mode" icon="hand">
+    **Manual control**
+    - You choose what context to share
+    - AI suggests one change at a time
+    - You approve each suggestion individually
+    - You execute code manually
+  </Card>
+</CardGroup>
+
+## When to Use Hands-On Mode
+
+<AccordionGroup>
+<Accordion title="Working with sensitive data" icon="shield-halved">
+  When you need strict control over what the AI can access, Hands-On Mode lets you share only specific cells or datasets. Perfect for:
+  - Financial data with privacy requirements
+  - Customer PII that needs careful handling
+  - Proprietary business logic
+
+  <Warning>
+  Even in Hands-On Mode, SignalPilot follows a **zero data retention policy**. No data is stored outside your notebook.
+  </Warning>
+</Accordion>
+
+<Accordion title="Learning and exploring" icon="graduation-cap">
+  If you're learning data analysis or want to understand what the AI is doing, Hands-On Mode lets you:
+  - Review each suggestion before applying it
+  - Modify code to understand different approaches
+  - Execute step by step to see intermediate results
+  - Learn coding patterns from AI suggestions
+</Accordion>
+
+<Accordion title="Debugging specific issues" icon="bug">
+  When troubleshooting a particular cell or function:
+  - Share only the problematic code
+  - Get focused suggestions without affecting other cells
+  - Test fixes incrementally
+  - Maintain full control over execution order
+</Accordion>
+
+<Accordion title="Collaborative workflows" icon="users">
+  When working in a shared notebook:
+  - Review all changes before applying them
+  - Ensure suggestions align with team standards
+  - Document why certain approaches were chosen
+  - Avoid unintended modifications to shared cells
+</Accordion>
+</AccordionGroup>
+
+## Context Management
+
+One of Hands-On Mode's most powerful features is explicit context control:
+
+### Adding Context
+
+<Tabs>
+<Tab title="Select Cells">
+  Click the checkbox next to specific cells to add them to AI context.
+
+  **Use case:** Focus the AI on a specific part of your analysis without exposing unrelated code.
+</Tab>
+
+<Tab title="@Mention Datasets">
+  Type `@dataset_name` in the chat to explicitly share a dataset.
+
+  ```
+  @revenue_data Show me the distribution of sales by region
+  ```
+
+  **Use case:** Work with specific dataframes without sharing your entire kernel state.
+</Tab>
+
+<Tab title="@Mention Cells">
+  Reference cells by number: `@cell-3` or by type: `@markdown-cells`
+
+  ```
+  @cell-3 @cell-7 Refactor these two cells to share common logic
+  ```
+
+  **Use case:** Precise control over which cells the AI can see and modify.
+</Tab>
+
+<Tab title="@Mention Databases">
+  Explicitly connect to databases when needed.
+
+  ```
+  @postgres-prod Get the schema for the users table
+  ```
+
+  **Use case:** Control when the AI queries external data sources.
+</Tab>
+</Tabs>
+
+### Removing Context
+
+You can remove items from context at any time by:
+- Unchecking selected cells
+- Clearing the context panel
+- Starting a new conversation thread
+
+<Tip>
+Keep your context minimal. Only share what's needed for the current task. This makes AI suggestions more focused and relevant.
+</Tip>
+
+## Switching Modes
+
+You can switch between modes anytime using the **mode selector** in the SignalPilot panel:
+
+<Steps>
+<Step title="Click the mode selector">
+  Located in the bottom-right corner of the notebook interface
+</Step>
+
+<Step title="Choose your mode">
+  - **Agent Mode** — Autonomous execution with plan approval
+  - **Hands-On Mode** — Manual control (current)
+  - **Ask Mode** — Read-only questions
+</Step>
+
+<Step title="Continue working">
+  SignalPilot adapts immediately. Your notebook state is preserved.
+</Step>
+</Steps>
+
+<Note>
+Your context selection persists when switching modes. If you had specific cells selected in Hands-On Mode, they'll remain in context when you switch.
+</Note>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Can I switch to Agent Mode mid-analysis?" icon="shuffle">
+  Yes. You can start in Hands-On Mode to carefully build your analysis, then switch to Agent Mode when you want the AI to handle repetitive tasks autonomously.
+
+  Your notebook state, context, and conversation history are all preserved when switching.
+</Accordion>
+
+<Accordion title="Does Hands-On Mode use my data?" icon="database">
+  Only the data you explicitly share via context selection or `@mention`. The AI cannot access:
+  - Cells you haven't selected
+  - Datasets you haven't mentioned
+  - Database connections you haven't added to context
+
+  And as always, SignalPilot follows a **zero data retention policy**.
+</Accordion>
+
+<Accordion title="Can the AI still access MCP servers in Hands-On Mode?" icon="plug">
+  Only if you explicitly allow it. You can:
+  - `@mention` specific MCP resources (e.g., `@dbt-models`)
+  - Grant permission when the AI requests external context
+  - Deny requests if you want to keep the AI focused on local context
+
+  <Card title="Learn about MCP" icon="plug" href="/integrations/mcp-overview">
+    See how SignalPilot connects to external tools via Model Context Protocol
+  </Card>
+</Accordion>
+
+<Accordion title="How do I know what context the AI has?" icon="eye">
+  The SignalPilot panel shows your active context at all times:
+  - List of selected cells
+  - Mentioned datasets
+  - Active database connections
+  - MCP resources in scope
+
+  You can review and modify this list anytime.
+</Accordion>
+
+<Accordion title="Can I use Hands-On Mode with planning?" icon="list-check">
+  Yes. You can ask the AI to create a plan, review it, and then execute steps manually. The AI will suggest code for each step, but you approve and run it yourself.
+
+  This combines the structure of planning with the control of manual execution.
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Try Agent Mode" icon="robot" href="/reference/agent-modes/agent-mode">
+    Switch to fully autonomous execution with plan approval
+  </Card>
+
+  <Card title="Explore Ask Mode" icon="question" href="/reference/agent-modes/ask-mode">
+    Read-only mode for questions without modifications
+  </Card>
+
+  <Card title="MCP Integration" icon="plug" href="/integrations/mcp-overview">
+    Connect to dbt, Slack, Jira for richer context
+  </Card>
+
+  <Card title="Cell-Level Editing" icon="pen" href="/reference/cell-editing/inline-edit">
+    Learn about inline edits and tab autocomplete
+  </Card>
+</CardGroup>
