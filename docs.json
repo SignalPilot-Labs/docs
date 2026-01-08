@@ -91,8 +91,8 @@
             "group": "Real-World Examples",
             "pages": [
               "guides/01-user-funnel-analysis",
-              "guides/02-campaign-spending-vs-votes",
-              "guides/02-notion-slack-connection"
+              "guides/02-notion-slack-connection",
+              "guides/03-campaign-spending-vs-votes"
             ]
           }
         ]
