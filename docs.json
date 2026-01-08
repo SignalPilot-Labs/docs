@@ -45,7 +45,7 @@
               {
                 "group": "External Tools (MCP)",
                 "pages": [
-                  "integrations/mcp-overview",
+                  "integrations/skills_and_mcp_servers",
                   "integrations/dbt-integration",
                   "integrations/collaboration/slack",
                   "integrations/collaboration/jira"
@@ -90,11 +90,9 @@
           {
             "group": "Real-World Examples",
             "pages": [
-              "guides/investigating-revenue-drops",
-              "guides/debugging-data-quality",
-              "guides/analyzing-timeseries",
-              "guides/working-with-dbt",
-              "guides/customizing-hooks"
+              "guides/01-user-funnel-analysis",
+              "guides/02-campaign-spending-vs-votes",
+              "guides/02-notion-slack-connection"
             ]
           }
         ]
