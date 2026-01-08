@@ -7,6 +7,8 @@ description: "AI agent with **full org context** that ChatGPT or IDE copilots ca
 
 **SignalPilot** is a Jupyter-native AI agentic harness that investigates data by connecting to your **db warehouse, dbt lineage, query history, slack threads, notion, and Jira tickets** — giving the AI institutional knowledge that coding assistants like ChatGPT and copilots can't access.
 
+<img src="/images/agentic-harness-signalpilot.png" alt="SignalPilot Agentic Harness: MCP Context Layer + Long-Running Agent Loop + Memory + Skills/Rules" />
+
 <CardGroup cols={2}>
   <Card title="Multi-Source Context" icon="plug">
     **Aggregates organizational knowledge**
@@ -34,30 +36,55 @@ description: "AI agent with **full org context** that ChatGPT or IDE copilots ca
 **🔒 Zero data retention** • **Read-only access** • **Local-first execution** • **SOC 2 in progress**
 </Note>
 
----
+## How is SignalPilot different from ChatGPT or Copilot?
 
-## Why build an agentic harness instead of using ChatGPT?
+**ChatGPT and IDE copilots** are general-purpose code generators. **SignalPilot** is purpose-built for data investigation:
 
-**ChatGPT and IDE copilots** are general-purpose code generators. **SignalPilot** is a specialized agentic harness built for data investigation — it connects to institutional knowledge those tools can't access, runs long-term investigations with analyst oversight, and learns your team's domain patterns.
+<CardGroup cols={2}>
+  <Card title="Full Org Context" icon="plug">
+    **ChatGPT/Copilots:** Manual copy-paste or code files only
 
-| Capability | ChatGPT + Jupyter | IDE Copilots (Cursor, GitHub) | SignalPilot Agentic Harness |
-|------------|-------------------|-------------------------------|------------------------------|
-| **Full organizational context** | ❌ Manual copy-paste | ❌ Code files only | ✅ DB schemas, dbt lineage, Slack, Jira, query history via MCP |
-| **Long-running investigations** | ❌ Single-shot responses | ❌ Single-file edits | ✅ Multi-step loop with analyst-in-the-loop approval |
-| **Domain knowledge retention** | ❌ No memory | ❌ No memory | ✅ Multi-session memory of past hypotheses, assumptions, quirks |
-| **Team-specific customization** | ❌ Generic | ❌ Generic | ✅ Custom skills (analysis patterns) + rules (coding standards, business logic) |
-| **Control & oversight** | ❌ Run output yourself | ⚠️ Auto-applies changes | ✅ Plan approval, hooks, audit trail |
+    **SignalPilot:** Auto-connects to dbt, databases, Slack, Jira, query history via MCP
+  </Card>
 
-**Why "harness"?** SignalPilot provides the infrastructure (context aggregation, execution environment, memory, customization) that lets AI agents work effectively on complex data investigations. You stay in control while AI handles the heavy lifting.
+  <Card title="Multi-Step Investigations" icon="rotate">
+    **ChatGPT/Copilots:** Single-shot responses or single-file edits
 
-<Card title="See Full Comparison" icon="balance-scale" href="/introduction/why-signalpilot">
-  SignalPilot vs ChatGPT vs GitHub Copilot vs Cursor
+    **SignalPilot:** Long-running loop with analyst-in-the-loop approval
+  </Card>
+
+  <Card title="Team Memory" icon="brain">
+    **ChatGPT/Copilots:** No memory between sessions or notebooks
+
+    **SignalPilot:** Remembers hypotheses, assumptions, data quirks
+  </Card>
+
+  <Card title="Custom Domain Logic" icon="code">
+    **ChatGPT/Copilots:** Generic suggestions
+
+    **SignalPilot:** Your team's skills, rules, and business logic
+  </Card>
+</CardGroup>
+
+**Why "harness"?** SignalPilot provides the infrastructure that lets AI work on complex data investigations while keeping you in control.
+
+<Card title="See Full Comparison with Real Examples" icon="balance-scale" href="/introduction/why-signalpilot">
+  SignalPilot vs ChatGPT vs Copilot — Head-to-head workflows + when to use each
 </Card>
 
 ---
 
-## Install in One Command
+## One Minute Installer
 
+**Prerequisites:** macOS, Linux, or Windows (WSL)  • uv  • Internet connection
+
+**Don't have [uv](https://docs.astral.sh/uv/getting-started/installation/)?** Install it first (takes seconds):
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+<small>Or see [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) for other methods (Homebrew, Windows, etc.)</small>
+
+**Then install SignalPilot:**
 ```bash
 uvx signalpilot
 ```
@@ -65,478 +92,117 @@ uvx signalpilot
 **What happens:**
 ```bash
 ✓ Creating workspace at ~/SignalPilotHome
-✓ Installing Python 3.12 + Jupyter Lab + SignalPilot extension
+✓ Installing isolated Python 3.12 + Jupyter Lab + SignalPilot extension
 ✓ Installing data packages (pandas, numpy, matplotlib, plotly...)
 ✓ Optimizing Jupyter cache for fast startup
-⚡ Setup complete in 2m 14s
+⚡ Setup complete in 1m 10s
 
 → Launching Jupyter Lab at http://localhost:8888
-   Token: abc123...
 ```
 
-<AccordionGroup>
-<Accordion title="Prerequisites" icon="list-check">
-  - **Python 3.10+** (auto-installed if using uvx)
-  - **uv package manager** (auto-installed with uvx)
-  - **Internet connection** (for AI features via Anthropic Claude)
-  - **OS:** macOS, Linux, Windows (WSL recommended)
-</Accordion>
+<Card title="Full Installation Guide" icon="book" href="/getting-started/installation">
+  Advanced options, alternative methods, troubleshooting
+</Card>
 
-<Accordion title="Alternative Installation Methods" icon="download">
-  ```bash
-  # Option 1: uvx (recommended - no installation needed)
-  uvx signalpilot
-
-  # Option 2: uv tool install
-  uv tool install signalpilot
-  sp init
-
-  # Option 3: pip
-  pip install signalpilot
-  sp init
-  ```
-
-  <Card title="Full Installation Guide" icon="book" href="/getting-started/installation">
-    Advanced options, troubleshooting, manual setup
-  </Card>
-</Accordion>
-</AccordionGroup>
-
----
-
-## Your First Investigation in 5 Minutes
+## Get Started in 3 Steps
 
 <Steps>
-<Step title="Launch Jupyter with SignalPilot" icon="rocket">
-  Already installed? Start Jupyter:
-
+<Step title="Launch SignalPilot" icon="rocket">
   ```bash
   uvx signalpilot lab
   ```
+  Opens Jupyter Lab at `http://localhost:8888` with SignalPilot loaded
 
-  Opens Jupyter Lab at `http://localhost:8888` with SignalPilot extension active.
+  <Accordion title="Not installed yet?" icon="download">
+    Run the installer first:
+    ```bash
+    uvx signalpilot
+    ```
+    Takes ~2 minutes to set up everything
+  </Accordion>
 </Step>
 
-<Step title="Connect your first data source" icon="plug">
-  Choose one to start:
+<Step title="Connect your data (optional)" icon="plug">
+  **Option 1:** Connect a database (PostgreSQL, Snowflake, BigQuery)
 
-  <CardGroup cols={3}>
-    <Card title="PostgreSQL" icon="database" href="/integrations/databases/postgresql">
-      Local or cloud Postgres
-    </Card>
-    <Card title="Snowflake" icon="snowflake" href="/integrations/databases/snowflake">
-      Data warehouse
-    </Card>
-    <Card title="dbt" icon="diagram-project" href="/integrations/dbt-integration">
-      Cloud or Core projects
-    </Card>
-  </CardGroup>
+  **Option 2:** Analyze local files (CSV, Excel, notebooks)
 
-  **What you get:** SignalPilot can now see schemas, lineage, and query history
+  <Card title="Connection Guides" icon="database" href="/integrations">
+    Step-by-step setup for databases, dbt, Slack, Jira
+  </Card>
+
+  <Note>
+  You can start analyzing local files without connecting to any external data sources
+  </Note>
 </Step>
 
 <Step title="Ask your first question" icon="message">
-  In the SignalPilot sidebar, ask:
-
   > "Show me the top 10 customers by revenue this month"
 
-  **SignalPilot will:**
-  1. ✅ Fetch your database schema
-  2. ✅ Generate a plan (shows you first)
-  3. ✅ Write + execute the SQL query
-  4. ✅ Create a visualization
-  5. ✅ Explain the results
+  SignalPilot generates a plan → you approve → it executes
 
-  <Card title="Complete Quickstart Tutorial" icon="graduation-cap" href="/getting-started/quickstart">
-    Debug a revenue drop in 5 minutes (with screenshots)
+  <Card title="5-Minute Quickstart" icon="graduation-cap" href="/getting-started/quickstart">
+    Complete walkthrough with real example
   </Card>
 </Step>
 </Steps>
 
 ---
 
-## What You Can Build with SignalPilot
-
-<CardGroup cols={2}>
-  <Card title="Investigate Revenue Anomalies" icon="chart-line-down" href="/guides/investigating-revenue-drops">
-    **Use case:** "Why did revenue drop 15% last week?"
-
-    **SignalPilot aggregates:**
-    - dbt lineage to find upstream changes
-    - Slack threads about recent issues
-    - Jira tickets about deployments
-    - Query history for anomalies
-
-    **Outcome:** Root cause identified in minutes, not hours
-  </Card>
-
-  <Card title="Debug Data Quality Issues" icon="bug" href="/guides/debugging-data-quality">
-    **Use case:** "Why are order counts suddenly higher?"
-
-    **SignalPilot uses:**
-    - Schema introspection (recent changes?)
-    - Query performance analysis
-    - dbt test results
-    - Multi-step hypothesis testing
-
-    **Outcome:** Duplicate records found + fix proposed
-  </Card>
-
-  <Card title="Analyze Time-Series Trends" icon="chart-line" href="/guides/analyzing-timeseries">
-    **Use case:** "Plot monthly active users with seasonality"
-
-    **SignalPilot:**
-    - Generates optimized queries
-    - Creates interactive Plotly charts
-    - Runs statistical analysis
-    - Iterates on visualization style
-
-    **Outcome:** Publication-ready chart in one prompt
-  </Card>
-
-  <Card title="Explore dbt Model Dependencies" icon="diagram-project" href="/guides/working-with-dbt">
-    **Use case:** "What upstream models affect user_revenue?"
-
-    **SignalPilot:**
-    - Visualizes full lineage graph
-    - Explains transformations
-    - Shows test coverage
-    - Identifies breaking change risks
-
-    **Outcome:** Full dependency map with documentation
-  </Card>
-</CardGroup>
-
----
-
-## How the Agentic Harness Works
-
-SignalPilot is built on **4 foundational systems** that work together to enable AI agents for data investigation — while keeping analysts in control.
-
-<img src="/images/architecture-diagram.png" alt="SignalPilot Agentic Harness: MCP Context Layer + Long-Running Agent Loop + Memory + Skills/Rules" />
-
-### Four Foundational Systems
-
-<AccordionGroup>
-<Accordion title="1. Multi-Source Context Aggregation (MCP Sidecar)" icon="plug" defaultOpen>
-  SignalPilot connects to your data stack via **MCP (Model Context Protocol):**
-
-  **Internal MCP Sidecar:**
-  - Kernel operations (execute code, introspect state)
-  - Database queries (schemas, performance, history)
-  - Schema introspection (metadata, lineage)
-  - Kernel variables (dataframes, active data)
-  - Local files (notebooks, CSVs, configs)
-
-  **External MCP Servers:**
-  - **dbt** (Cloud/Core): Model lineage, documentation, tests
-  - **Slack**: Threads, decisions, discussions about data
-  - **Jira**: Tickets, issues, deployment history
-  - **GDocs/Notion**: Design docs, wikis, runbooks
-  - **Snowflake/Databricks**: Query logs, usage stats
-
-  **Result:** The AI can reason across your entire data stack + organizational knowledge.
-
-  <Card title="Deep Dive: MCP Architecture" icon="sitemap" href="/deep-dives/context-aggregation">
-    Understand how MCP enables context orchestration
-  </Card>
-</Accordion>
-
-<Accordion title="2. Long-Running Agent Loop (with Analyst-in-the-Loop)" icon="rotate">
-  Unlike single-shot completions (ChatGPT) or auto-apply copilots, SignalPilot runs a **long-running investigation loop with human oversight:**
-
-  ```
-  1. Resolve Contexts (PARALLEL)
-     └─ Fetch schemas, lineage, Slack threads, query history, past investigations
-
-  2. Build System Prompt (with full organizational context)
-
-  3. Generate Investigation Plan
-     └─ AI proposes multi-step approach
-
-  4. 👤 ANALYST APPROVAL CHECKPOINT
-     └─ Review plan, modify, or reject before execution
-
-  5. Execute Tools (PARALLEL)
-     └─ Run queries, update cells, generate plots, check assumptions
-
-  6. Stream Results + Continuous Completion Check
-     └─ Loop until investigation complete or analyst stops
-
-  7. Save to Memory
-     └─ Capture findings, validated assumptions, patterns for future investigations
-  ```
-
-  **Why "long-running"?** Data investigations aren't single queries — they're multi-step processes. SignalPilot maintains context across the entire investigation.
-
-  **Why "analyst-in-the-loop"?** You approve plans before execution. AI proposes, you decide. Full control with AI assistance.
-
-  <Card title="Deep Dive: Agent Loop Mechanics" icon="gears" href="/deep-dives/agent-orchestration">
-    How the production loop works internally
-  </Card>
-</Accordion>
-
-<Accordion title="3. Multi-Session Memory & Control Hooks" icon="brain">
-  **Multi-Session Memory** is the institutional knowledge layer that makes AI agents actually useful:
-  - **Analysis history:** What hypotheses were tested in past investigations? What was ruled out?
-  - **Validated assumptions:** "Revenue calculation uses net, not gross" (learned once, applied forever)
-  - **Known data quirks:** "Orders table has duplicates before 2024-01" (no more rediscovering issues)
-  - **Past solutions:** "Last time conversion spiked, it was timezone issues" (pattern recognition)
-
-  **Why this matters:** Without memory, every investigation starts from zero. With memory, SignalPilot learns your data stack over time.
-
-  ---
-
-  **Control Hooks** are safety guardrails that enforce governance and best practices:
-  - **Pre-execution validation:** "Only query prod DB during office hours" (prevent accidents)
-  - **Data quality checks:** "Warn if row count changed >20%" (catch anomalies early)
-  - **Custom constraints:** "Always use vectorized pandas, never iterrows()" (enforce performance patterns)
-  - **Audit logging:** Track what data was accessed, when, and for what investigation (compliance-ready)
-
-  **Why this matters:** Agentic systems need constraints. Hooks let you define boundaries while still enabling autonomy.
-
-  <CardGroup cols={2}>
-    <Card title="Deep Dive: Memory System" icon="database" href="/deep-dives/multi-session-memory">
-      How memory works and what gets stored
-    </Card>
-    <Card title="Deep Dive: Hooks System" icon="webhook" href="/deep-dives/hooks-system">
-      Custom constraints and validations
-    </Card>
-  </CardGroup>
-</Accordion>
-
-<Accordion title="4. Skills and Rules System (Team Customization)" icon="code">
-  **Custom Skills** are reusable analysis patterns that encode your team's domain expertise:
-  - **Analysis templates:** "Run cohort retention on users table with our 7-day/30-day windows"
-  - **Domain calculations:** "Calculate MRR using our billing logic: (seats × price) + overages - credits"
-  - **Data transformations:** "Clean customer addresses using USPS standards + international normalization"
-  - **Visualization templates:** "Generate exec-ready revenue waterfall using company brand colors"
-
-  **Why this matters:** Generic AI doesn't know your business. Skills let you teach SignalPilot your team's analysis playbook — once. Then every analyst benefits.
-
-  ---
-
-  **Rules** are the coding standards and business logic that ensure consistency:
-  - **Code style:** "Always import pandas as pd, use type hints, docstrings for functions >10 lines"
-  - **Performance patterns:** "Use vectorized operations, never .iterrows(), always explain() queries before large scans"
-  - **Business logic:** "Revenue = (price × quantity) - discounts, EXCLUDE test_accounts and internal domains"
-  - **Data quality gates:** "Flag if nulls >5%, dates outside [2020, today], or row count Δ >20%"
-
-  **Why this matters:** Agentic harness means the infrastructure enforces your standards. No more "AI wrote bad code" — Rules prevent it from happening.
-
-  **Result:** Every analysis follows your team's best practices automatically. New analysts get instant access to senior patterns.
-
-  <CardGroup cols={2}>
-    <Card title="Deep Dive: Custom Skills" icon="wand-magic-sparkles" href="/deep-dives/custom-skills">
-      Build reusable analysis patterns
-    </Card>
-    <Card title="Deep Dive: Rules System" icon="gavel" href="/deep-dives/rules-system">
-      Enforce standards and business logic
-    </Card>
-  </CardGroup>
-</Accordion>
-</AccordionGroup>
-
----
-
-**Why these 4 systems make an "agentic harness":**
-
-The harness metaphor is intentional — just like a climbing harness provides **infrastructure that keeps you safe while enabling you to climb higher**, SignalPilot provides the infrastructure that lets AI agents work on complex data investigations while keeping analysts in control:
-
-1. **Context Layer (MCP)** → Gives AI the organizational knowledge to reason effectively
-2. **Long-Running Loop** → Enables multi-step investigations (not single-shot queries) with human oversight
-3. **Memory & Hooks** → Learns from past work + enforces safety boundaries
-4. **Skills & Rules** → Customizes to your domain + coding standards
-
-**Together:** AI-forward data teams get the speed of AI with the control, safety, and domain expertise they need for production investigations.
-
-<Card title="Full Architecture Guide" icon="sitemap" href="/introduction/how-it-works">
-  Complete technical overview with diagrams and API references
-</Card>
-
----
-
-## Security & Privacy
-
-<CardGroup cols={2}>
-  <Card title="Read-Only MCP Access" icon="lock">
-    **All connections are read-only**
-
-    SignalPilot can query and introspect, but cannot write to your databases or modify data sources.
-  </Card>
-
-  <Card title="Zero Data Retention" icon="ban">
-    **Your data never leaves your environment**
-
-    Local-first execution. No data stored on SignalPilot servers. Zero retention agreement with Anthropic (model provider).
-  </Card>
-
-  <Card title="Scope Control" icon="sliders">
-    **You choose what to connect**
-
-    Granular control: select specific schemas, dbt projects, Slack channels. Agent only sees what you explicitly allow.
-  </Card>
-
-  <Card title="Audit Trail" icon="file-lines">
-    **Full transparency**
-
-    See what context was accessed, when, and for what analysis. Export audit logs for compliance.
-  </Card>
-</CardGroup>
-
-<Note>
-**SOC 2 Type II in progress** • **GDPR compliant** • **HIPAA-ready architecture**
-</Note>
-
-<Card title="Full Security Documentation" icon="shield-halved" href="/introduction/security-and-privacy">
-  Data handling, compliance, encryption, and access controls
-</Card>
-
----
-
-## Popular Integrations
-
-<Tabs>
-<Tab title="Databases">
-  <CardGroup cols={3}>
-    <Card title="PostgreSQL" icon="database" href="/integrations/databases/postgresql">
-      Local or cloud Postgres
-    </Card>
-    <Card title="Snowflake" icon="snowflake" href="/integrations/databases/snowflake">
-      Cloud data warehouse
-    </Card>
-    <Card title="Databricks" icon="database" href="/integrations/databases/databricks">
-      Lakehouse platform
-    </Card>
-    <Card title="MySQL" icon="database" href="/integrations/databases/mysql">
-      Popular open-source DB
-    </Card>
-    <Card title="BigQuery" icon="google" href="/integrations/databases/bigquery">
-      Google Cloud warehouse
-    </Card>
-    <Card title="Redshift" icon="aws" href="/integrations/databases/redshift">
-      AWS data warehouse
-    </Card>
-  </CardGroup>
-</Tab>
-
-<Tab title="Data Tools">
-  <CardGroup cols={2}>
-    <Card title="dbt Cloud" icon="cloud" href="/integrations/dbt-integration">
-      Hosted dbt projects
-    </Card>
-    <Card title="dbt Core" icon="diagram-project" href="/integrations/dbt-integration">
-      Local dbt projects
-    </Card>
-  </CardGroup>
-</Tab>
-
-<Tab title="Collaboration">
-  <CardGroup cols={3}>
-    <Card title="Slack" icon="slack" href="/integrations/collaboration/slack">
-      Threads and discussions
-    </Card>
-    <Card title="Jira" icon="jira" href="/integrations/collaboration/jira">
-      Tickets and issues
-    </Card>
-    <Card title="Google Docs" icon="google" href="/integrations/collaboration/gdocs">
-      Design docs and wikis
-    </Card>
-  </CardGroup>
-</Tab>
-</Tabs>
-
-<Card title="All Integrations" icon="puzzle-piece" href="/integrations">
-  Browse the full integration catalog
-</Card>
-
----
-
 ## Learn More
 
+<CardGroup cols={2}>
+  <Card title="How It Works" icon="gears" href="/introduction/how-it-works">
+    **4 foundational systems explained**
+
+    MCP context layer, long-running loop, memory & hooks, skills & rules
+  </Card>
+
+  <Card title="Why SignalPilot?" icon="balance-scale" href="/introduction/why-signalpilot">
+    **vs ChatGPT vs IDE Copilots**
+
+    Full comparison + real-world investigation example
+  </Card>
+
+  <Card title="Security & Privacy" icon="shield-halved" href="/introduction/security-and-privacy">
+    **Read-only, local-first, zero retention**
+
+    SOC 2 in progress, GDPR compliant, audit trail
+  </Card>
+
+  <Card title="All Integrations" icon="puzzle-piece" href="/integrations">
+    **Connect your data stack**
+
+    PostgreSQL, Snowflake, dbt, Slack, Jira, and more
+  </Card>
+</CardGroup>
+
+---
+
+## Resources
+
 <CardGroup cols={3}>
-  <Card title="Key Concepts" icon="book" href="/getting-started/key-concepts">
-    Understand agents, modes, context, planning, and hooks
+  <Card title="Quickstart Tutorial" icon="rocket" href="/getting-started/quickstart">
+    5-minute investigation walkthrough
   </Card>
 
   <Card title="CLI Reference" icon="terminal" href="/reference/cli-commands">
-    Complete command documentation (init, lab, doctor, upgrade)
+    Commands and troubleshooting
   </Card>
 
   <Card title="Configuration" icon="sliders" href="/reference/configuration">
-    Customize agent behavior, hooks, and MCP servers
+    Customize behavior and rules
   </Card>
 
-  <Card title="Troubleshooting" icon="wrench" href="/reference/troubleshooting">
-    Common issues and solutions
-  </Card>
-
-  <Card title="Community Discord" icon="discord" href="https://discord.gg/signalpilot">
+  <Card title="Discord Community" icon="discord" href="https://discord.gg/signalpilot">
     Get help and share use cases
   </Card>
 
   <Card title="GitHub" icon="github" href="https://github.com/signalpilot">
     Report issues and contribute
   </Card>
+
+  <Card title="Documentation" icon="book" href="/getting-started/key-concepts">
+    Full concepts and guides
+  </Card>
 </CardGroup>
-
----
-
-## Real-World Example: All 4 Systems Working Together
-
-**Scenario:** Your CFO asks "Why did our conversion rate drop 8% last week?"
-
-### Traditional Workflow (2+ hours, no institutional knowledge capture)
-1. ❌ Open Snowflake, manually explore tables (no context)
-2. ❌ Copy schema to ChatGPT, ask for query (hallucinated table names)
-3. ❌ Run query, fix errors, re-run (3-4 iterations)
-4. ❌ Check Slack for recent changes (scroll back 100+ messages manually)
-5. ❌ Find Jira ticket about A/B test, read linked doc (manual search)
-6. ❌ Write new queries based on findings (no memory of what was tested)
-7. ❌ Create visualization in notebook (generic, not following team standards)
-8. ❌ Write summary, **forget to document assumptions for next time**
-
-### SignalPilot Agentic Harness (10 minutes, with learning)
-
-**Ask once:** "Why did conversion rate drop 8% last week?"
-
-**SignalPilot orchestrates using all 4 systems:**
-
-1. **🔌 Context Aggregation (System 1)**
-   - Fetches Snowflake schema (conversion_rate table, relationships)
-   - Loads dbt lineage (upstream dependencies: events → sessions → conversions)
-   - Searches Slack for "conversion" mentions last week → finds A/B test thread
-   - Pulls Jira ticket #3421 about experiment + linked design doc
-   - Queries Snowflake query_history for anomalies
-
-2. **🔄 Long-Running Loop (System 2)**
-   - **Generates investigation plan:** "Check A/B test deployment → Compare cohorts → Analyze funnel drop-off"
-   - **👤 Shows you plan for approval** (analyst-in-the-loop)
-   - You approve → Executes in phases:
-     - Phase 1: Validate A/B test started on drop date ✓
-     - Phase 2: Compare treatment vs control conversion ✓
-     - Phase 3: Identify funnel stage with issue ✓
-
-3. **🧠 Memory & Hooks (System 3)**
-   - **Memory recalls:** "Last time conversion dropped (2 months ago), it was timezone bug in tracking"
-   - **Checks that pattern first** → Not the issue this time
-   - **Hooks enforce:** Data quality check flags that test group has 18% fewer users than control (suspicious)
-   - **Saves to memory:** "Conversion drops often correlate with A/B tests — check experiment metadata first"
-
-4. **💻 Skills & Rules (System 4)**
-   - **Applies team skill:** "conversion_funnel_analysis" (your pre-built analysis template)
-   - **Follows rules:** Uses vectorized pandas (not loops), excludes test_accounts, generates waterfall chart with brand colors
-   - **Enforces business logic:** Revenue calculation follows your formula (excludes refunds, includes discounts)
-
-**Outcome:**
-- ✅ Root cause identified: A/B test deployed with buggy tracking pixel
-- ✅ Before/after comparison chart (following team viz standards)
-- ✅ **Institutional knowledge captured:** "Check A/B test experiments first for conversion anomalies"
-- ✅ **Next analyst who investigates conversion** gets this pattern automatically
-
-**Time saved:** 2 hours → 10 minutes
-**Knowledge multiplier:** Every investigation makes the team smarter
-
-<Card title="Try the Full Tutorial" icon="play" href="/getting-started/quickstart">
-  Debug a revenue drop in 5 minutes (step-by-step)
-</Card>

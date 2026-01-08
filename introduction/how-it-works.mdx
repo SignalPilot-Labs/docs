@@ -1,153 +1,230 @@
 ---
 title: "How SignalPilot Works"
-description: "Understanding the MCP sidecar architecture, agent orchestration loop, and multi-session memory"
+description: "Deep dive into the 4 foundational systems that make up the agentic harness for AI-forward data teams"
 ---
 
-# How SignalPilot Works
+# How the Agentic Harness Works
 
-<Info>
-SignalPilot is a **context orchestration engine** that gives AI agents access to your full organizational knowledge.
-</Info>
+SignalPilot is built on **4 foundational systems** that work together to enable AI agents for data investigation — while keeping analysts in control.
 
-## Three Core Innovations
-
-SignalPilot solves data investigation challenges through three interconnected systems:
-
-<CardGroup cols={3}>
-  <Card title="MCP Sidecar" icon="plug">
-    Multi-source context aggregation from databases, dbt, Slack, Jira
-  </Card>
-  <Card title="Agent Loop" icon="rotate">
-    Production-ready orchestration with planning, iteration, and execution
-  </Card>
-  <Card title="Memory + Hooks" icon="brain">
-    Institutional knowledge capture and custom constraints
-  </Card>
-</CardGroup>
+<img src="/images/agentic-harness-signalpilot.png" alt="SignalPilot Agentic Harness: MCP Context Layer + Long-Running Agent Loop + Memory + Skills/Rules" />
 
 ---
 
-## 1. Multi-Source Context Aggregation (MCP Sidecar)
-
-SignalPilot connects to your data stack via **MCP (Model Context Protocol):**
-
-### Internal MCP Sidecar
-- **Kernel Ops:** Execute code, introspect state
-- **DB Queries:** Access schemas, query history
-- **Schema Introspection:** Metadata, lineage
-- **Kernel Variables:** Dataframes, in-memory state
-- **Local Files:** Notebooks, CSVs, config
-
-### External MCP Servers
-- **dbt Cloud/Core:** Lineage, documentation
-- **Slack:** Threads, decisions, discussions
-- **Jira:** Tickets, issues, changes
-- **GDocs/Notion:** Design docs, wikis
-- **Snowflake/Databricks:** Query logs, statistics
-
-<Check>
-**Result:** SignalPilot can reason across database schemas, dbt lineage, past Slack discussions, Jira tickets, and historical investigations
-</Check>
-
----
-
-## 2. Production-Ready Agent Orchestration Loop
-
-Unlike single-shot completions, SignalPilot runs a **continuous orchestration loop:**
-
-<Steps>
-<Step title="Resolve Contexts (PARALLEL)">
-  - Fetch relevant schemas
-  - Load dbt lineage
-  - Find related Slack threads
-  - Retrieve past investigation notebooks
-</Step>
-
-<Step title="Build System Prompt">
-  Aggregate all context into a unified system prompt
-</Step>
-
-<Step title="Call LLM (Stream Response)">
-  - Extended thinking (Claude Sonnet 4.5)
-  - Tool use (execute code, query DB)
-</Step>
-
-<Step title="Execute Tools (PARALLEL)">
-  - Kernel ops, DB queries, schema checks
-</Step>
-
-<Step title="Stream Results + Completion Check">
-  Loop until done or user stops
-</Step>
-</Steps>
-
-### Key Innovations
-
-<Tip>
-- **Parallel context resolution:** Fast, doesn't block LLM
-- **Continuous completion checking:** Knows when to stop
-- **Tool execution in parallel:** Efficient
-- **Multi-step iteration:** Not single-shot
-</Tip>
-
----
-
-## 3. Multi-Session Memory & Hooks
-
-### Memory
-
-SignalPilot captures and reuses institutional knowledge:
-
-- **Analysis history:** What hypotheses were tested? Ruled out?
-- **Validated assumptions:** "Revenue calculation uses net, not gross"
-- **Known data quirks:** "Orders table has duplicates before 2024"
-- **Past solutions:** "Last time this spiked, it was timezone issues"
-
-### Hooks
-
-Custom constraints and validations:
-
-- **Pre-execution validation:** "Only query prod DB during office hours"
-- **Data quality checks:** "Warn if row count changed >20%"
-- **Custom rules:** "Always use vectorized pandas, never loops"
-- **Audit logging:** Track what data was accessed and when
-
----
-
-## Security & Control
-
-Despite broad access, you maintain full control:
+## Four Foundational Systems
 
 <AccordionGroup>
-<Accordion title="Read-Only MCP Connections">
-  No writes to production systems — all connections are read-only
+<Accordion title="1. Multi-Source Context Aggregation" icon="plug" defaultOpen>
+  SignalPilot connects to your data stack via internal tools, jupyter notebook interface, and **MCP (Model Context Protocol):**
+
+  **Internal MCP Tooling Sidecar:**
+  - Kernel operations (execute code, introspect state)
+  - Database queries (schemas, performance, history)
+  - Schema introspection (metadata, lineage)
+  - Kernel variables (dataframes, active data)
+  - Local files (notebooks, CSVs, configs)
+
+  **External MCP Servers:**
+  - **dbt** (Cloud/Core): Model lineage, documentation, tests
+  - **Slack**: Threads, decisions, discussions about data
+  - **Jira**: Tickets, issues, deployment history
+  - **GDocs/Notion**: Design docs, wikis, runbooks
+  - **Snowflake/Databricks**: Query logs, usage stats
+
+  **Result:** The AI can reason across your entire data stack + organizational knowledge.
+
+  <Card title="Deep Dive: MCP Architecture" icon="sitemap" href="/deep-dives/context-aggregation">
+    Understand how MCP enables context orchestration
+  </Card>
 </Accordion>
 
-<Accordion title="Scope Control">
-  Choose which schemas/projects to connect — granular permissions
+<Accordion title="2. Long-Running Agent Loop (with Analyst-in-the-Loop)" icon="rotate">
+  Unlike single-shot completions (ChatGPT) or auto-apply copilots, SignalPilot runs a **long-running investigation loop with human oversight:**
+
+  ```
+  1. Resolve Contexts (PARALLEL)
+     └─ Fetch schemas, lineage, Slack threads, query history, past investigations
+
+  2. Build System Prompt (with full organizational context)
+
+  3. Generate Investigation Plan
+     └─ AI proposes multi-step approach
+
+  4. 👤 ANALYST APPROVAL CHECKPOINT
+     └─ Review plan, modify, or reject before execution
+
+  5. Execute Tools (PARALLEL)
+     └─ Run queries, update cells, generate plots, check assumptions
+
+  6. Stream Results + Continuous Completion Check
+     └─ Loop until investigation complete or analyst stops
+
+  7. Save to Memory
+     └─ Capture findings, validated assumptions, patterns for future investigations
+  ```
+
+  **Why "long-running"?** Data investigations aren't single queries — they're multi-step processes. SignalPilot maintains context across the entire investigation.
+
+  **Why "analyst-in-the-loop"?** You approve plans before execution. AI proposes, you decide. Full control with AI assistance.
+
+  <Card title="Deep Dive: Agent Loop Mechanics" icon="gears" href="/deep-dives/agent-orchestration">
+    How the production loop works internally
+  </Card>
 </Accordion>
 
-<Accordion title="Approval Workflows">
-  Planning Mode requires explicit confirmation before execution
+<Accordion title="3. Multi-Session Memory & Control Hooks" icon="brain">
+  **Multi-Session Memory** is the institutional knowledge layer that makes AI agents actually useful:
+  - **Analysis history:** What hypotheses were tested in past investigations? What was ruled out?
+  - **Validated assumptions:** "Revenue calculation uses net, not gross" (learned once, applied forever)
+  - **Known data quirks:** "Orders table has duplicates before 2024-01" (no more rediscovering issues)
+  - **Past solutions:** "Last time conversion spiked, it was timezone issues" (pattern recognition)
+
+  **Why this matters:** Without memory, every investigation starts from zero. With memory, SignalPilot learns your data stack over time.
+
+  ---
+
+  **Control Hooks** are safety guardrails that enforce governance and best practices:
+  - **Pre-execution validation:** "Only query prod DB during office hours" (prevent accidents)
+  - **Data quality checks:** "Warn if row count changed >20%" (catch anomalies early)
+  - **Custom constraints:** "Always use vectorized pandas, never iterrows()" (enforce performance patterns)
+  - **Audit logging:** Track what data was accessed, when, and for what investigation (compliance-ready)
+
+  **Why this matters:** Agentic systems need constraints. Hooks let you define boundaries while still enabling autonomy.
+
+  <CardGroup cols={2}>
+    <Card title="Deep Dive: Memory System" icon="database" href="/deep-dives/multi-session-memory">
+      How memory works and what gets stored
+    </Card>
+    <Card title="Deep Dive: Hooks System" icon="webhook" href="/deep-dives/hooks-system">
+      Custom constraints and validations
+    </Card>
+  </CardGroup>
 </Accordion>
 
-<Accordion title="Hooks Constraints">
-  Enforce custom rules via pre-execution hooks
-</Accordion>
+<Accordion title="4. Skills and Rules System (Team Customization)" icon="code">
+  **Custom Skills** are reusable analysis patterns that encode your team's domain expertise:
+  - **Analysis templates:** "Run cohort retention on users table with our 7-day/30-day windows"
+  - **Domain calculations:** "Calculate MRR using our billing logic: (seats × price) + overages - credits"
+  - **Data transformations:** "Clean customer addresses using USPS standards + international normalization"
+  - **Visualization templates:** "Generate exec-ready revenue waterfall using company brand colors"
 
-<Accordion title="Local-First Execution">
-  Code runs in your environment — never on SignalPilot servers
-</Accordion>
+  **Why this matters:** Generic AI doesn't know your business. Skills let you teach SignalPilot your team's analysis playbook — once. Then every analyst benefits.
 
-<Accordion title="Zero Data Retention">
-  No data stored on SignalPilot servers — full privacy
-</Accordion>
+  ---
 
-<Accordion title="Audit Trail">
-  See what context was accessed and when
+  **Rules** are the coding standards and business logic that ensure consistency:
+  - **Code style:** "Always import pandas as pd, use type hints, docstrings for functions >10 lines"
+  - **Performance patterns:** "Use vectorized operations, never .iterrows(), always explain() queries before large scans"
+  - **Business logic:** "Revenue = (price × quantity) - discounts, EXCLUDE test_accounts and internal domains"
+  - **Data quality gates:** "Flag if nulls >5%, dates outside [2020, today], or row count Δ >20%"
+
+  **Why this matters:** Agentic harness means the infrastructure enforces your standards. No more "AI wrote bad code" — Rules prevent it from happening.
+
+  **Result:** Every analysis follows your team's best practices automatically. New analysts get instant access to senior patterns.
+
+  <CardGroup cols={2}>
+    <Card title="Deep Dive: Custom Skills" icon="wand-magic-sparkles" href="/deep-dives/custom-skills">
+      Build reusable analysis patterns
+    </Card>
+    <Card title="Deep Dive: Rules System" icon="gavel" href="/deep-dives/rules-system">
+      Enforce standards and business logic
+    </Card>
+  </CardGroup>
 </Accordion>
 </AccordionGroup>
 
-<Card title="Learn more about security" icon="shield" href="/introduction/security-and-privacy">
-  Deep dive into security architecture and privacy controls
+---
+
+## Why These 4 Systems Make an "Agentic Harness"
+
+The harness metaphor is intentional — just like a climbing harness provides **infrastructure that keeps you safe while enabling you to climb higher**, SignalPilot provides the infrastructure that lets AI agents work on complex data investigations while keeping analysts in control:
+
+1. **Context Layer (MCP)** → Gives AI the organizational knowledge to reason effectively
+2. **Long-Running Loop** → Enables multi-step investigations (not single-shot queries) with human oversight
+3. **Memory & Hooks** → Learns from past work + enforces safety boundaries
+4. **Skills & Rules** → Customizes to your domain + coding standards
+
+**Together:** AI-forward data teams get the speed of AI with the control, safety, and domain expertise they need for production investigations.
+
+---
+
+## Real-World Example: All 4 Systems Working Together
+
+**Scenario:** Your CFO asks "Why did our conversion rate drop 8% last week?"
+
+### Traditional Workflow (2+ hours, no institutional knowledge capture)
+1. ❌ Open Snowflake, manually explore tables (no context)
+2. ❌ Copy schema to ChatGPT, ask for query (hallucinated table names)
+3. ❌ Run query, fix errors, re-run (3-4 iterations)
+4. ❌ Check Slack for recent changes (scroll back 100+ messages manually)
+5. ❌ Find Jira ticket about A/B test, read linked doc (manual search)
+6. ❌ Write new queries based on findings (no memory of what was tested)
+7. ❌ Create visualization in notebook (generic, not following team standards)
+8. ❌ Write summary, **forget to document assumptions for next time**
+
+### SignalPilot Agentic Harness (10 minutes, with learning)
+
+**Ask once:** "Why did conversion rate drop 8% last week?"
+
+**SignalPilot orchestrates using all 4 systems:**
+
+#### 1. 🔌 Context Aggregation (System 1)
+- Fetches Snowflake schema (conversion_rate table, relationships)
+- Loads dbt lineage (upstream dependencies: events → sessions → conversions)
+- Searches Slack for "conversion" mentions last week → finds A/B test thread
+- Pulls Jira ticket #3421 about experiment + linked design doc
+- Queries Snowflake query_history for anomalies
+
+#### 2. 🔄 Long-Running Loop (System 2)
+- **Generates investigation plan:** "Check A/B test deployment → Compare cohorts → Analyze funnel drop-off"
+- **👤 Shows you plan for approval** (analyst-in-the-loop)
+- You approve → Executes in phases:
+  - Phase 1: Validate A/B test started on drop date ✓
+  - Phase 2: Compare treatment vs control conversion ✓
+  - Phase 3: Identify funnel stage with issue ✓
+
+#### 3. 🧠 Memory & Hooks (System 3)
+- **Memory recalls:** "Last time conversion dropped (2 months ago), it was timezone bug in tracking"
+- **Checks that pattern first** → Not the issue this time
+- **Hooks enforce:** Data quality check flags that test group has 18% fewer users than control (suspicious)
+- **Saves to memory:** "Conversion drops often correlate with A/B tests — check experiment metadata first"
+
+#### 4. 💻 Skills & Rules (System 4)
+- **Applies team skill:** "conversion_funnel_analysis" (your pre-built analysis template)
+- **Follows rules:** Uses vectorized pandas (not loops), excludes test_accounts, generates waterfall chart with brand colors
+- **Enforces business logic:** Revenue calculation follows your formula (excludes refunds, includes discounts)
+
+### Outcome
+- ✅ Root cause identified: A/B test deployed with buggy tracking pixel
+- ✅ Before/after comparison chart (following team viz standards)
+- ✅ **Institutional knowledge captured:** "Check A/B test experiments first for conversion anomalies"
+- ✅ **Next analyst who investigates conversion** gets this pattern automatically
+
+**Time saved:** 2 hours → 10 minutes
+**Knowledge multiplier:** Every investigation makes the team smarter
+
+<Card title="Try the Full Tutorial" icon="play" href="/getting-started/quickstart">
+  Debug a revenue drop in 5 minutes (step-by-step)
 </Card>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Why SignalPilot?" icon="balance-scale" href="/introduction/why-signalpilot">
+    See full comparison vs ChatGPT and IDE copilots
+  </Card>
+
+  <Card title="Security & Privacy" icon="shield-halved" href="/introduction/security-and-privacy">
+    Read-only access, zero retention, audit trail
+  </Card>
+
+  <Card title="Quickstart Tutorial" icon="rocket" href="/getting-started/quickstart">
+    5-minute walkthrough with your data
+  </Card>
+
+  <Card title="Key Concepts" icon="book" href="/getting-started/key-concepts">
+    Understand agents, modes, planning, and context
+  </Card>
+</CardGroup>

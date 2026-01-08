@@ -1,176 +1,376 @@
 ---
 title: "Installation"
-description: "Get SignalPilot up and running in under 3 minutes"
+description: "Get SignalPilot up and running in under 2 minutes"
 ---
 
 # Installation
 
 <Info>
-Get SignalPilot up and running in under 3 minutes with a single command.
+SignalPilot is a **Jupyter Lab extension** with AI agent capabilities. Install it in under 2 minutes with a single command — no manual setup required.
 </Info>
 
 ## What You're Installing
 
-SignalPilot is a **Jupyter Lab extension** (soon VSCode) with:
+SignalPilot is a **Jupyter Lab extension** (soon VSCode) that provides:
 
 <CardGroup cols={2}>
-  <Card title="AI Agent" icon="robot">
-    Full organizational context (dbt, databases, Slack, etc.)
+  <Card title="Agentic Harness" icon="robot">
+    Long-running agent with analyst-in-the-loop approval
   </Card>
-  <Card title="MCP-Powered Context" icon="plug">
-    Context aggregation from multiple sources
+  <Card title="Multi-Source Context" icon="plug">
+    Connects to dbt, databases, Slack, Jira, query history via MCP
   </Card>
-  <Card title="Multi-Step Planning" icon="list-check">
-    Planning and execution workflows
+  <Card title="Memory & Hooks" icon="brain">
+    Institutional knowledge retention + safety guardrails
   </Card>
-  <Card title="Cell-Level Editing" icon="pencil">
-    Inline editing and tab autocomplete
+  <Card title="Skills & Rules" icon="code">
+    Custom analysis patterns + team coding standards
   </Card>
 </CardGroup>
 
-### The SignalPilot CLI
+### The SignalPilot Installer: `uvx` CLI
 
-The SignalPilot CLI is a **bootstrap tool** that:
+The `uvx` CLI is a **bootstrap installer** (not the product itself) that:
 
-1. Creates your workspace (`~/SignalPilotHome`)
-2. Installs Jupyter Lab + SignalPilot extension
-3. Manages Python environments and packages
-4. Launches Jupyter with SignalPilot pre-configured
+- Creates your workspace (`~/SignalPilotHome`)
+- Installs isolated Python 3.12 + Jupyter Lab + SignalPilot extension
+- Sets up data science packages (pandas, numpy, matplotlib, plotly)
+- Launches Jupyter with SignalPilot pre-configured
 
 <Warning>
-The CLI is an **installer**, not the product itself. The actual product is the Jupyter extension.
+**Product vs Installer:** The **Jupyter extension is the product**. The CLI just installs it in one command.
 </Warning>
 
----
+## Quick Install (Recommended)
 
-## Quick Start
+**Prerequisites:** macOS, Linux, or Windows (WSL) • Internet connection
+
+**Don't have [uv](https://docs.astral.sh/uv/getting-started/installation/)?** Install it first (takes 10 seconds):
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+<small>Or see [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) for other methods (Homebrew, Windows, etc.)</small>
+
+**Then install SignalPilot:**
 
 <Steps>
 <Step title="Run the installer">
-  No installation needed — runs via `uvx`:
-
   ```bash
   uvx signalpilot
   ```
 
-  <Check>
-  **What happens:**
-  - Creates `~/SignalPilotHome` workspace
-  - Installs Python 3.12 + Jupyter Lab + SignalPilot extension
-  - Sets up data science packages (pandas, numpy, matplotlib, plotly)
-  - Launches Jupyter Lab in your browser
-  </Check>
+  <Accordion title="Expected Output" icon="terminal">
+    ```
+    🚀 SignalPilot Setup
+    ───────────────────────────────────────────────
+    ✓ Creating workspace at ~/SignalPilotHome
+    ✓ Installing Python 3.12 environment
+    ✓ Installing Jupyter Lab + SignalPilot extension
+    ✓ Installing data packages (pandas, numpy, matplotlib, plotly)
+    ✓ Setting up starter notebooks
 
-  **Time:** ~2-3 minutes
+    🎉 Setup complete!
+
+    📂 Workspace: ~/SignalPilotHome
+    🔗 Opening Jupyter Lab at http://localhost:8888
+    ```
+  </Accordion>
+
+  **Time:** ~2 minutes
+
+  **What gets created:**
+  ```
+  ~/SignalPilotHome/
+  ├── user-skills/       # Your custom analysis patterns
+  ├── user-rules/        # Your team's coding standards
+  ├── team-workspace/    # Shared notebooks (git-tracked)
+  ├── demo-project/      # Example notebooks
+  ├── start-here.ipynb   # Quick start guide
+  ├── pyproject.toml     # Project config
+  └── .venv/             # Python environment
+  ```
 </Step>
 
-<Step title="Open Jupyter Lab">
-  Your browser will open automatically at `http://localhost:8888`
+<Step title="Jupyter Lab opens automatically">
+  Your browser opens at `http://localhost:8888`
 
-  You'll see the SignalPilot panel on the left sidebar.
+  You'll see the **SignalPilot panel** in the left and right sidebar with:
+  - Chat interface for agent interaction
+  - DB, Folder, MCP connectors and explorers
+  - Plan approval UI (analyst-in-the-loop)
+  - Skills & Rules editor
 </Step>
 
-<Step title="Connect your first database">
-  Follow the [database connection guide](/integrations/databases/postgresql) to connect to your data warehouse.
+<Step title="Start your first investigation">
+  Open `start-here.ipynb` and ask SignalPilot to help with your first data investigation.
+
+  Or jump to the [5-minute quickstart tutorial](/getting-started/quickstart).
 </Step>
 </Steps>
 
----
+## Launching Jupyter Lab Anytime
+
+Once installed, you can launch Jupyter Lab anytime with:
+
+```bash
+uvx signalpilot lab
+```
+
+**What this does:**
+- Opens Jupyter Lab in `~/SignalPilotHome` (your default workspace)
+- Uses the existing `.venv` (no reinstallation)
+- SignalPilot extension is pre-loaded
+- Opens browser at `http://localhost:8888`
+
+<AccordionGroup>
+<Accordion title="Pass custom Jupyter Lab arguments" icon="terminal">
+  You can pass any Jupyter Lab flags after the command:
+
+  ```bash
+  # Custom port
+  uvx signalpilot lab --port=8888
+
+  # Disable browser auto-open
+  uvx signalpilot lab --no-browser
+
+  # Bind to all network interfaces (access remotely)
+  uvx signalpilot lab --ip=0.0.0.0 --port=9999
+  ```
+
+  All standard `jupyter lab` arguments work.
+</Accordion>
+</AccordionGroup>
+
+## Alternative Installation Methods
+
+If you can't use `uvx` or prefer manual setup:
+
+<Tabs>
+<Tab title="Manual with uv">
+  **When to use:** Corporate environments, custom Python setup, or full control
+
+  <Steps>
+  <Step title="Install uv">
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    ```
+  </Step>
+
+  <Step title="Create workspace and install packages">
+    ```bash
+    mkdir -p ~/SignalPilotHome && cd ~/SignalPilotHome
+    uv venv --seed --python 3.12
+    source .venv/bin/activate
+    uv pip install signalpilot-ai jupyterlab pandas numpy matplotlib plotly
+    ```
+  </Step>
+
+  <Step title="Launch Jupyter Lab">
+    ```bash
+    jupyter lab
+    ```
+    Opens at `http://localhost:8888`
+  </Step>
+  </Steps>
+
+  **Next time:** Just activate and run:
+  ```bash
+  cd ~/SignalPilotHome && source .venv/bin/activate
+  jupyter lab
+  ```
+</Tab>
+
+<Tab title="Manual with pip/conda">
+  **When to use:** Existing conda workflows, no uv available
+
+  <Steps>
+  <Step title="Install conda">
+    If not already installed: https://docs.conda.io/en/latest/miniconda.html
+  </Step>
+
+  <Step title="Create conda environment">
+    ```bash
+    conda create -n signalpilot-env python=3.12
+    ```
+  </Step>
+
+  <Step title="Activate environment">
+    ```bash
+    conda activate signalpilot-env
+    ```
+  </Step>
+
+  <Step title="Install packages">
+    ```bash
+    mkdir ~/SignalPilotHome && cd ~/SignalPilotHome
+    pip install signalpilot-ai jupyterlab pandas numpy matplotlib plotly
+    ```
+  </Step>
+
+  <Step title="Launch Jupyter Lab">
+    ```bash
+    jupyter lab
+    ```
+    Opens at `http://localhost:8888`
+  </Step>
+  </Steps>
+
+  **Next time:** Just activate and run:
+  ```bash
+  conda activate signalpilot-env
+  cd ~/SignalPilotHome && jupyter lab
+  ```
+
+  <Warning>
+  **Note:** pip/conda is slower than uv (10-100x) and may have dependency conflicts. We recommend uv for best experience.
+  </Warning>
+</Tab>
+
+<Tab title="uv tool install">
+  **When to use:** Want `sp` command available globally
+
+  ```bash
+  uv tool install signalpilot
+  sp init  # Creates workspace and launches Jupyter
+  ```
+
+  **Next time:**
+  ```bash
+  sp lab
+  ```
+</Tab>
+</Tabs>
 
 ## Advanced: Working in Different Directories
 
-### Use `--here` to work in current directory
+By default, SignalPilot creates a workspace at `~/SignalPilotHome`. You can customize this with two flags:
+
+### `--here` flag: Work in current directory with default environment
 
 ```bash
-# Work in your existing project directory
 cd ~/projects/my-data-analysis
-uvx signalpilot --here
+uvx signalpilot lab --here
 ```
 
-<Tip>
-Use `--here` when you want to work with existing notebooks in your project directory.
-</Tip>
+**What this does:**
+- Opens Jupyter Lab in your **current directory**
+- Uses the **default environment** from `~/SignalPilotHome/.venv`
+- Perfect for quick exploration in any folder without setting up a new environment
 
-### Use `--project` to specify a custom workspace
+**Use case:** Analyzing data files in an existing project folder
+
+
+### `--project` flag: Work in current directory with local environment
 
 ```bash
-# Create a custom workspace
-uvx signalpilot --project ~/my-signalpilot-workspace
+cd ~/projects/my-data-project
+uvx signalpilot lab --project
 ```
 
+**What this does:**
+- Opens Jupyter Lab in your **current directory**
+- Uses a **local `.venv`** in that directory
+- Great for project-specific work with custom dependencies
+
+**Requirements:**
+- A `.venv` must exist in the current directory
+- Must have `jupyterlab` and `signalpilot-ai` installed
+
+**Create a project environment:**
+```bash
+# Create new project directory
+mkdir ~/projects/custom-analytics
+cd ~/projects/custom-analytics
+
+# Create Python 3.12 environment
+uv venv --seed --python 3.12
+
+# Activate and install dependencies
+source .venv/bin/activate
+uv pip install jupyterlab signalpilot-ai pandas numpy
+
+# Launch SignalPilot
+uvx signalpilot lab --project
+```
+{/* 
 ---
 
-## CLI Reference
+## Common CLI Commands
 
-### `uvx signalpilot` or `sp init`
+<AccordionGroup>
+<Accordion title="sp lab" icon="terminal">
+  Launch Jupyter Lab with SignalPilot
 
-Initialize and launch SignalPilot.
+  ```bash
+  # Default: Open ~/SignalPilotHome
+  sp lab
 
-**Options:**
-- `--here`: Use current directory instead of `~/SignalPilotHome`
-- `--project <path>`: Use custom workspace directory
+  # Open in current directory (uses default .venv)
+  sp lab --here
 
-**Example:**
-```bash
-uvx signalpilot --project ~/analytics-workspace
-```
+  # Open in current directory (uses local .venv)
+  sp lab --project
 
-### `sp lab [--here|--project]`
+  # Pass Jupyter Lab flags
+  sp lab --port=8888 --no-browser
+  ```
+</Accordion>
 
-Launch Jupyter Lab with SignalPilot.
+<Accordion title="sp doctor" icon="stethoscope">
+  Diagnose installation issues
 
-**Options:**
-- `--here`: Launch in current directory
-- `--project <path>`: Launch in specific workspace
+  ```bash
+  sp doctor
+  ```
 
-**Example:**
-```bash
-sp lab --here
-```
+  **Checks:**
+  - Python version (requires 3.12+)
+  - Jupyter Lab installation
+  - SignalPilot extension status
+  - MCP server connectivity
+  - Environment configuration
+</Accordion>
 
-### `sp doctor`
+<Accordion title="sp upgrade" icon="arrow-up">
+  Upgrade SignalPilot to the latest version
 
-Diagnose installation issues.
+  ```bash
+  sp upgrade
+  ```
 
-```bash
-sp doctor
-```
+  **What this does:**
+  - Updates `signalpilot` CLI tool
+  - Updates `signalpilot-ai` Jupyter extension
+  - Updates core dependencies
+  - Preserves your workspace and configuration
+</Accordion>
+</AccordionGroup>
 
-**Checks:**
-- Python version (requires 3.12+)
-- Jupyter Lab installation
-- SignalPilot extension status
-- MCP server connectivity
+<Card title="Full CLI Reference" icon="terminal" href="/reference/cli-commands">
+  Complete command documentation with all flags and options
+</Card>
 
-### `sp upgrade`
+--- */}
 
-Upgrade SignalPilot to the latest version.
-
-```bash
-sp upgrade
-```
-
----
-
-## Package Management
+## Managing Python Packages
 
 SignalPilot uses **uv** for fast, reliable package management.
+
+<Info>
+**Why uv?** 10-100x faster than pip/conda, better dependency resolution, and native integration with SignalPilot kernel.
+</Info>
 
 ### Add a package
 
 ```bash
-uv add <package-name>
-```
-
-**Example:**
-```bash
-uv add scikit-learn
+cd ~/SignalPilotHome
+uv add scikit-learn  # Adds to pyproject.toml and installs
 ```
 
 ### Remove a package
 
 ```bash
-uv remove <package-name>
+uv remove scikit-learn
 ```
 
 ### List installed packages
@@ -179,63 +379,135 @@ uv remove <package-name>
 uv pip list
 ```
 
+### Install from requirements.txt
+
+```bash
+uv pip install -r requirements.txt
+```
+
 ---
 
 ## Troubleshooting
 
 <AccordionGroup>
-<Accordion title="Jupyter Lab won't start">
-  **Symptoms:** Browser doesn't open or shows error
+<Accordion title="Jupyter Lab won't start" icon="exclamation-circle">
+  **Symptoms:** Browser doesn't open or shows connection error
 
   **Solutions:**
-  1. Check Python version: `python --version` (must be 3.12+)
-  2. Run `sp doctor` to diagnose issues
-  3. Try reinstalling: `sp upgrade --force`
+  ```bash
+  # 1. Check Python version (must be 3.10+)
+  python --version
+
+  # 2. Run diagnostics
+  sp doctor
+
+  # 3. Check if port is already in use
+  lsof -i :8888  # macOS/Linux
+
+  # 4. Try a different port
+  uvx signalpilot lab --port=8889
+  ```
+
+  **Still not working?** Check [troubleshooting guide](/reference/troubleshooting) for detailed solutions.
 </Accordion>
 
-<Accordion title="SignalPilot extension not showing">
+<Accordion title="SignalPilot extension not showing" icon="puzzle-piece">
   **Symptoms:** No SignalPilot panel in Jupyter Lab sidebar
 
   **Solutions:**
-  1. Verify extension is installed: `jupyter labextension list`
-  2. Rebuild Jupyter Lab: `jupyter lab build`
-  3. Clear browser cache and refresh
+  ```bash
+  # 1. Verify extension is installed
+  jupyter labextension list | grep signalpilot
+
+  # 2. Rebuild Jupyter Lab
+  cd ~/SignalPilotHome
+  jupyter lab build
+
+  # 3. Clear browser cache and hard refresh
+  # Chrome/Firefox: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Win/Linux)
+  ```
+
+  **Expected output:**
+  ```
+  signalpilot-ai v1.0.0 enabled OK
+  ```
 </Accordion>
 
-<Accordion title="MCP server connection failed">
-  **Symptoms:** "Cannot connect to MCP server" error
+<Accordion title="MCP server connection failed" icon="plug">
+  **Symptoms:** "Cannot connect to MCP server" error in chat
 
   **Solutions:**
-  1. Check network connectivity
-  2. Verify firewall allows connections
-  3. Run `sp doctor` to test MCP connectivity
+  ```bash
+  # 1. Run diagnostics
+  sp doctor
+
+  # 2. Check MCP server status
+  ps aux | grep mcp
+
+  # 3. Restart Jupyter Lab
+  # Stop (Ctrl+C) and restart
+  uvx signalpilot lab
+  ```
+
+  **Note:** MCP servers start automatically with Jupyter Lab. If issues persist, check firewall settings.
 </Accordion>
 
-<Accordion title="Permission denied errors">
-  **Symptoms:** Cannot create workspace directory
+<Accordion title="Permission denied errors" icon="lock">
+  **Symptoms:** Cannot create `~/SignalPilotHome` directory
 
   **Solutions:**
-  1. Check directory permissions
-  2. Use `--project` to specify a writable location
-  3. Run with appropriate permissions (avoid sudo)
+  ```bash
+  # 1. Check directory permissions
+  ls -ld ~/
+
+  # 2. Ensure you own the home directory
+  # (avoid using sudo)
+
+  # 3. Use a custom location you own
+  mkdir ~/my-workspace
+  cd ~/my-workspace
+  uvx signalpilot lab --project
+  ```
+
+  **Important:** Never run SignalPilot with `sudo` — this can cause permission issues later.
+</Accordion>
+
+<Accordion title="uv not found" icon="question">
+  **Symptoms:** `uvx: command not found`
+
+  **Solutions:**
+  ```bash
+  # Install uv
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+
+  # Add to PATH (if not auto-added)
+  echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.zshrc
+  source ~/.zshrc
+
+  # Verify installation
+  uv --version
+  ```
 </Accordion>
 </AccordionGroup>
 
----
+<Card title="Full Troubleshooting Guide" icon="wrench" href="/reference/troubleshooting">
+  Detailed solutions for installation, networking, and runtime issues
+</Card>
+
 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Quickstart Tutorial" icon="rocket" href="/getting-started/quickstart">
-    Complete your first analysis in 5 minutes
+  <Card title="5-Minute Quickstart" icon="rocket" href="/getting-started/quickstart">
+    Complete your first investigation with real data
   </Card>
   <Card title="Connect a Database" icon="database" href="/integrations/databases/postgresql">
-    Connect to your data warehouse
-  </Card>
-  <Card title="Key Concepts" icon="book" href="/getting-started/key-concepts">
-    Understand SignalPilot's core concepts
+    PostgreSQL, Snowflake, BigQuery, Databricks
   </Card>
   <Card title="dbt Integration" icon="diagram-project" href="/integrations/dbt-integration">
-    Connect to your dbt project
+    Connect dbt Cloud or Core for lineage awareness
+  </Card>
+  <Card title="Key Concepts" icon="book" href="/getting-started/key-concepts">
+    Understand agents, memory, hooks, skills, and rules
   </Card>
 </CardGroup>

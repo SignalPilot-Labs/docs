@@ -18,7 +18,6 @@
         "group": "Introduction",
         "pages": [
           "index",
-          "introduction/what-is-signalpilot",
           "introduction/why-signalpilot",
           "introduction/how-it-works",
           "introduction/security-and-privacy"

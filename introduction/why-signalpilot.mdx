@@ -1,74 +1,322 @@
 ---
 title: "Why SignalPilot?"
-description: "Compare SignalPilot vs ChatGPT, GitHub Copilot, and other AI coding assistants"
+description: "SignalPilot vs ChatGPT vs IDE Copilots - Full comparison for AI-forward data teams"
 ---
 
-# Why SignalPilot vs ChatGPT + Jupyter?
+## Why Use an Agentic Harness Instead of ChatGPT?
 
-<Info>
-SignalPilot is the only tool that can answer questions like "Why did X spike?" by aggregating context across your entire data stack + organizational knowledge.
-</Info>
+**ChatGPT and IDE copilots** are general-purpose code generators. **SignalPilot** is a specialized agentic harness built for data investigation — it connects to institutional knowledge those tools can't access, runs long-term investigations with analyst oversight, and learns your team's domain patterns.
 
-## The Problem with Traditional AI Coding Assistants
+---
 
-When you ask ChatGPT or Copilot:
-> "Why did remote assist interventions spike last week?"
+## Head-to-Head Comparison
 
-They can't answer because:
-- ❌ No access to your dbt model lineage
-- ❌ No access to recent Jira tickets about changes
-- ❌ No access to Slack threads where issues were discussed
-- ❌ No access to query history showing anomalies
-- ❌ No memory of past investigations
+| Capability | ChatGPT + Jupyter | IDE Copilots (Cursor, GitHub) | SignalPilot Agentic Harness |
+|------------|-------------------|-------------------------------|------------------------------|
+| **Full organizational context** | ❌ Manual copy-paste | ❌ Code files only | ✅ DB schemas, dbt lineage, Slack, Jira, query history via MCP |
+| **Long-running investigations** | ❌ Single-shot responses | ❌ Single-file edits | ✅ Multi-step loop with analyst-in-the-loop approval |
+| **Domain knowledge retention** | ❌ No memory | ❌ No memory | ✅ Multi-session memory of past hypotheses, assumptions, quirks |
+| **Team-specific customization** | ❌ Generic | ❌ Generic | ✅ Custom skills (analysis patterns) + rules (coding standards, business logic) |
+| **Control & oversight** | ❌ Run output yourself | ⚠️ Auto-applies changes | ✅ Plan approval, hooks, audit trail |
 
-**They can only see the code you copy-paste.**
+**Why "harness"?** SignalPilot provides the **infrastructure** (context aggregation, execution environment, memory, customization) that lets AI agents work effectively on complex data investigations. You stay in control while AI handles the heavy lifting.
 
-## SignalPilot's Unique Advantages
+## Real-World Investigation: Traditional vs SignalPilot
 
-| Capability | ChatGPT + Jupyter | GitHub Copilot | SignalPilot |
-|------------|-------------------|----------------|-------------|
-| **Code completion** | ❌ Manual | ✅ Inline | ✅ Tab autocomplete |
-| **Database schema awareness** | ❌ Copy-paste | ❌ | ✅ Auto via MCP |
-| **dbt lineage** | ❌ | ❌ | ✅ Full graph |
-| **Slack/Jira context** | ❌ | ❌ | ✅ MCP subagents |
-| **Multi-step planning** | ❌ Single-shot | ❌ | ✅ Orchestrated loop |
-| **Multi-session memory** | ❌ | ❌ | ✅ Persistent |
-| **Query history analysis** | ❌ | ❌ | ✅ Via MCP |
-| **Institutional knowledge** | ❌ | ❌ | ✅ Via memory + MCP |
+**Scenario:** Your CFO asks "Why did conversion rate drop 8% last week?"
 
-## What This Means in Practice
+<Tabs>
+<Tab title="Traditional Workflow">
+  ### ChatGPT + Jupyter (2+ hours, no learning)
+
+  1. ⏱️ Open Snowflake, manually explore tables
+     - No context about which tables matter
+     - Might miss upstream dependencies
+
+  2. ⏱️ Copy schema to ChatGPT, ask for query
+     - ChatGPT hallucinates column names
+     - No access to dbt lineage or transformations
+
+  3. ⏱️ Run query, hit errors, iterate 3-4 times
+     - Manual debugging
+     - No access to query history for patterns
+
+  4. ⏱️ Check Slack manually (scroll 100+ messages)
+     - Time-consuming
+     - Might miss relevant threads
+
+  5. ⏱️ Find Jira ticket about A/B test
+     - Manual search across tools
+     - No automated connection to related docs
+
+  6. ⏱️ Write more queries based on findings
+     - Start from scratch each time
+     - No memory of what was already tested
+
+  7. ⏱️ Create visualization in notebook
+     - Generic, doesn't follow team standards
+     - Manual chart styling
+
+  8. ❌ Write summary, forget assumptions
+     - **No institutional knowledge captured**
+     - Next analyst will repeat this work
+
+  **Result:**
+  - ⏱️ 2+ hours spent
+  - 🧠 No learning for next time
+  - 😓 High cognitive load
+</Tab>
+
+<Tab title="IDE Copilot Workflow">
+  ### Cursor/GitHub Copilot (1-2 hours, partial help)
+
+  1. ⚠️ Copilot suggests SQL queries
+     - Only sees current file context
+     - No access to dbt models or lineage
+     - Still need to manually find right tables
+
+  2. ⚠️ Autocompletes some pandas code
+     - Helps with syntax
+     - Doesn't know your business logic
+     - Might suggest inefficient patterns
+
+  3. ⏱️ Still need to manually check Slack/Jira
+     - Copilot has no access to collaboration tools
+     - Context gathering remains manual
+
+  4. ❌ No memory across sessions
+     - Can't learn from past investigations
+     - Every analysis starts from zero
+
+  5. ⚠️ Auto-applies changes
+     - Less control over what runs
+     - Risk of executing before review
+
+  **Result:**
+  - ⏱️ 1-2 hours (faster than ChatGPT, slower than SignalPilot)
+  - 🧠 Still no learning
+  - ⚠️ Less control over execution
+</Tab>
+
+<Tab title="SignalPilot Workflow">
+  ### SignalPilot Agentic Harness (10 minutes, with learning)
+
+  **Ask once:** "Why did conversion rate drop 8% last week?"
+
+  **SignalPilot orchestrates across all 4 systems:**
+
+  #### 1. 🔌 Context Aggregation
+  - ✅ Fetches Snowflake schema automatically
+  - ✅ Loads dbt lineage (events → sessions → conversions)
+  - ✅ Searches Slack for "conversion" mentions → finds A/B test thread
+  - ✅ Pulls Jira ticket #3421 about experiment + design doc
+  - ✅ Queries Snowflake query_history for anomalies
+
+  #### 2. 🔄 Long-Running Loop
+  - ✅ Generates plan: "Check A/B test → Compare cohorts → Analyze funnel"
+  - 👤 **Shows you plan for approval** (analyst-in-the-loop)
+  - ✅ You approve → Executes in phases with checkpoints
+
+  #### 3. 🧠 Memory & Hooks
+  - ✅ Recalls: "Last conversion drop was timezone bug" → checks that first
+  - ✅ Hooks enforce: Data quality check flags suspicious cohort imbalance
+  - ✅ **Saves to memory:** "Conversion drops often = A/B test issues"
+
+  #### 4. 💻 Skills & Rules
+  - ✅ Applies team skill: "conversion_funnel_analysis" template
+  - ✅ Follows rules: Vectorized pandas, excludes test_accounts, brand colors
+  - ✅ Enforces business logic: Your revenue formula (excl. refunds)
+
+  **Outcome:**
+  - ✅ Root cause: A/B test tracking pixel bug
+  - ✅ Chart following team standards
+  - ✅ **Next analyst gets this pattern automatically**
+
+  **Result:**
+  - ⏱️ 10 minutes
+  - 🧠 Team gets smarter with each investigation
+  - ✅ Full control with approval checkpoints
+</Tab>
+</Tabs>
+
+---
+
+## Value by Persona
 
 <AccordionGroup>
-<Accordion title="For Data Analysts">
-  - **Before:** Spend hours re-collecting context from Slack, Jira, dbt docs
-  - **After:** SignalPilot automatically aggregates relevant context for your investigation
-  - **Impact:** 80% reduction in investigation prep time
+<Accordion title="For Data Analysts" icon="chart-line">
+  **Problem:** Spend 80% of time gathering context, 20% doing analysis
+
+  **SignalPilot solves:**
+  - ✅ Automatic context aggregation from dbt, Slack, Jira, query history
+  - ✅ Multi-session memory means you don't re-investigate same issues
+  - ✅ Team skills library gives you templates for common analyses
+
+  **Impact:**
+  - ⏱️ 10x faster investigation prep (2 hours → 10 minutes)
+  - 🎯 More time for actual insight generation
+  - 📈 Higher quality analysis with institutional knowledge
 </Accordion>
 
-<Accordion title="For Data Engineers">
-  - **Before:** Junior analysts constantly ask "which table should I use for revenue?"
-  - **After:** SignalPilot knows your lineage and can guide analysts to the right models
-  - **Impact:** Fewer interruptions, more consistent analysis
+<Accordion title="For Data Engineers" icon="code">
+  **Problem:** Junior analysts constantly interrupt with "which table should I use?"
+
+  **SignalPilot solves:**
+  - ✅ dbt lineage awareness guides analysts to correct models
+  - ✅ Rules enforce performance patterns (no iterrows(), proper vectorization)
+  - ✅ Skills codify senior engineer analysis patterns for juniors
+
+  **Impact:**
+  - 📉 Fewer interruptions ("AI knows the lineage")
+  - ✅ Consistent code quality (rules enforced automatically)
+  - 🚀 Faster junior onboarding (skills library)
 </Accordion>
 
-<Accordion title="For Analytics Leaders">
-  - **Before:** Analysis quality depends on analyst tenure and tribal knowledge
-  - **After:** SignalPilot captures institutional knowledge in multi-session memory
-  - **Impact:** Faster onboarding, higher quality insights
+<Accordion title="For Analytics Leaders" icon="users">
+  **Problem:** Analysis quality depends on analyst tenure. Tribal knowledge lost when people leave.
+
+  **SignalPilot solves:**
+  - ✅ Multi-session memory captures validated assumptions, known quirks
+  - ✅ Skills library preserves senior analyst patterns
+  - ✅ Hooks enforce governance (e.g., "only query prod during office hours")
+
+  **Impact:**
+  - 🏢 Institutional knowledge doesn't walk out the door
+  - ⚡ New analysts productive faster (access to team playbook)
+  - ✅ Audit trail for compliance (what data accessed, when, why)
+</Accordion>
+
+<Accordion title="For Data Science Teams" icon="flask">
+  **Problem:** Experimentation analysis lacks organizational context (past experiments, Jira tickets, design docs)
+
+  **SignalPilot solves:**
+  - ✅ Connects to Jira (experiment tickets), Slack (discussions), past notebooks
+  - ✅ Memory recalls: "Last A/B test issue was sample ratio mismatch"
+  - ✅ Skills: Reusable experiment analysis templates
+
+  **Impact:**
+  - 📊 Better experiment design (learn from past mistakes)
+  - 🔍 Faster root cause analysis (context from Jira/Slack)
+  - 🎓 Knowledge transfer (new DS gets team patterns)
 </Accordion>
 </AccordionGroup>
 
-## Bottom Line
+---
 
-<Card title="SignalPilot is purpose-built for data investigation" icon="lightbulb">
-  While ChatGPT and Copilot excel at general coding, SignalPilot is optimized for the unique workflow of data analysis — where 80% of the work is gathering context and only 20% is writing code.
+## Common Questions
+
+<AccordionGroup>
+<Accordion title="Why not just paste everything into ChatGPT?" icon="message-question">
+  **You could, but:**
+  - ❌ ChatGPT has no access to your dbt lineage, Slack, Jira, query history
+  - ❌ You'd need to manually copy-paste schemas, discussions, tickets (hours of work)
+  - ❌ No memory across conversations — every investigation starts from zero
+  - ❌ No enforcement of your team's coding standards or business logic
+  - ❌ Can't execute code in your environment (copy-paste loop)
+
+  **SignalPilot:**
+  - ✅ Auto-aggregates context from all sources via MCP
+  - ✅ Remembers past investigations (institutional knowledge)
+  - ✅ Executes code in Jupyter with approval checkpoints
+  - ✅ Enforces your team's rules and applies your custom skills
+</Accordion>
+
+<Accordion title="Why not use Cursor/GitHub Copilot in Jupyter?" icon="code">
+  **IDE copilots are great for software engineering, but:**
+  - ❌ Only see code files (no dbt, Slack, Jira, query history context)
+  - ❌ Single-file edits (not multi-step data investigations)
+  - ❌ No domain-specific memory (can't learn your data stack quirks)
+  - ❌ Generic suggestions (don't know your business logic)
+  - ⚠️ Auto-apply changes (less control in data workflows)
+
+  **SignalPilot is purpose-built for data investigation:**
+  - ✅ Full organizational context via MCP sidecar
+  - ✅ Long-running investigation loop (multi-step with approval)
+  - ✅ Multi-session memory (learns your data stack)
+  - ✅ Team customization (skills + rules)
+  - ✅ Analyst-in-the-loop (you approve plans before execution)
+</Accordion>
+
+<Accordion title="Can I use SignalPilot AND ChatGPT/Copilot?" icon="handshake">
+  **Yes! They're complementary:**
+
+  **Use ChatGPT/Copilot for:**
+  - General coding questions outside data investigations
+  - Learning new programming concepts
+  - Code refactoring suggestions
+
+  **Use SignalPilot for:**
+  - Data investigations that require organizational context
+  - Multi-step analyses with dbt/Slack/Jira integration
+  - Building institutional knowledge for your team
+  - Enforcing data team standards and business logic
+
+  **Many teams use both:** Copilot for code editing, SignalPilot for data investigations.
+</Accordion>
+
+<Accordion title="Does SignalPilot replace data analysts?" icon="user-slash">
+  **No. SignalPilot is a harness, not a replacement.**
+
+  **What SignalPilot does:**
+  - ✅ Aggregates context so analysts don't waste hours gathering it
+  - ✅ Proposes investigation plans (analyst approves before execution)
+  - ✅ Executes repetitive query/plot generation
+  - ✅ Captures institutional knowledge for the team
+
+  **What analysts do:**
+  - ✅ Define the investigation question
+  - ✅ Approve plans (analyst-in-the-loop)
+  - ✅ Interpret results with business context
+  - ✅ Make strategic recommendations
+
+  **Impact:** Analysts spend more time on high-value insight generation, less on context gathering and boilerplate.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Why "Agentic Harness"?
+
+The **harness metaphor** is intentional. Just like a climbing harness provides **infrastructure that keeps you safe while enabling you to climb higher**, SignalPilot provides the infrastructure that lets AI agents work effectively on complex data investigations while keeping analysts in control.
+
+**The 4 foundational systems:**
+1. **Context Layer (MCP)** → Organizational knowledge ChatGPT can't access
+2. **Long-Running Loop** → Multi-step investigations with human approval
+3. **Memory & Hooks** → Institutional learning + safety guardrails
+4. **Skills & Rules** → Team-specific domain expertise
+
+**Together:** AI-forward data teams get the **speed of AI** with the **control, safety, and domain expertise** they need for production investigations.
+
+<Card title="Deep Dive: How It Works" icon="gears" href="/introduction/how-it-works">
+  See detailed architecture breakdown with real-world example
 </Card>
 
+---
+
+## Next Steps
+
 <CardGroup cols={2}>
-  <Card title="How it works" icon="gears" href="/introduction/how-it-works">
-    Understand the MCP sidecar architecture
+  <Card title="Try SignalPilot" icon="rocket" href="/getting-started/quickstart">
+    **5-minute quickstart**
+
+    Debug a revenue drop with your data
   </Card>
-  <Card title="Get started" icon="rocket" href="/getting-started/installation">
-    Install SignalPilot in under 3 minutes
+
+  <Card title="How It Works" icon="sitemap" href="/introduction/how-it-works">
+    **Architecture deep dive**
+
+    4 foundational systems explained
+  </Card>
+
+  <Card title="Security & Privacy" icon="shield-halved" href="/introduction/security-and-privacy">
+    **Trust & compliance**
+
+    Read-only access, zero retention, audit trail
+  </Card>
+
+  <Card title="Installation" icon="download" href="/getting-started/installation">
+    **Get started**
+
+    Install in under 2 minutes
   </Card>
 </CardGroup>
