@@ -42,12 +42,6 @@
         ]
       },
       {
-        "group": "Integrations",
-        "pages": [
-          "integrations/mcp-overview"
-        ]
-      },
-      {
         "group": "Database Connections",
         "pages": [
           "integrations/databases/postgresql",
@@ -57,13 +51,15 @@
         ]
       },
       {
-        "group": "Collaboration Tools",
+        "group": "Integrations",
         "pages": [
+          "integrations/mcp-overview",
           "integrations/dbt-integration",
           "integrations/collaboration/slack",
           "integrations/collaboration/jira"
         ]
       },
+      
       {
         "group": "Agent Modes",
         "pages": [
