@@ -67,10 +67,10 @@
               {
                 "group": "Context & Interactions",
                 "pages": [
-                  "reference/agent-modes/context",
-                  "reference/agent-modes/chat",
-                  "reference/agent-modes/planning",
-                  "reference/agent-modes/tools"
+                  "reference/context/context",
+                  "reference/context/chat",
+                  "reference/context/planning",
+                  "reference/context/tools"
                 ]
               },
               {
