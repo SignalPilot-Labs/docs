@@ -1,0 +1,28 @@
+---
+title: "Skills and MCP Servers"
+description: "Extend SignalPilot's capabilities with custom skills and MCP server integrations"
+---
+
+# Skills and MCP Servers
+
+SignalPilot's extensibility framework allows you to expand its capabilities beyond built-in features by adding custom skills and connecting to MCP (Model Context Protocol) servers. This architecture enables you to integrate proprietary tools, internal APIs, and specialized data sources directly into your analysis workflows, making SignalPilot adaptable to your organization's unique requirements.
+
+## Skills
+
+Skills are self-contained extensions that add new capabilities to SignalPilot's AI agent. Each skill provides a specific function such as connecting to a data source, performing a specialized analysis, or automating a workflow. Skills can access data from databases, APIs, and file systems, execute custom Python code, and generate visualizations or reports. When you install a skill, it becomes available to the AI agent as a tool it can invoke when relevant to your queries. For example, a skill might enable querying your company's internal metrics database, running statistical tests on datasets, or generating compliance reports from your data warehouse. Skills are designed to be modular and composable—you can combine multiple skills to build sophisticated multi-step workflows.
+
+## MCP Servers
+
+MCP (Model Context Protocol) servers are standardized integrations that expose external tools and services to AI agents through a common protocol. MCP servers act as bridges between SignalPilot and third-party systems, enabling seamless interaction with tools like Slack, GitHub, Notion, database systems, and custom APIs. Unlike skills, which are SignalPilot-specific extensions, MCP servers follow an open protocol specification, meaning any MCP-compatible server works with SignalPilot without custom adapters. When you connect an MCP server, SignalPilot automatically discovers the available tools and resources the server provides, making them immediately accessible during analysis sessions. This standardization reduces integration complexity and allows you to leverage a growing ecosystem of pre-built MCP servers for popular services while maintaining the flexibility to create custom servers for proprietary systems.
+
+SignalPilot includes three default MCP servers out of the box: Notion for accessing workspace documents and databases, Slack for retrieving messages and channel information, and Google Docs for working with Google Drive files and documents.
+
+<Frame>
+<img src="/images/default_mcps.png" alt="SignalPilot's default MCP servers showing Notion, Slack, and Google Docs integrations" />
+</Frame>
+
+You can add additional mcp servers by editing the configuration file:
+
+<Frame>
+<img src="/images/adding_mcp_ui.png" alt="MCP configuration editor showing how to add custom MCP servers with JSON configuration examples" />
+</Frame>
