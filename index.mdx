@@ -3,7 +3,7 @@ title: "SignalPilot: Introduction"
 description: "AI agent with full org context that ChatGPT or IDE copilots can't access"
 ---
 
-## Agentic Harness for AI-Forward Data Teams
+## Agentic Harness for Fast Moving Data Teams
 
 **SignalPilot** is a Jupyter-native AI agentic harness that investigates data by connecting to your **db warehouse, dbt lineage, query history, slack threads, notion, and Jira tickets** — giving the AI institutional knowledge that coding assistants like ChatGPT and copilots can't access.
 
@@ -99,8 +99,21 @@ uvx signalpilot
 → Launching Jupyter Lab at http://localhost:8888
 ```
 
+<Accordion title="Closed terminal or browser? Relaunch anytime" icon="rotate">
+  **Option 1: Using uvx (recommended)**
+  ```bash
+  uvx signalpilot@latest home
+  ```
+
+  **Option 2: Manual activation**
+  ```bash
+  cd ~/SignalPilotHome
+  source .venv/bin/activate && jupyter lab
+  ```
+</Accordion>
+
 <Card title="Full Installation Guide" icon="book" href="/getting-started/installation">
-  Advanced options, alternative methods, troubleshooting
+  Alternative methods, manual installation (pip, conda, uv), troubleshooting
 </Card>
 
 ## Get Started in 3 Steps

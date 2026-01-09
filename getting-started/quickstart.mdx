@@ -18,7 +18,7 @@ uvx signalpilot
 ```
 
 <Accordion title="Don't have uv?" icon="question">
-  Install `uv` first (takes 10 seconds):
+  Install `uv` first (takes seconds):
 
   ```bash
   curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -42,13 +42,25 @@ uvx signalpilot
 → Launching Jupyter Lab at http://localhost:8888
 ```
 
+<Accordion title="Closed terminal or browser? Relaunch anytime" icon="rotate">
+  **Option 1: Using uvx (recommended)**
+  ```bash
+  uvx signalpilot@latest home
+  ```
+
+  **Option 2: Manual activation**
+  ```bash
+  cd ~/SignalPilotHome
+  source .venv/bin/activate && jupyter lab
+  ```
+</Accordion>
+
 <Accordion title="More installation options" icon="book">
   See the [Installation Guide](/getting-started/installation) for:
-  - Manual installation with uv or pip/conda
+  - Manual installation with pip, conda, or uv
   - Working in different modes (default, home, project)
   - Auto-update configuration
   - Troubleshooting
-  - Alternative installation methods
 </Accordion>
 
 ## Step 2: Create Your First Notebook

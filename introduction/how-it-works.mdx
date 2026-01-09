@@ -15,9 +15,9 @@ SignalPilot is built on **4 foundational systems** that work together to enable 
 
 <AccordionGroup>
 <Accordion title="1. Multi-Source Context Aggregation" icon="plug" defaultOpen>
-  SignalPilot connects to your data stack via internal tools, jupyter notebook interface, and **MCP (Model Context Protocol):**
+  SignalPilot connects to your data stack via internal explorer and context orchestraton tools, jupyter notebook interface, and **MCP (Model Context Protocol):**
 
-  **Internal MCP Tooling Sidecar:**
+  **Internal Context Explorer:**
   - Kernel operations (execute code, introspect state)
   - Database queries (schemas, performance, history)
   - Schema introspection (metadata, lineage)
@@ -153,14 +153,14 @@ The harness metaphor is intentional — just like a climbing harness provides **
 **Scenario:** Your CFO asks "Why did our conversion rate drop 8% last week?"
 
 ### Traditional Workflow (2+ hours, no institutional knowledge capture)
-1. ❌ Open Snowflake, manually explore tables (no context)
-2. ❌ Copy schema to ChatGPT, ask for query (hallucinated table names)
-3. ❌ Run query, fix errors, re-run (3-4 iterations)
-4. ❌ Check Slack for recent changes (scroll back 100+ messages manually)
-5. ❌ Find Jira ticket about A/B test, read linked doc (manual search)
-6. ❌ Write new queries based on findings (no memory of what was tested)
-7. ❌ Create visualization in notebook (generic, not following team standards)
-8. ❌ Write summary, **forget to document assumptions for next time**
+1. ⏱️ Open Snowflake, manually explore tables (no context)
+2. ⏱️ Copy schema to ChatGPT, ask for query (hallucinated table names)
+3. ⏱️ Run query, fix errors, re-run (3-4 iterations)
+4. ⏱️ Check Slack for recent changes (scroll back 100+ messages manually)
+5. ⏱️ Find Jira ticket about A/B test, read linked doc (manual search)
+6. ⏱️ Write new queries based on findings (no memory of what was tested)
+7. ⏱️ Create visualization in notebook (generic, not following team standards)
+8. ⏱️ Write summary, **forget to document assumptions for next time**
 
 ### SignalPilot Agentic Harness (10 minutes, with learning)
 

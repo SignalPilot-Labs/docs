@@ -11,6 +11,50 @@ Complete reference for the SignalPilot command-line interface.
 The CLI is a **bootstrap installer** that sets up the SignalPilot Jupyter extension. The extension itself (not the CLI) is the actual product.
 </Info>
 
+## Command Syntax
+
+### Using uvx signalpilot (recommended)
+
+Run SignalPilot without installation using uvx:
+
+```bash
+# Initialize workspace (first-time setup)
+uvx signalpilot
+
+# Launch Jupyter Lab
+uvx signalpilot lab              # Current directory + home environment
+uvx signalpilot lab --home       # Home directory + home environment
+uvx signalpilot lab --project    # Current directory + local .venv
+
+# Shortcuts
+uvx signalpilot home             # Same as: lab --home
+
+# Upgrade
+uvx signalpilot upgrade          # Upgrade home environment + CLI
+uvx signalpilot upgrade --project # Upgrade local .venv
+
+# Jupyter Lab arguments also work
+uvx signalpilot lab --port=8889  # Example: custom port
+```
+
+### Using sp (after global install)
+
+Install globally with `uv tool install signalpilot` to use the shorter `sp` command:
+
+```bash
+sp init           # Same as: uvx signalpilot
+sp lab            # Same as: uvx signalpilot lab
+sp lab --home     # Same as: uvx signalpilot lab --home
+sp home           # Same as: uvx signalpilot home
+sp upgrade        # Same as: uvx signalpilot upgrade
+```
+
+<Note>
+All `uvx signalpilot` commands and arguments work identically with `sp`. See [Alternative Installation Methods](#alternative-installation-methods) for global installation.
+</Note>
+
+---
+
 ## Core Commands
 
 ### `uvx signalpilot` (or `sp init`)
@@ -27,9 +71,9 @@ uvx signalpilot
 - Installs data packages (pandas, numpy, matplotlib, seaborn, plotly)
 - Launches Jupyter Lab at `http://localhost:8888`
 
+<Info>
 **First-time setup only.** After installation, use `uvx signalpilot lab` to launch.
-
----
+</Info>
 
 ### `uvx signalpilot lab`
 
@@ -48,10 +92,10 @@ uvx signalpilot lab [OPTIONS]
 **Smart Detection:** If a local `.venv` with jupyter is detected, you'll see a red warning prompting you to use `--project` flag.
 </Warning>
 
-**Options:**
+### SignalPilot Options
 
 <ParamField path="--home" type="flag">
-  Open Jupyter Lab in `~/SignalPilotHome` directory with home environment.
+  Launch in `~/SignalPilotHome` directory with home environment.
 
   ```bash
   uvx signalpilot lab --home
@@ -59,52 +103,46 @@ uvx signalpilot lab [OPTIONS]
 </ParamField>
 
 <ParamField path="--project" type="flag">
-  Force use of local `.venv` in current directory (fails if missing).
+  Use local `.venv` in current directory. Requires `.venv` with `jupyterlab` and `signalpilot-ai` installed.
 
   ```bash
   cd ~/projects/my-project
   uvx signalpilot lab --project
   ```
-
-  **Requirements:**
-  - `.venv` must exist in current directory
-  - Must have `jupyterlab` and `signalpilot-ai` installed
 </ParamField>
 
-<ParamField path="--port" type="integer">
-  Custom port for Jupyter Lab (default: 8888).
+### Jupyter Lab Arguments
 
-  ```bash
-  uvx signalpilot lab --port=8889
-  ```
-</ParamField>
-
-<ParamField path="--no-browser" type="flag">
-  Don't automatically open browser.
-
-  ```bash
-  uvx signalpilot lab --no-browser
-  ```
-</ParamField>
-
-<ParamField path="--ip" type="string">
-  IP address to bind to (default: localhost).
-
-  ```bash
-  # Bind to all interfaces (remote access)
-  uvx signalpilot lab --ip=0.0.0.0 --port=9999
-  ```
-</ParamField>
-
-**Pass any Jupyter Lab argument:**
-
-All standard `jupyter lab` flags work after the command:
+SignalPilot passes through standard Jupyter Lab arguments:
 
 ```bash
-# Examples
-uvx signalpilot lab --ServerApp.token='' --ServerApp.password=''
-uvx signalpilot lab --ServerApp.allow_origin='*'
+uvx signalpilot lab --port=8889        # Custom port (default: 8888)
+uvx signalpilot lab --no-browser       # Don't open browser automatically
+uvx signalpilot lab --ip=0.0.0.0       # Allow remote access (default: localhost)
 ```
+
+<Accordion title="Advanced Jupyter Lab configuration">
+
+**Server configuration:**
+
+```bash
+# Disable authentication
+uvx signalpilot lab --ServerApp.token='' --ServerApp.password=''
+
+# Allow CORS from any origin
+uvx signalpilot lab --ServerApp.allow_origin='*'
+
+# Set custom root directory
+uvx signalpilot lab --ServerApp.root_dir=/path/to/notebooks
+
+# Enable debug mode
+uvx signalpilot lab --debug
+```
+
+<Note>
+See [Jupyter Lab documentation](https://jupyter-server.readthedocs.io/en/latest/other/full-config.html) for all available server configuration options.
+</Note>
+</Accordion>
 
 ---
 
@@ -153,8 +191,6 @@ uvx signalpilot upgrade --project
 
 Upgrades the local `.venv` in the current directory instead of home environment.
 
----
-
 ## Auto-Update System
 
 SignalPilot automatically checks for updates when you launch Jupyter Lab.
@@ -195,7 +231,6 @@ check_for_updates = false
 Update checks run in the background and **never slow down** Jupyter startup.
 </Note>
 
----
 
 ## Working Modes
 
@@ -259,26 +294,18 @@ SignalPilot offers three launch modes:
 </Tab>
 </Tabs>
 
----
 
 ## Alternative Installation Methods
 
 ### Global Installation with uv
 
+Install SignalPilot globally to use the shorter `sp` command:
+
 ```bash
 uv tool install signalpilot
 ```
 
-**Use `sp` command instead of `uvx signalpilot`:**
-
-```bash
-sp init           # Initialize workspace
-sp lab            # Launch Jupyter Lab
-sp lab --home     # Launch in home workspace
-sp lab --project  # Launch with local .venv
-sp home           # Shortcut for sp lab --home
-sp upgrade        # Upgrade home environment
-```
+After installation, use `sp` instead of `uvx signalpilot` (see [Command Syntax](#command-syntax) for examples).
 
 <Note>
 Global installations don't auto-update. Reinstall periodically:
@@ -297,7 +324,7 @@ sp init
 <Warning>
 pip is 10-100x slower than uv and may have dependency conflicts. We recommend uv for best experience.
 </Warning>
-
+{/* 
 ---
 
 ## Environment Variables
@@ -322,7 +349,7 @@ SignalPilot respects these environment variables:
   ```
 </ParamField>
 
----
+--- */}
 
 ## Troubleshooting Commands
 
@@ -331,6 +358,9 @@ SignalPilot respects these environment variables:
 ```bash
 # Verify uv is installed
 uv --version
+
+# Go to Home + Turn on venv
+cd ~/SignalPilotHome && source .venv/bin/activate
 
 # Check Python version
 python --version
@@ -353,13 +383,6 @@ netstat -ano | findstr :8888  # Windows
 
 # Start with verbose logging
 uvx signalpilot lab --debug
-```
-
-### Rebuild Jupyter Lab
-
-```bash
-cd ~/SignalPilotHome
-jupyter lab build
 ```
 
 ---

@@ -45,7 +45,7 @@ The `uvx` CLI is a **bootstrap installer** (not the product itself) that:
 
 **Prerequisites:** macOS, Linux, or Windows (WSL) • Internet connection
 
-**Don't have [uv](https://docs.astral.sh/uv/getting-started/installation/)?** Install it first (takes 10 seconds):
+**Don't have [uv](https://docs.astral.sh/uv/getting-started/installation/)?** Install it first (takes seconds):
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
@@ -89,6 +89,19 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
   ├── pyproject.toml     # Project config
   └── .venv/             # Python environment
   ```
+
+  <Accordion title="Closed terminal or browser? Relaunch anytime" icon="rotate">
+    **Option 1: Using uvx (recommended)**
+    ```bash
+    uvx signalpilot@latest home
+    ```
+
+    **Option 2: Manual activation**
+    ```bash
+    cd ~/SignalPilotHome
+    source .venv/bin/activate && jupyter lab
+    ```
+  </Accordion>
 </Step>
 
 <Step title="Jupyter Lab opens automatically">
@@ -153,9 +166,9 @@ uvx signalpilot home
 </Accordion>
 </AccordionGroup>
 
-## Alternative Installation Methods
+## Manual Installation Methods
 
-If you can't use `uvx` or prefer manual setup:
+If you can't use `uvx` or prefer manual setup with pip, conda, or uv:
 
 <Tabs>
 <Tab title="Manual with uv">
