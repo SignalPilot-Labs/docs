@@ -108,9 +108,13 @@ uvx signalpilot
 <Steps>
 <Step title="Launch SignalPilot" icon="rocket">
   ```bash
-  uvx signalpilot lab
+  uvx signalpilot home
   ```
-  Opens Jupyter Lab at `http://localhost:8888` with SignalPilot loaded
+  Opens Jupyter Lab in your SignalPilot workspace at `http://localhost:8888`
+
+  <Tip>
+  `uvx signalpilot home` is shorthand for `uvx signalpilot lab --home`
+  </Tip>
 
   <Warning>
   When creating notebooks, always use the **default Python 3 kernel**. SignalPilot uses this kernel and may not work with other kernels due to missing system variables.

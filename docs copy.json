@@ -1,0 +1,101 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "SignalPilot",
+  "theme": "mint",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#6D28D9",
+    "light": "#C4B5FD",
+    "dark": "#6D28D9"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Introduction",
+        "pages": [
+          "index",
+          "introduction/why-signalpilot",
+          "introduction/how-it-works",
+          "introduction/security-and-privacy"
+        ]
+      },
+      {
+        "group": "Getting Started",
+        "pages": [
+          "getting-started/quickstart",
+          "getting-started/installation",
+          "getting-started/key-concepts"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": [
+          "guides/investigating-revenue-drops",
+          "guides/debugging-data-quality",
+          "guides/analyzing-timeseries",
+          "guides/working-with-dbt",
+          "guides/customizing-hooks"
+        ]
+      },
+      {
+        "group": "Database Connections",
+        "pages": [
+          "integrations/databases/postgresql",
+          "integrations/databases/snowflake",
+          "integrations/databases/databricks",
+          "integrations/databases/mysql"
+        ]
+      },
+      {
+        "group": "Integrations",
+        "pages": [
+          "integrations/mcp-overview",
+          "integrations/dbt-integration",
+          "integrations/collaboration/slack",
+          "integrations/collaboration/jira"
+        ]
+      },
+      
+      {
+        "group": "Agent Modes",
+        "pages": [
+          "reference/agent-modes/agent-mode",
+          "reference/agent-modes/hands-on-mode",
+          "reference/agent-modes/ask-mode"
+        ]
+      },
+      {
+        "group": "Cell-Level Editing",
+        "pages": [
+          "reference/cell-editing/inline-edit",
+          "reference/cell-editing/tab-autocomplete"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/cli-commands",
+          "reference/configuration",
+          "reference/troubleshooting"
+        ]
+      },
+      {
+        "group": "Deep Dives",
+        "pages": [
+          "deep-dives/context-aggregation",
+          "deep-dives/agent-orchestration-loop",
+          "deep-dives/multi-session-memory",
+          "deep-dives/hooks-system",
+          "deep-dives/extended-thinking"
+        ]
+      }
+    ]
+  },
+  "appearance": {
+    "default": "dark"
+  }
+}

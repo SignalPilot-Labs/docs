@@ -1,0 +1,125 @@
+---
+title: "Configuration"
+description: "Configure SignalPilot through config.toml and understand startup optimizations"
+---
+
+# Configuration
+
+SignalPilot configuration is stored in `~/SignalPilotHome/.signalpilot/config.toml`.
+
+## Configuration Options
+
+### Updates
+
+```toml
+[updates]
+check_for_updates = false  # Disable automatic update checks
+```
+
+<Note>
+Update checks run in background and don't slow down startup.
+</Note>
+
+## Startup Optimizations
+
+SignalPilot launches Jupyter Lab with optimized settings for fast startup (**150-750ms faster** than default):
+
+```bash
+# Authentication - disabled for local use
+--IdentityProvider.token=''
+
+# Kernel management - prevent conflicts
+--KernelSpecManager.ensure_native_kernel=True
+--KernelSpecManager.allowed_kernelspecs=[]
+
+# Hide development artifacts
+--ContentsManager.hide_globs=['*.venv', '.venv', '__pycache__', '*.egg-info', '.git']
+
+# Startup speed - skip news fetch and collaboration init
+--LabApp.news_url=''              # Saves ~100-500ms
+--LabApp.collaborative=False      # Saves ~50-200ms
+
+# Async file handling for better performance
+--ServerApp.contents_manager_class=jupyter_server.services.contents.largefilemanager.AsyncLargeFileManager
+```
+
+<Warning>
+Token authentication is disabled by default. Re-enable if exposing Jupyter to a network.
+</Warning>
+
+## Custom Arguments
+
+Pass any standard Jupyter Lab arguments:
+
+```bash
+uvx signalpilot lab --port=9999
+```
+
+Override default optimizations:
+
+<Tabs>
+<Tab title="Enable Authentication">
+```bash
+uvx signalpilot lab --IdentityProvider.token='your-token'
+```
+</Tab>
+
+<Tab title="Show Hidden Files">
+```bash
+uvx signalpilot lab --ContentsManager.hide_globs=[]
+```
+</Tab>
+
+<Tab title="Enable Collaboration">
+```bash
+uvx signalpilot lab --LabApp.collaborative=True
+```
+</Tab>
+</Tabs>
+
+## Custom Environment Variables (Coming Soon)
+
+<ParamField path="SIGNALPILOT_HOME" type="string" default="~/SignalPilotHome">
+Custom workspace location.
+
+```bash
+export SIGNALPILOT_HOME=~/custom-workspace
+```
+</ParamField>
+
+<ParamField path="JUPYTER_CONFIG_DIR" type="string">
+Custom Jupyter configuration directory.
+
+```bash
+export JUPYTER_CONFIG_DIR=~/.jupyter-custom
+```
+</ParamField>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Configuration changes not taking effect">
+Restart Jupyter Lab for changes to apply.
+
+```bash
+# Stop with Ctrl+C, then relaunch
+uvx signalpilot lab
+```
+</Accordion>
+
+<Accordion title="Create config file manually">
+```bash
+mkdir -p ~/SignalPilotHome/.signalpilot
+touch ~/SignalPilotHome/.signalpilot/config.toml
+```
+</Accordion>
+</AccordionGroup>
+
+<CardGroup cols={2}>
+  <Card title="CLI Commands" icon="terminal" href="/reference/troubleshooting/cli-commands">
+    Complete CLI reference
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/reference/troubleshooting">
+    Common issues and solutions
+  </Card>
+</CardGroup>

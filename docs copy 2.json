@@ -2,6 +2,10 @@
   "$schema": "https://mintlify.com/docs.json",
   "name": "SignalPilot",
   "theme": "mint",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
   "favicon": "/favicon.svg",
   "colors": {
     "primary": "#6D28D9",
@@ -45,7 +49,7 @@
               {
                 "group": "External Tools (MCP)",
                 "pages": [
-                  "integrations/skills-and-mcp-servers",
+                  "integrations/mcp-overview",
                   "integrations/dbt-integration",
                   "integrations/collaboration/slack",
                   "integrations/collaboration/jira"
@@ -54,7 +58,7 @@
             ]
           },
           {
-            "group": "Core Concepts",
+            "group": "Core",
             "pages": [
               {
                 "group": "Agent Modes",
@@ -65,26 +69,10 @@
                 ]
               },
               {
-                "group": "Context & Interactions",
-                "pages": [
-                  "reference/context/context",
-                  "reference/context/chat",
-                  "reference/context/planning",
-                  "reference/context/tools"
-                ]
-              },
-              {
                 "group": "Cell-Level Editing",
                 "pages": [
                   "reference/cell-editing/inline-edit",
                   "reference/cell-editing/tab-autocomplete"
-                ]
-              },
-              {
-                "group": "Troubleshooting",
-                "pages": [
-                  "reference/troubleshooting/cli-commands",
-                  "reference/troubleshooting/configuration"
                 ]
               }
             ]
@@ -97,9 +85,11 @@
           {
             "group": "Real-World Examples",
             "pages": [
-              "guides/01-user-funnel-analysis",
-              "guides/02-notion-slack-connection",
-              "guides/03-campaign-spending-vs-votes"
+              "guides/investigating-revenue-drops",
+              "guides/debugging-data-quality",
+              "guides/analyzing-timeseries",
+              "guides/working-with-dbt",
+              "guides/customizing-hooks"
             ]
           }
         ]
@@ -114,8 +104,13 @@
         },
         {
           "anchor": "Blog",
-          "href": "https://blog.signalpilot.ai",
+          "href": "https://signalpilot.ai/blog",
           "icon": "newspaper"
+        },
+        {
+          "anchor": "Community",
+          "href": "https://discord.gg/signalpilot",
+          "icon": "discord"
         },
         {
           "anchor": "GitHub",
@@ -142,7 +137,8 @@
     "socials": {
       "x": "https://x.com/signalpilot",
       "github": "https://github.com/signalpilot",
-      "linkedin": "https://linkedin.com/company/signalpilot"
+      "linkedin": "https://linkedin.com/company/signalpilot",
+      "discord": "https://discord.gg/signalpilot"
     }
   },
   "background": {

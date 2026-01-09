@@ -1,0 +1,382 @@
+---
+title: "Installer CLI Commands"
+description: "Complete reference for SignalPilot CLI commands and options"
+---
+
+# CLI Commands
+
+Complete reference for the SignalPilot command-line interface.
+
+<Info>
+The CLI is a **bootstrap installer** that sets up the SignalPilot Jupyter extension. The extension itself (not the CLI) is the actual product.
+</Info>
+
+## Core Commands
+
+### `uvx signalpilot` (or `sp init`)
+
+Initialize SignalPilot workspace and launch Jupyter Lab.
+
+```bash
+uvx signalpilot
+```
+
+**What it does:**
+- Creates `~/SignalPilotHome` workspace
+- Installs Python 3.12 + Jupyter Lab + SignalPilot extension
+- Installs data packages (pandas, numpy, matplotlib, seaborn, plotly)
+- Launches Jupyter Lab at `http://localhost:8888`
+
+**First-time setup only.** After installation, use `uvx signalpilot lab` to launch.
+
+---
+
+### `uvx signalpilot lab`
+
+Launch Jupyter Lab with SignalPilot.
+
+```bash
+uvx signalpilot lab [OPTIONS]
+```
+
+**Default behavior:**
+- Opens Jupyter Lab in your **current directory**
+- Uses **home environment** from `~/SignalPilotHome/.venv`
+- Opens browser at `http://localhost:8888`
+
+<Warning>
+**Smart Detection:** If a local `.venv` with jupyter is detected, you'll see a red warning prompting you to use `--project` flag.
+</Warning>
+
+**Options:**
+
+<ParamField path="--home" type="flag">
+  Open Jupyter Lab in `~/SignalPilotHome` directory with home environment.
+
+  ```bash
+  uvx signalpilot lab --home
+  ```
+</ParamField>
+
+<ParamField path="--project" type="flag">
+  Force use of local `.venv` in current directory (fails if missing).
+
+  ```bash
+  cd ~/projects/my-project
+  uvx signalpilot lab --project
+  ```
+
+  **Requirements:**
+  - `.venv` must exist in current directory
+  - Must have `jupyterlab` and `signalpilot-ai` installed
+</ParamField>
+
+<ParamField path="--port" type="integer">
+  Custom port for Jupyter Lab (default: 8888).
+
+  ```bash
+  uvx signalpilot lab --port=8889
+  ```
+</ParamField>
+
+<ParamField path="--no-browser" type="flag">
+  Don't automatically open browser.
+
+  ```bash
+  uvx signalpilot lab --no-browser
+  ```
+</ParamField>
+
+<ParamField path="--ip" type="string">
+  IP address to bind to (default: localhost).
+
+  ```bash
+  # Bind to all interfaces (remote access)
+  uvx signalpilot lab --ip=0.0.0.0 --port=9999
+  ```
+</ParamField>
+
+**Pass any Jupyter Lab argument:**
+
+All standard `jupyter lab` flags work after the command:
+
+```bash
+# Examples
+uvx signalpilot lab --ServerApp.token='' --ServerApp.password=''
+uvx signalpilot lab --ServerApp.allow_origin='*'
+```
+
+---
+
+### `uvx signalpilot home`
+
+Shortcut for `uvx signalpilot lab --home`.
+
+```bash
+uvx signalpilot home [OPTIONS]
+```
+
+Opens Jupyter Lab in `~/SignalPilotHome` directory with home environment.
+
+**Example:**
+```bash
+# Open home workspace without browser
+uvx signalpilot home --no-browser
+```
+
+---
+
+### `uvx signalpilot upgrade`
+
+Upgrade SignalPilot CLI and Jupyter extension.
+
+```bash
+uvx signalpilot upgrade [--project]
+```
+
+**Default (home environment):**
+```bash
+uvx signalpilot upgrade
+```
+
+**What gets updated:**
+- `signalpilot` CLI tool
+- `signalpilot-ai` Jupyter extension
+- Core dependencies
+- Preserves workspace and configuration
+
+**Project environment:**
+```bash
+cd /path/to/project
+uvx signalpilot upgrade --project
+```
+
+Upgrades the local `.venv` in the current directory instead of home environment.
+
+---
+
+## Auto-Update System
+
+SignalPilot automatically checks for updates when you launch Jupyter Lab.
+
+### Minor Updates
+
+Non-breaking updates show a notification:
+
+```
+╭─────────────── 📦 SignalPilot Update ───────────────╮
+│ Update Available: 0.11.8 (installed: 0.11.7)        │
+│ Run 'uvx signalpilot upgrade' to update             │
+╰──────────────────────────────────────────────────────╯
+```
+
+### Major Updates
+
+Breaking changes prompt for immediate upgrade:
+
+```
+╭─────────────── 📦 SignalPilot Update ───────────────╮
+│ Important Update: 0.12.0 (installed: 0.11.7)        │
+│ This is a MAJOR update                              │
+╰──────────────────────────────────────────────────────╯
+Upgrade now? [y/n] (n):
+```
+
+### Disable Auto-Check
+
+Edit `~/SignalPilotHome/.signalpilot/config.toml`:
+
+```toml
+[updates]
+check_for_updates = false
+```
+
+<Note>
+Update checks run in the background and **never slow down** Jupyter startup.
+</Note>
+
+---
+
+## Working Modes
+
+SignalPilot offers three launch modes:
+
+<Tabs>
+<Tab title="Default Mode">
+  **Current directory + Home environment**
+
+  ```bash
+  cd ~/projects/analysis
+  uvx signalpilot lab
+  ```
+
+  **Use when:**
+  - Quick exploration in any folder
+  - Don't need custom dependencies
+  - Want to use stable home environment
+
+  <Warning>
+  Shows warning if local `.venv` with jupyter detected.
+  </Warning>
+</Tab>
+
+<Tab title="Home Mode">
+  **SignalPilotHome + Home environment**
+
+  ```bash
+  uvx signalpilot lab --home
+  # Or:
+  uvx signalpilot home
+  ```
+
+  **Use when:**
+  - Working in your main SignalPilot workspace
+  - Accessing skills, rules, team notebooks
+  - Need all your configured tools
+</Tab>
+
+<Tab title="Project Mode">
+  **Current directory + Local environment**
+
+  ```bash
+  cd ~/projects/custom-analytics
+  uvx signalpilot lab --project
+  ```
+
+  **Use when:**
+  - Project has custom dependencies
+  - Need isolated Python packages
+  - Different Python version than home (3.10+)
+
+  **Setup:**
+  ```bash
+  mkdir ~/projects/my-project && cd ~/projects/my-project
+  uv venv --seed --python 3.12
+  source .venv/bin/activate
+  uv pip install jupyterlab signalpilot-ai pandas numpy
+  uvx signalpilot lab --project
+  ```
+</Tab>
+</Tabs>
+
+---
+
+## Alternative Installation Methods
+
+### Global Installation with uv
+
+```bash
+uv tool install signalpilot
+```
+
+**Use `sp` command instead of `uvx signalpilot`:**
+
+```bash
+sp init           # Initialize workspace
+sp lab            # Launch Jupyter Lab
+sp lab --home     # Launch in home workspace
+sp lab --project  # Launch with local .venv
+sp home           # Shortcut for sp lab --home
+sp upgrade        # Upgrade home environment
+```
+
+<Note>
+Global installations don't auto-update. Reinstall periodically:
+```bash
+uv tool install --force signalpilot
+```
+</Note>
+
+### Installation with pip
+
+```bash
+pip install signalpilot
+sp init
+```
+
+<Warning>
+pip is 10-100x slower than uv and may have dependency conflicts. We recommend uv for best experience.
+</Warning>
+
+---
+
+## Environment Variables
+
+SignalPilot respects these environment variables:
+
+<ParamField path="SIGNALPILOT_HOME" type="string">
+  Custom location for SignalPilot workspace (default: `~/SignalPilotHome`)
+
+  ```bash
+  export SIGNALPILOT_HOME=~/custom-workspace
+  uvx signalpilot
+  ```
+</ParamField>
+
+<ParamField path="JUPYTER_CONFIG_DIR" type="string">
+  Custom Jupyter configuration directory
+
+  ```bash
+  export JUPYTER_CONFIG_DIR=~/.jupyter-custom
+  uvx signalpilot lab
+  ```
+</ParamField>
+
+---
+
+## Troubleshooting Commands
+
+### Check Installation
+
+```bash
+# Verify uv is installed
+uv --version
+
+# Check Python version
+python --version
+
+# List Jupyter extensions
+jupyter labextension list | grep signalpilot
+```
+
+**Expected output:**
+```
+signalpilot-ai v1.0.0 enabled OK
+```
+
+### Debug Jupyter Startup
+
+```bash
+# Check if port is in use
+lsof -i :8888  # macOS/Linux
+netstat -ano | findstr :8888  # Windows
+
+# Start with verbose logging
+uvx signalpilot lab --debug
+```
+
+### Rebuild Jupyter Lab
+
+```bash
+cd ~/SignalPilotHome
+jupyter lab build
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation Guide" icon="book" href="/getting-started/installation">
+    Complete setup walkthrough
+  </Card>
+  <Card title="Quickstart Tutorial" icon="rocket" href="/getting-started/quickstart">
+    First analysis in 5 minutes
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/reference/troubleshooting">
+    Common issues and solutions
+  </Card>
+  <Card title="Configuration" icon="sliders" href="/reference/configuration">
+    Customize SignalPilot behavior
+  </Card>
+</CardGroup>

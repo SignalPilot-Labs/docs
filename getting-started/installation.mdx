@@ -117,14 +117,22 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Once installed, you can launch Jupyter Lab anytime with:
 
 ```bash
-uvx signalpilot lab
+uvx signalpilot home
 ```
 
 **What this does:**
-- Opens Jupyter Lab in `~/SignalPilotHome` (your default workspace)
-- Uses the existing `.venv` (no reinstallation)
+- Opens Jupyter Lab in `~/SignalPilotHome` workspace
+- Uses **home environment** from `~/SignalPilotHome/.venv`
 - SignalPilot extension is pre-loaded
 - Opens browser at `http://localhost:8888`
+
+<Tip>
+`uvx signalpilot home` is shorthand for `uvx signalpilot lab --home`
+</Tip>
+
+<Note>
+**Working elsewhere?** Use `uvx signalpilot lab` to open Jupyter in your current directory with the home environment.
+</Note>
 
 <AccordionGroup>
 <Accordion title="Pass custom Jupyter Lab arguments" icon="terminal">
@@ -132,13 +140,13 @@ uvx signalpilot lab
 
   ```bash
   # Custom port
-  uvx signalpilot lab --port=8888
+  uvx signalpilot home --port=8889
 
   # Disable browser auto-open
-  uvx signalpilot lab --no-browser
+  uvx signalpilot home --no-browser
 
   # Bind to all network interfaces (access remotely)
-  uvx signalpilot lab --ip=0.0.0.0 --port=9999
+  uvx signalpilot home --ip=0.0.0.0 --port=9999
   ```
 
   All standard `jupyter lab` arguments work.
@@ -245,39 +253,55 @@ If you can't use `uvx` or prefer manual setup:
 </Tab>
 </Tabs>
 
-## Advanced: Working in Different Directories
+## Working in Different Modes
 
-By default, SignalPilot creates a workspace at `~/SignalPilotHome`. You can customize this with two flags:
+SignalPilot offers three ways to launch Jupyter Lab:
 
-### `--here` flag: Work in current directory with default environment
+### Default Mode: Current directory + Home environment
 
 ```bash
-cd ~/projects/my-data-analysis
-uvx signalpilot lab --here
+cd ~/projects/my-analysis
+uvx signalpilot lab
 ```
 
 **What this does:**
 - Opens Jupyter Lab in your **current directory**
-- Uses the **default environment** from `~/SignalPilotHome/.venv`
-- Perfect for quick exploration in any folder without setting up a new environment
+- Uses **home environment** from `~/SignalPilotHome/.venv`
+- Perfect for quick exploration without setting up new environment
 
-**Use case:** Analyzing data files in an existing project folder
+<Warning>
+If you have a local `.venv` with jupyter, you'll see a red warning prompting you to use `--project` flag.
+</Warning>
 
-
-### `--project` flag: Work in current directory with local environment
+### Home Mode: SignalPilotHome workspace + Home environment
 
 ```bash
-cd ~/projects/my-data-project
+uvx signalpilot home
+```
+
+**What this does:**
+- Opens Jupyter Lab in `~/SignalPilotHome` directory
+- Uses **home environment** from `~/SignalPilotHome/.venv`
+- Default workspace with all your skills, rules, and team notebooks
+
+<Tip>
+Shorthand for `uvx signalpilot lab --home`
+</Tip>
+
+### Project Mode: Current directory + Local environment
+
+```bash
+cd ~/projects/custom-analytics
 uvx signalpilot lab --project
 ```
 
 **What this does:**
 - Opens Jupyter Lab in your **current directory**
-- Uses a **local `.venv`** in that directory
+- Uses **local `.venv`** in that directory (fails if missing)
 - Great for project-specific work with custom dependencies
 
 **Requirements:**
-- A `.venv` must exist in the current directory
+- A `.venv` must exist in current directory
 - Must have `jupyterlab` and `signalpilot-ai` installed
 
 **Create a project environment:**
@@ -291,12 +315,68 @@ uv venv --seed --python 3.12
 
 # Activate and install dependencies
 source .venv/bin/activate
-uv pip install jupyterlab signalpilot-ai pandas numpy
+uv pip install jupyterlab signalpilot-ai pandas numpy matplotlib plotly
 
 # Launch SignalPilot
 uvx signalpilot lab --project
 ```
-{/* 
+
+## Keeping SignalPilot Updated
+
+SignalPilot automatically checks for updates when you launch Jupyter Lab. When an update is available, you'll see a notification:
+
+**For minor updates:**
+```
+╭─────────────── 📦 SignalPilot Update ───────────────╮
+│ Update Available: 0.11.8 (installed: 0.11.7)        │
+│ Run 'uvx signalpilot upgrade' to update             │
+╰──────────────────────────────────────────────────────╯
+```
+
+**For major updates:**
+```
+╭─────────────── 📦 SignalPilot Update ───────────────╮
+│ Important Update: 0.12.0 (installed: 0.11.7)        │
+│ This is a MAJOR update                              │
+╰──────────────────────────────────────────────────────╯
+Upgrade now? [y/n] (n):
+```
+
+<AccordionGroup>
+<Accordion title="Manual upgrade commands" icon="arrow-up">
+  Upgrade the home environment:
+
+  ```bash
+  uvx signalpilot upgrade
+  ```
+
+  Upgrade a project's local environment:
+
+  ```bash
+  cd /path/to/project
+  uvx signalpilot upgrade --project
+  ```
+
+  **What gets updated:**
+  - `signalpilot` CLI tool
+  - `signalpilot-ai` Jupyter extension
+  - Core dependencies
+  - Preserves your workspace and configuration
+</Accordion>
+
+<Accordion title="Disable auto-update checks" icon="bell-slash">
+  Update checks happen in the background and never slow down Jupyter startup.
+
+  To disable them, edit `~/SignalPilotHome/.signalpilot/config.toml`:
+
+  ```toml
+  [updates]
+  check_for_updates = false
+  ```
+</Accordion>
+</AccordionGroup>
+
+{/*
 ---
 
 ## Common CLI Commands
@@ -409,7 +489,7 @@ uv pip install -r requirements.txt
   lsof -i :8888  # macOS/Linux
 
   # 4. Try a different port
-  uvx signalpilot lab --port=8889
+  uvx signalpilot home --port=8889
   ```
 
   **Still not working?** Check [troubleshooting guide](/reference/troubleshooting) for detailed solutions.

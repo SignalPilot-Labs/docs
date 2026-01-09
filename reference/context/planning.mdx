@@ -1,0 +1,432 @@
+---
+title: "Planning System"
+description: "How agents break down complex tasks into structured, trackable, multi-step plans with to-do management"
+---
+
+# Planning System
+
+**Multi-step task orchestration** — SignalPilot agents don't just react to single requests. They can create structured plans, track progress, and dynamically adapt as your analysis evolves.
+
+<Info>
+Planning transforms high-level goals into executable steps, handles dependencies automatically, and keeps you in control with analyst-in-the-loop approval.
+</Info>
+
+## How Planning Works
+
+<Steps>
+<Step title="Analyze context">
+  When you give a high-level request, the agent reviews:
+  - Your current notebook state and available data
+  - Database connections and schemas
+  - dbt models and transformations (if connected)
+  - Relevant Slack/Jira context (if available via MCP)
+
+  <Note>
+  The agent gathers all relevant context before proposing a plan.
+  </Note>
+</Step>
+
+<Step title="Draft a plan">
+  The agent breaks your request into a step-by-step sequence:
+  - Clear, actionable tasks
+  - Logical ordering (handles dependencies automatically)
+  - Progress tracking with checkboxes
+  - Estimated complexity or notes
+
+  <Frame>
+  <img src="/images/planning-draft.png" alt="Agent proposing a multi-step plan" />
+  </Frame>
+</Step>
+
+<Step title="Ask for confirmation">
+  Before executing anything, the agent shows you the full plan:
+  - Review all steps
+  - Reorder if needed
+  - Add or remove steps
+  - Refine instructions
+  - Approve or reject
+
+  <Check>
+  **Analyst-in-the-loop approval** — you always see the plan before execution.
+  </Check>
+</Step>
+
+<Step title="Execute step by step">
+  After approval, the agent:
+  - Works through each step sequentially
+  - Marks steps as done (✓) when completed
+  - Updates the plan cell with progress
+  - Shows results after each major step
+
+  <Tip>
+  You can pause execution at any time to review intermediate results.
+  </Tip>
+</Step>
+
+<Step title="Update dynamically">
+  If results change or errors occur, the plan adapts:
+  - Pauses on errors to show the issue
+  - Suggests fixes before continuing
+  - Updates remaining steps based on new information
+  - Allows you to refine the plan mid-execution
+
+  <Note>
+  Plans are living documents that evolve with your analysis.
+  </Note>
+</Step>
+</Steps>
+
+## Example: Dollar-Cost Averaging Analysis
+
+**Your request:**
+```
+"Do dollar cost averaging investment in SPY every month with $1000 for the last 5 years"
+```
+
+**Agent creates this plan:**
+
+<Frame>
+<img src="/images/dca-plan-example.png" alt="DCA investment plan with 5 steps" />
+</Frame>
+
+```markdown
+## Investment Analysis Plan
+
+- [ ] Download SPY historical data for last 5 years
+- [ ] Calculate monthly investment schedule ($1000/month)
+- [ ] Compute cumulative shares purchased at each period
+- [ ] Calculate final portfolio value and total invested
+- [ ] Generate performance visualization comparing DCA to lump sum
+```
+
+**You review and click "Approve"**
+
+**Agent executes:**
+1. ✓ Downloads SPY data using yfinance
+2. ✓ Creates monthly date range and investment amounts
+3. ✓ Calculates shares purchased each month at closing price
+4. ✓ Sums total shares and computes current value
+5. ✓ Generates interactive plotly chart with key metrics
+
+<Check>
+Complete analysis in your notebook, ready to iterate or share.
+</Check>
+
+## Planning in Different Modes
+
+<Tabs>
+<Tab title="Agent Mode">
+  **Behavior:** Fully autonomous after approval
+
+  **Workflow:**
+  1. You give high-level goal
+  2. Agent creates plan
+  3. You approve plan
+  4. Agent executes all steps automatically
+  5. Marks tasks as complete progressively
+
+  **Best for:** Complex analyses where you trust the agent to execute once the plan is approved
+
+  **Example:**
+  ```
+  You: "Investigate why conversion dropped 8% last week"
+
+  Agent: [Creates 8-step plan including data loading, filtering,
+          cohort analysis, A/B test check, visualization]
+
+  You: [Reviews, approves]
+
+  Agent: [Executes all 8 steps, updating plan as it goes]
+  ```
+</Tab>
+
+<Tab title="Hands-On Mode">
+  **Behavior:** You execute each step manually
+
+  **Workflow:**
+  1. You give high-level goal
+  2. Agent creates plan
+  3. You approve plan
+  4. Agent suggests code for step 1
+  5. You review and execute
+  6. Repeat for each step
+
+  **Best for:** Learning workflows, sensitive data, or when you want to review each step
+
+  **Example:**
+  ```
+  You: "Clean this dataset and prepare it for modeling"
+
+  Agent: [Creates 5-step plan: handle nulls, remove duplicates,
+          encode categoricals, scale features, validate]
+
+  You: [Approves]
+
+  Agent: [Suggests code for step 1]
+  You: [Reviews, runs]
+  Agent: [Marks step 1 complete, suggests step 2]
+  ```
+</Tab>
+
+<Tab title="Ask Mode">
+  **Behavior:** Plan generation only (no execution)
+
+  **Workflow:**
+  1. You ask how to approach something
+  2. Agent creates a conceptual plan
+  3. Explains each step
+  4. You implement manually or switch modes
+
+  **Best for:** Understanding approach before committing to execution
+
+  **Example:**
+  ```
+  You: "How would I analyze customer churn?"
+
+  Agent: [Creates conceptual plan with explanations]
+         "Here's how I'd approach this:
+         1. Define churn (e.g., no activity in 90 days)
+         2. Calculate churn rate by cohort
+         3. Identify features correlated with churn
+         4. Segment users into risk categories
+         5. Visualize churn trends"
+
+  You: [Decides if this approach makes sense]
+  You: [Can switch to Agent Mode to execute, or implement manually]
+  ```
+</Tab>
+</Tabs>
+
+## Managing Plans
+
+### Viewing the Plan
+
+Plans are stored in a special markdown cell at the top of your notebook:
+
+```markdown
+## Analysis Plan
+- [x] Load data from warehouse
+- [x] Filter for 2024 Q4
+- [ ] Calculate key metrics
+- [ ] Generate visualizations
+- [ ] Export results
+```
+
+The cell updates automatically as the agent works.
+
+### Modifying the Plan
+
+You can edit the plan at any time:
+
+<Tabs>
+<Tab title="Before Execution">
+  **After approval but before agent starts:**
+  - Click the plan cell
+  - Add, remove, or reorder steps
+  - Click "Regenerate Plan" to have agent incorporate changes
+</Tab>
+
+<Tab title="During Execution">
+  **While agent is working:**
+  - Click "Pause" to stop execution
+  - Edit the plan cell
+  - Click "Resume" with updated plan
+  - Agent adapts to changes
+</Tab>
+
+<Tab title="After Errors">
+  **If a step fails:**
+  - Agent pauses and shows error
+  - You can:
+    - Fix the issue and resume
+    - Skip the failing step
+    - Add new steps to handle the error
+    - Refine the instructions for that step
+</Tab>
+</Tabs>
+
+### Plan Persistence
+
+Plans are saved with your notebook:
+
+<Check>
+**Persists across sessions** — When you reopen the notebook, the agent remembers:
+- The original plan
+- Which steps were completed
+- Where execution left off
+- Any modifications you made
+</Check>
+
+<Warning>
+If you manually delete the plan cell, the agent won't remember progress. Keep the plan cell to maintain context.
+</Warning>
+
+## Why Planning Matters
+
+<CardGroup cols={2}>
+  <Card title="Handle dependencies" icon="diagram-project">
+    Agent automatically orders steps logically. You don't need to think about "load data before analyzing it" — the agent figures out dependencies.
+  </Card>
+
+  <Card title="Track progress" icon="list-check">
+    Visual checkboxes show what's done, what's in progress, and what's remaining. No more "wait, did I already do that?"
+  </Card>
+
+  <Card title="Adapt to errors" icon="rotate">
+    When something fails, the plan pauses, explains the issue, and lets you decide how to proceed. No silent failures.
+  </Card>
+
+  <Card title="Maintain control" icon="shield-check">
+    You approve the plan upfront. No surprises. You always know what the agent will do before it does it.
+  </Card>
+</CardGroup>
+
+## Planning Best Practices
+
+<AccordionGroup>
+<Accordion title="Start with high-level goals" icon="bullseye">
+  **Good:** "Analyze customer retention over last 6 months"
+
+  **Too specific:** "Load customers table, filter for signup_date > '2024-06-01', group by month, calculate retention rate, plot as line chart"
+
+  Let the agent break down the high-level goal. You can always refine the plan after seeing it.
+</Accordion>
+
+<Accordion title="Review plans carefully before approving" icon="magnifying-glass">
+  **Check for:**
+  - Missing steps (e.g., data validation before analysis)
+  - Wrong ordering (e.g., visualization before aggregation)
+  - Unclear instructions (e.g., "analyze data" without specifics)
+  - Unnecessary steps (e.g., loading data you already have)
+
+  It's easier to fix the plan before execution than to debug issues later.
+</Accordion>
+
+<Accordion title="Use planning for complex tasks, skip for simple ones" icon="balance-scale">
+  **Use planning for:**
+  - Multi-step analyses (3+ steps)
+  - Investigations with unclear scope
+  - Tasks with dependencies
+  - Workflows you might want to repeat
+
+  **Skip planning for:**
+  - Single operations ("load this CSV")
+  - Quick fixes ("add error handling to cell 5")
+  - Exploration without clear goal
+
+  Use [Inline Edit](/reference/cell-editing/inline-edit) or simple [chat](/reference/agent-modes/chat) for simple tasks.
+</Accordion>
+
+<Accordion title="Pause and review intermediate results" icon="pause">
+  Don't let the agent run through all steps without checking:
+  - Click "Pause" after key steps
+  - Review the results
+  - Verify the approach is working
+  - Adjust the plan if needed
+
+  Catching issues early saves time.
+</Accordion>
+</AccordionGroup>
+
+## Plan Templates (Coming Soon)
+
+<Note>
+**Roadmap feature:** Save common plans as templates for reuse.
+
+**Example templates:**
+- "Weekly revenue analysis"
+- "Customer segmentation workflow"
+- "Data quality check and cleaning"
+- "A/B test analysis"
+
+Vote on this feature in our [GitHub discussions](https://github.com/SignalPilot-Labs/signalpilot).
+</Note>
+
+## FAQ
+
+<AccordionGroup>
+<Accordion title="Why does the agent ask for confirmation first?" icon="shield-check">
+  To give you control. Analyst-in-the-loop approval means you review the full plan before any code runs. This prevents:
+  - Unexpected changes to your notebook
+  - Wasted time on wrong approaches
+  - Costly database queries or API calls
+  - Confusion about what the agent is doing
+
+  The plan is your chance to course-correct before execution.
+</Accordion>
+
+<Accordion title="What happens if a step fails?" icon="exclamation-triangle">
+  The plan pauses and shows you:
+  - The error message with context
+  - Which step failed
+  - Suggested fixes
+
+  You can then:
+  - **Accept the fix:** Agent updates the code and continues
+  - **Edit manually:** Fix it yourself and tell agent to continue
+  - **Skip the step:** Move on without completing it
+  - **Refine the plan:** Adjust instructions and retry
+
+  The agent won't proceed until you address the failure.
+</Accordion>
+
+<Accordion title="Can I update the plan mid-execution?" icon="pen">
+  Yes! You can:
+  1. Click "Pause" to stop the agent
+  2. Edit the plan cell (add, remove, or reorder steps)
+  3. Click "Resume" or "Regenerate Plan"
+  4. Agent incorporates your changes and continues
+
+  The agent adapts to plan changes dynamically.
+</Accordion>
+
+<Accordion title="Does the plan persist across sessions?" icon="floppy-disk">
+  Yes. The plan is saved as part of the notebook metadata. When you reopen the notebook:
+  - The plan cell is still there
+  - Completed steps are still marked ✓
+  - The agent remembers where it left off
+  - You can resume execution or modify the plan
+
+  This makes it easy to work on complex analyses over multiple sessions.
+</Accordion>
+
+<Accordion title="Can I have multiple plans in one notebook?" icon="list">
+  Yes! You can have multiple plan cells for different analyses. The agent will:
+  - Track each plan independently
+  - Ask which plan you want to work on if there are multiple
+  - Update the relevant plan cell as it works
+
+  This is useful for notebooks with multiple distinct analyses.
+</Accordion>
+
+<Accordion title="What if I manually delete the plan cell?" icon="trash">
+  If you delete the plan cell:
+  - The agent loses track of progress
+  - It won't remember completed steps
+  - You'll need to start from scratch if you want planning
+
+  **Don't delete the plan cell** unless you're sure you're done with that analysis.
+
+  If you want to hide it, collapse the cell instead of deleting it.
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Chat Interface" icon="comments" href="/reference/agent-modes/chat">
+    Learn how to trigger planning via chat
+  </Card>
+
+  <Card title="Agent Mode" icon="robot" href="/reference/agent-modes/agent-mode">
+    Use planning with autonomous execution
+  </Card>
+
+  <Card title="Available Tools" icon="wrench" href="/reference/agent-modes/tools">
+    See what the agent can do in each plan step
+  </Card>
+
+  <Card title="Real-World Example" icon="chart-line-down" href="/guides/investigating-revenue-drops">
+    Follow a complete investigation using planning
+  </Card>
+</CardGroup>
