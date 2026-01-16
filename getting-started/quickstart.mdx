@@ -80,8 +80,20 @@ uvx signalpilot
   </Warning>
 </Step>
 
-<Step title="Load sample data">
-  In the first cell, load a sample dataset:
+<Step title="Load your data">
+  **Option 1: Use local files (recommended)**
+
+  Type `@` in the SignalPilot chat to mention any CSV, Excel, or data file:
+  - Home workspace: `~/SignalPilotHome/data/`
+  - Project folder: `./data/` in current working project directory
+
+  <Tip>
+  Use the **File Scanner** in the left sidebar to add more folders to index.
+  </Tip>
+
+  **Option 2: Generate sample data**
+
+  If you don't have data files, create sample data in the first cell:
 
   ```python
   import pandas as pd
@@ -99,7 +111,7 @@ uvx signalpilot
   ```
 
   <Check>
-  **Expected:** DataFrame with date and revenue columns displayed
+  **Expected:** DataFrame loaded from file or displayed from generated data
   </Check>
 </Step>
 
