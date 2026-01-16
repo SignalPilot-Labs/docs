@@ -8,7 +8,7 @@ description: "Complete reference for SignalPilot CLI commands and options"
 Complete reference for the SignalPilot command-line interface.
 
 <Info>
-The CLI is a **bootstrap installer** that sets up the SignalPilot Jupyter extension. The extension itself (not the CLI) is the actual product.
+The CLI is a **bootstrap installer** that sets up the [SignalPilot-AI](https://pypi.org/project/signalpilot-ai/) Jupyter extension. The extension itself (not the CLI) is the actual product.
 </Info>
 
 ## Command Syntax
@@ -20,6 +20,9 @@ Run SignalPilot without installation using uvx:
 ```bash
 # Initialize workspace (first-time setup)
 uvx signalpilot
+
+# Check version
+uvx signalpilot version
 
 # Launch Jupyter Lab
 uvx signalpilot lab              # Current directory + home environment
@@ -43,6 +46,7 @@ Install globally with `uv tool install signalpilot` to use the shorter `sp` comm
 
 ```bash
 sp init           # Same as: uvx signalpilot
+sp version        # Same as: uvx signalpilot version
 sp lab            # Same as: uvx signalpilot lab
 sp lab --home     # Same as: uvx signalpilot lab --home
 sp home           # Same as: uvx signalpilot home
@@ -66,14 +70,29 @@ uvx signalpilot
 ```
 
 **What it does:**
-- Creates `~/SignalPilotHome` workspace
-- Installs Python 3.12 + Jupyter Lab + SignalPilot extension
+- Creates `~/SignalPilotHome` workspace with starter notebooks
+- Installs isolated Python 3.12 + Jupyter Lab + SignalPilot extension
 - Installs data packages (pandas, numpy, matplotlib, seaborn, plotly)
+- Optimizes Jupyter cache for fast startup
 - Launches Jupyter Lab at `http://localhost:8888`
 
 <Info>
 **First-time setup only.** After installation, use `uvx signalpilot lab` to launch.
 </Info>
+
+---
+
+### `uvx signalpilot version`
+
+Check the installed CLI version.
+
+```bash
+uvx signalpilot version
+```
+
+Shows the installed CLI version with the SignalPilot logo.
+
+---
 
 ### `uvx signalpilot lab`
 
@@ -177,12 +196,6 @@ uvx signalpilot upgrade [--project]
 uvx signalpilot upgrade
 ```
 
-**What gets updated:**
-- `signalpilot` CLI tool
-- `signalpilot-ai` Jupyter extension
-- Core dependencies
-- Preserves workspace and configuration
-
 **Project environment:**
 ```bash
 cd /path/to/project
@@ -190,6 +203,49 @@ uvx signalpilot upgrade --project
 ```
 
 Upgrades the local `.venv` in the current directory instead of home environment.
+
+### How Upgrade Works
+
+The upgrade command updates **two components**:
+
+1. **CLI tool** (`signalpilot`) — The installer/launcher you run from terminal
+2. **Jupyter extension** (`signalpilot-ai`) — The actual product inside your `.venv`
+
+**What happens when you run `uvx signalpilot upgrade`:**
+
+<Steps>
+<Step title="Detect installation type">
+  Checks if `~/.local/bin/signalpilot` exists to determine if you installed globally with `uv tool install` or run ephemerally with `uvx`.
+</Step>
+
+<Step title="Upgrade CLI">
+  - **uvx users:** Clears uvx cache with `uv cache clean signalpilot`. Next `uvx signalpilot` fetches fresh version.
+  - **Tool users:** Runs `uv tool install --force signalpilot` + clears cache.
+</Step>
+
+<Step title="Upgrade Jupyter extension">
+  Runs `uv pip install --upgrade signalpilot-ai` in your target environment (`~/SignalPilotHome/.venv` or project `.venv`).
+</Step>
+</Steps>
+
+**Summary table:**
+
+| Installation Type | CLI Upgrade | Library Upgrade |
+|-------------------|-------------|-----------------|
+| **uvx** (ephemeral) | `uv cache clean signalpilot` | `uv pip install --upgrade signalpilot-ai` |
+| **uv tool** (global) | `uv tool install --force` + cache clean | `uv pip install --upgrade signalpilot-ai` |
+
+<Accordion title="Why this approach?">
+
+**Why context-aware?** uvx users prefer ephemeral execution without permanent installations. The CLI respects this by only clearing cache rather than installing globally.
+
+**Why not `uvx --refresh`?** The `--refresh` flag is unreliable (known uv issue). `uv cache clean signalpilot` reliably ensures the next `uvx signalpilot` run fetches the latest version from PyPI.
+
+**What's preserved?** Your workspace, notebooks, skills, rules, and configuration remain untouched. Only the CLI and extension binaries are updated.
+
+</Accordion>
+
+---
 
 ## Auto-Update System
 
@@ -202,7 +258,7 @@ Non-breaking updates show a notification:
 ```
 ╭─────────────── 📦 SignalPilot Update ───────────────╮
 │ Update Available: 0.11.8 (installed: 0.11.7)        │
-│ Run 'uvx signalpilot upgrade' to update             │
+│ Run 'sp upgrade' to update                          │
 ╰──────────────────────────────────────────────────────╯
 ```
 
@@ -231,6 +287,7 @@ check_for_updates = false
 Update checks run in the background and **never slow down** Jupyter startup.
 </Note>
 
+---
 
 ## Working Modes
 
@@ -294,18 +351,52 @@ SignalPilot offers three launch modes:
 </Tab>
 </Tabs>
 
+---
+
+## What Gets Installed
+
+### Python Packages
+
+- `signalpilot-ai` — AI agent integration (the actual product)
+- `jupyterlab` — Modern Jupyter interface
+- `pandas`, `numpy` — Data manipulation
+- `matplotlib`, `seaborn`, `plotly` — Visualization
+- `python-dotenv`, `tomli` — Configuration utilities
+
+### Directory Structure
+
+```
+~/SignalPilotHome/
+├── data/              # Put local files here for @mentions
+├── user-skills/       # Custom analysis patterns
+├── user-rules/        # Team coding standards
+├── team-workspace/    # Shared notebooks (git-tracked)
+├── demo-project/      # Example notebooks
+├── start-here.ipynb   # Quick start guide
+├── pyproject.toml     # Python project config
+└── .venv/             # Python environment
+```
+
+---
 
 ## Alternative Installation Methods
 
-### Global Installation with uv
+### Option 1: Run with uvx (Recommended)
 
-Install SignalPilot globally to use the shorter `sp` command:
+```bash
+uvx signalpilot
+```
+
+No permanent installation needed. Perfect for most users.
+
+### Option 2: Install with uv tool
 
 ```bash
 uv tool install signalpilot
+sp init
 ```
 
-After installation, use `sp` instead of `uvx signalpilot` (see [Command Syntax](#command-syntax) for examples).
+Installs `sp` command globally. Use `sp lab`, `sp home` to launch later.
 
 <Note>
 Global installations don't auto-update. Reinstall periodically:
@@ -314,7 +405,7 @@ uv tool install --force signalpilot
 ```
 </Note>
 
-### Installation with pip
+### Option 3: Install with pip
 
 ```bash
 pip install signalpilot
@@ -324,32 +415,8 @@ sp init
 <Warning>
 pip is 10-100x slower than uv and may have dependency conflicts. We recommend uv for best experience.
 </Warning>
-{/* 
+
 ---
-
-## Environment Variables
-
-SignalPilot respects these environment variables:
-
-<ParamField path="SIGNALPILOT_HOME" type="string">
-  Custom location for SignalPilot workspace (default: `~/SignalPilotHome`)
-
-  ```bash
-  export SIGNALPILOT_HOME=~/custom-workspace
-  uvx signalpilot
-  ```
-</ParamField>
-
-<ParamField path="JUPYTER_CONFIG_DIR" type="string">
-  Custom Jupyter configuration directory
-
-  ```bash
-  export JUPYTER_CONFIG_DIR=~/.jupyter-custom
-  uvx signalpilot lab
-  ```
-</ParamField>
-
---- */}
 
 ## Troubleshooting Commands
 
@@ -384,6 +451,13 @@ netstat -ano | findstr :8888  # Windows
 # Start with verbose logging
 uvx signalpilot lab --debug
 ```
+
+---
+
+## Requirements
+
+- Python 3.10 or higher
+- [uv](https://docs.astral.sh/uv/) package manager (recommended)
 
 ---
 
