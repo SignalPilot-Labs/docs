@@ -143,17 +143,24 @@ uvx signalpilot
 </Step>
 
 <Step title="Connect your data (optional)" icon="plug">
-  **Option 1:** Connect a database (PostgreSQL, Snowflake, BigQuery)
+  **Start immediately with local files:**
+  - Type `@` in chat to mention any CSV, Excel, or data file from the `data/` folder
+  - Home workspace: `~/SignalPilotHome/data/`
+  - Project folder: `./data/` in current working project directory
 
-  **Option 2:** Analyze local files (CSV, Excel, notebooks)
+  **Add more folders:** Use the **File Scanner** tool in the left sidebar to index additional directories.
 
-  <Card title="Connection Guides" icon="database" href="/integrations">
-    Step-by-step setup for databases, dbt, Slack, Jira
-  </Card>
+  **Connect databases:** PostgreSQL, Snowflake, BigQuery for warehouse access.
 
-  <Note>
-  You can start analyzing local files without connecting to any external data sources
-  </Note>
+  <CardGroup cols={2}>
+    <Card title="Database Setup" icon="database" href="/integrations/databases/postgresql">
+      Connect PostgreSQL, Snowflake, BigQuery
+    </Card>
+
+    <Card title="Context & @Mentions" icon="at" href="/reference/context/context">
+      Reference local files, dataframes, and databases
+    </Card>
+  </CardGroup>
 </Step>
 
 <Step title="Ask your first question" icon="message">

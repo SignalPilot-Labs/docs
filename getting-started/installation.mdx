@@ -81,6 +81,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
   **What gets created:**
   ```
   ~/SignalPilotHome/
+  ├── data/              # Put local files here for @mentions
   ├── user-skills/       # Your custom analysis patterns
   ├── user-rules/        # Your team's coding standards
   ├── team-workspace/    # Shared notebooks (git-tracked)
@@ -119,7 +120,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 </Step>
 
 <Step title="Start your first investigation">
-  Open `start-here.ipynb` and ask SignalPilot to help with your first data investigation.
+  **Use local files:** Type `@` in the chat to mention CSV, Excel, or data files from:
+  - `~/SignalPilotHome/data/` (home workspace)
+  - `./data/` (current working project directory)
+
+  **Add more folders:** Use the **File Scanner** in the left sidebar to index additional directories.
 
   Or jump to the [5-minute quickstart tutorial](/getting-started/quickstart).
 </Step>

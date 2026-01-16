@@ -24,10 +24,10 @@ Context is all the information the AI needs to understand your request and provi
   </Card>
 
   <Card title="Data Sources" icon="database">
+    - Local files (CSV, Excel, Parquet)
     - Database schemas and metadata
     - Table relationships
     - Query performance history
-    - Data quality metrics
   </Card>
 
   <Card title="Transformations" icon="diagram-project">
@@ -110,6 +110,21 @@ SignalPilot uses a multi-layered approach to gather context:
   </Note>
 </Step>
 
+<Step title="Layer 1.5: Local Files">
+  **Indexed automatically** — CSV, Excel, Parquet, and other data files
+
+  - **Default indexed folders:**
+    - `~/SignalPilotHome/data/` (home workspace)
+    - `./data/` (current working project directory)
+
+  - **@mention files:** Type `@` in chat to reference any indexed file
+  - **Add folders:** Use the **File Scanner** tool in the left sidebar
+
+  <Tip>
+  This is the fastest way to get started — drop files in `data/` and @mention them in chat.
+  </Tip>
+</Step>
+
 <Step title="Layer 2: Data Warehouse Context">
   **Configured connections** — Database metadata and query history
 
@@ -187,10 +202,17 @@ In Hands-On Mode, you control what context the AI can access:
 
 <Tab title="@Mention Context">
   **In chat, type @ to mention:**
-  - `@revenue_data` — Share specific dataframe
+  - `@sales.csv` — Reference local files from `data/` folder
+  - `@revenue_data` — Share specific dataframe from kernel
   - `@cell-5` — Reference specific cell
   - `@postgres-prod` — Connect to specific database
   - `@dbt-models` — Access dbt lineage
+
+  **Default indexed folders:**
+  - `~/SignalPilotHome/data/` (home workspace)
+  - `./data/` (current working project directory)
+
+  **Add more folders:** Use the **File Scanner** tool in the left sidebar to index additional directories.
 
   **Use case:** Surgical precision for context sharing
 </Tab>
