@@ -1,14 +1,170 @@
 ---
 title: "Slack Integration"
-description: "Connect SignalPilot to Slack for collaboration context"
+description: "Connect SignalPilot to Slack to bring team discussions and data context into your investigations"
 ---
 
 # Slack Integration
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 2 implementation.
-</Warning>
+SignalPilot integrates with Slack to surface relevant team discussions during data investigations. Find out what your team said about a metric drop, who owns a data pipeline, or what decisions were made about data definitions.
 
-<Card title="Coming Soon" icon="users">
-Full Slack integration guide will be added during Phase 2 of documentation restructuring.
+## What Slack Integration Provides
+
+| Context Type | What You Get | Example Use |
+|--------------|--------------|-------------|
+| **Channel Discussions** | Recent messages about data topics | "What did the team say about conversion?" |
+| **Thread Context** | Full conversation threads | "Show me that revenue discussion" |
+| **Mentions** | References to metrics, tables, dashboards | "Who mentioned the orders table?" |
+| **Decisions** | Key decisions about data definitions | "What did we decide about active users?" |
+
+---
+
+## Setup
+
+<Steps>
+<Step title="Create a Slack App">
+1. Go to [api.slack.com/apps](https://api.slack.com/apps)
+2. Click **Create New App** → **From scratch**
+3. Name it "SignalPilot" and select your workspace
+</Step>
+
+<Step title="Configure OAuth Scopes">
+Under **OAuth & Permissions**, add these Bot Token Scopes:
+- `channels:history` - Read messages in public channels
+- `channels:read` - List public channels
+- `search:read` - Search messages
+- `users:read` - Resolve user names
+
+<Note>
+For private channels, add `groups:history` and `groups:read`, then invite the bot to each channel.
+</Note>
+</Step>
+
+<Step title="Install to Workspace">
+1. Click **Install to Workspace**
+2. Authorize the permissions
+3. Copy the **Bot User OAuth Token** (starts with `xoxb-`)
+</Step>
+
+<Step title="Configure SignalPilot">
+Add to your `signalpilot.config.json`:
+
+```json
+{
+  "mcp_servers": {
+    "slack": {
+      "type": "slack",
+      "bot_token": "${SLACK_BOT_TOKEN}",
+      "channels": ["data-team", "analytics", "data-incidents"]
+    }
+  }
+}
+```
+</Step>
+</Steps>
+
+---
+
+## Using Slack Context
+
+### Finding Relevant Discussions
+
+When investigating a metric change, SignalPilot automatically searches Slack:
+
+```
+You: "Why did conversion drop 8% last week?"
+
+SignalPilot: Searching Slack for recent conversion discussions...
+
+Found 3 relevant threads:
+
+1. #data-team (Tuesday): "Heads up - we deployed the new checkout flow"
+2. #analytics (Wednesday): "Seeing conversion numbers look off"
+3. #data-incidents (Wednesday): "Hotfix deployed for checkout tracking"
+
+Insight: The drop appears related to a checkout deployment with tracking issues.
+```
+
+### Asking About Decisions
+
+Surface past team decisions without manual searching:
+
+```
+You: "How do we define 'active user' again?"
+
+SignalPilot: Searching Slack for 'active user' definition...
+
+Found in #data-team (3 weeks ago):
+"Active user = logged in within 30 days with at least 1 action"
+Documentation: notion.so/data-definitions/active-user
+```
+
+### Finding Data Owners
+
+Identify who to ask about specific data:
+
+```
+You: "Who owns the attribution model?"
+
+SignalPilot: Searching Slack for attribution model ownership...
+
+Based on recent discussions:
+- @marketing_analyst: Primary owner (mentioned 12 times)
+- @data_engineer: Maintains the pipeline (mentioned 5 times)
+- #marketing-analytics: Main channel for attribution discussions
+```
+
+---
+
+## Slack Commands
+
+| Command | Description |
+|---------|-------------|
+| `@slack search <term>` | Search messages for a term |
+| `@slack channel <name>` | Get recent messages from a channel |
+| `@slack thread <url>` | Get full thread context |
+| `@slack mentions <term>` | Find who mentioned a topic |
+
+---
+
+## Privacy & Security
+
+- SignalPilot only searches channels the bot is invited to
+- Messages are fetched on-demand and not stored
+- All searches are logged locally for audit purposes
+- DMs and private channels require explicit bot invitation
+
+---
+
+## Best Practices
+
+<Steps>
+<Step title="Focus on Data Channels">
+Configure only channels where data discussions happen. This improves search relevance and speed.
+</Step>
+
+<Step title="Use Consistent Terminology">
+Encourage your team to use consistent names for metrics and tables. "MRR" is easier to search than various phrasings.
+</Step>
+
+<Step title="Document Decisions">
+When Slack surfaces a decision, add it to your team's documentation. Slack is for discovery, not long-term storage.
+</Step>
+</Steps>
+
+---
+
+## Related Resources
+
+<CardGroup cols={2}>
+<Card title="Jira Integration" icon="list-check" href="/integrations/collaboration/jira">
+Combine with Jira for ticket context
 </Card>
+
+<Card title="dbt Integration" icon="diagram-project" href="/integrations/dbt-integration">
+Add data lineage to Slack discussions
+</Card>
+
+<Card title="Context Aggregation" icon="plug" href="/deep-dives/context-aggregation">
+How Slack fits into the MCP architecture
+</Card>
+</CardGroup>

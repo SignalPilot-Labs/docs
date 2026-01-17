@@ -1,14 +1,251 @@
 ---
 title: "Hooks System"
-description: "Custom constraints, validations, audit"
+description: "Custom constraints, validations, and audit controls for AI-powered data investigations"
 ---
 
 # Hooks System
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
-</Warning>
+Hooks are safety guardrails that enforce governance and best practices in SignalPilot. They let you define boundaries for AI behavior while still enabling autonomous investigation—ensuring that agentic systems operate within your organization's constraints.
 
-<Card title="Coming Soon" icon="wrench">
-Full deep dive will be added during Phase 3 of documentation restructuring.
+## Why Hooks Matter
+
+Agentic AI systems can execute code and run queries autonomously. This power needs boundaries:
+
+```
+❌ Without Hooks:
+- AI queries production database during peak hours
+- Slow query runs without LIMIT, scans 100M rows
+- Analysis uses iterrows() instead of vectorized ops
+- No audit trail of what data was accessed
+```
+
+```
+✅ With Hooks:
+- Pre-hook blocks prod queries outside business hours
+- Pre-hook adds LIMIT clause to exploratory queries
+- Post-hook validates code follows performance standards
+- All data access logged for compliance
+```
+
+---
+
+## Hook Types
+
+SignalPilot supports four types of hooks:
+
+### 1. Pre-Execution Hooks
+
+Run **before** code or queries execute. Can block, modify, or approve.
+
+| Use Case | Example Rule |
+|----------|--------------|
+| Time-based access | "Only query prod between 9am-5pm" |
+| Query safety | "Add LIMIT 1000 to SELECT * queries" |
+| Resource protection | "Block queries without WHERE clause on large tables" |
+| Approval gates | "Require approval for DELETE/UPDATE operations" |
+
+### 2. Post-Execution Hooks
+
+Run **after** code executes. Validate results and flag issues.
+
+| Use Case | Example Rule |
+|----------|--------------|
+| Data quality | "Warn if null percentage > 5%" |
+| Anomaly detection | "Flag if row count changed > 20%" |
+| Result validation | "Check that dates are within expected range" |
+| Consistency checks | "Verify sum matches expected total" |
+
+### 3. Code Quality Hooks
+
+Validate generated code against team standards.
+
+| Use Case | Example Rule |
+|----------|--------------|
+| Performance | "Use vectorized pandas, never iterrows()" |
+| Style | "All functions must have docstrings" |
+| Security | "Never hardcode credentials" |
+| Best practices | "Use parameterized queries, not string concat" |
+
+### 4. Audit Hooks
+
+Log all operations for compliance and debugging.
+
+| What's Logged | Details |
+|---------------|---------|
+| Data access | Tables queried, columns accessed |
+| Code execution | What ran, when, by whom |
+| Context resolution | What MCP sources were queried |
+| Results | Summary of outputs (not raw data) |
+
+---
+
+## Configuring Hooks
+
+### Basic Configuration
+
+```json
+// signalpilot.config.json
+{
+  "hooks": {
+    "pre_execution": [
+      {
+        "name": "limit_exploratory_queries",
+        "trigger": "query",
+        "condition": "SELECT *",
+        "action": "modify",
+        "modification": "ADD LIMIT 1000"
+      }
+    ],
+    "post_execution": [
+      {
+        "name": "check_data_quality",
+        "trigger": "dataframe_created",
+        "action": "validate",
+        "rules": ["null_percentage < 0.05", "row_count > 0"]
+      }
+    ]
+  }
+}
+```
+
+### Python Configuration
+
+```python
+from signalpilot import hooks
+
+# Pre-execution hook
+@hooks.pre_execute
+def limit_prod_queries(query, context):
+    if context.database == "production":
+        if "LIMIT" not in query.upper():
+            return query + " LIMIT 10000"
+    return query
+
+# Post-execution hook
+@hooks.post_execute
+def validate_results(result, context):
+    if isinstance(result, pd.DataFrame):
+        null_pct = result.isnull().mean().max()
+        if null_pct > 0.05:
+            hooks.warn(f"High null percentage: {null_pct:.1%}")
+    return result
+
+# Code quality hook
+@hooks.code_quality
+def enforce_vectorization(code):
+    if ".iterrows()" in code:
+        raise hooks.CodeQualityError(
+            "Use vectorized operations instead of iterrows()"
+        )
+    return code
+```
+
+---
+
+## Common Hook Patterns
+
+### Production Database Protection
+
+```python
+@hooks.pre_execute
+def protect_production(query, context):
+    from datetime import datetime
+
+    if context.database == "production":
+        hour = datetime.now().hour
+        if hour < 9 or hour > 17:
+            raise hooks.BlockedError(
+                "Production queries only allowed 9am-5pm. "
+                "Use staging database for after-hours work."
+            )
+    return query
+```
+
+### Query Cost Control
+
+```python
+@hooks.pre_execute
+def control_query_cost(query, context):
+    # Block full table scans on large tables
+    large_tables = ["events", "pageviews", "logs"]
+
+    for table in large_tables:
+        if table in query.lower():
+            if "WHERE" not in query.upper():
+                raise hooks.BlockedError(
+                    f"Query on {table} requires WHERE clause. "
+                    f"Table has 100M+ rows."
+                )
+    return query
+```
+
+### Data Quality Validation
+
+```python
+@hooks.post_execute
+def validate_data_quality(result, context):
+    if not isinstance(result, pd.DataFrame):
+        return result
+
+    issues = []
+
+    # Check for nulls
+    null_pct = result.isnull().mean()
+    high_null_cols = null_pct[null_pct > 0.05].index.tolist()
+    if high_null_cols:
+        issues.append(f"High null columns: {high_null_cols}")
+
+    # Check for duplicates
+    if result.duplicated().any():
+        dup_count = result.duplicated().sum()
+        issues.append(f"Found {dup_count} duplicate rows")
+
+    if issues:
+        hooks.warn("\n".join(issues))
+
+    return result
+```
+
+---
+
+## Best Practices
+
+<Steps>
+<Step title="Start Permissive, Tighten Over Time">
+Begin with warnings rather than blocks. Review warnings to understand patterns before enforcing strict rules.
+</Step>
+
+<Step title="Explain Blocks Clearly">
+When blocking an operation, provide clear explanation and suggested alternatives.
+</Step>
+
+<Step title="Test Hooks in Development">
+Use a staging database and test notebooks to verify hooks work as expected before enabling in production.
+</Step>
+
+<Step title="Review Audit Logs">
+Regularly review audit logs to identify patterns and adjust hooks accordingly.
+</Step>
+</Steps>
+
+---
+
+## Related Deep Dives
+
+<CardGroup cols={2}>
+<Card title="Agent Orchestration Loop" icon="rotate" href="/deep-dives/agent-orchestration-loop">
+How hooks integrate with the execution loop
 </Card>
+
+<Card title="Multi-Session Memory" icon="brain" href="/deep-dives/multi-session-memory">
+Store validated patterns for hook rules
+</Card>
+
+<Card title="Security & Privacy" icon="shield-halved" href="/introduction/security-and-privacy">
+Complete security model documentation
+</Card>
+
+<Card title="How It Works" icon="gears" href="/introduction/how-it-works">
+Overview of all foundational systems
+</Card>
+</CardGroup>

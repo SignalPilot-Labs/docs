@@ -1,14 +1,159 @@
 ---
 title: "Jira Integration"
-description: "Connect SignalPilot to Jira for collaboration context"
+description: "Connect SignalPilot to Jira for deployment history, ticket context, and issue tracking"
 ---
 
 # Jira Integration
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 2 implementation.
-</Warning>
+SignalPilot integrates with Jira to bring deployment history, ticket context, and issue tracking into your data investigations. Correlate data changes with deployments and find related bug reports.
 
-<Card title="Coming Soon" icon="users">
-Full Jira integration guide will be added during Phase 2 of documentation restructuring.
+## What Jira Integration Provides
+
+| Context Type | What You Get | Example Use |
+|--------------|--------------|-------------|
+| **Deployment History** | Recent releases and changes | "What deployed last week?" |
+| **Related Tickets** | Issues mentioning data or metrics | "Any tickets about the orders table?" |
+| **Issue Details** | Full ticket context and comments | "What does ticket DATA-123 say?" |
+| **Sprint Context** | Current sprint and priorities | "What data work is in flight?" |
+
+---
+
+## Setup
+
+<Steps>
+<Step title="Generate API Token">
+1. Go to [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
+2. Click **Create API token**
+3. Name it "SignalPilot" and copy the token
+</Step>
+
+<Step title="Configure SignalPilot">
+Add to your `signalpilot.config.json`:
+
+```json
+{
+  "mcp_servers": {
+    "jira": {
+      "type": "jira",
+      "url": "https://yourcompany.atlassian.net",
+      "email": "${JIRA_EMAIL}",
+      "api_token": "${JIRA_API_TOKEN}",
+      "projects": ["DATA", "ANALYTICS", "ENG"]
+    }
+  }
+}
+```
+
+<Tip>
+Include the engineering project key (e.g., `ENG`) to capture deployments that might affect your data.
+</Tip>
+</Step>
+
+<Step title="Verify Connection">
+In a SignalPilot notebook, test with: `@jira recent DATA`
+</Step>
+</Steps>
+
+---
+
+## Using Jira Context
+
+### Correlating with Deployments
+
+When data changes unexpectedly, check what deployed:
+
+```
+You: "Why did conversion drop 8% last week?"
+
+SignalPilot: Checking Jira for recent deployments...
+
+Found 3 relevant deployments:
+
+1. ENG-1234: "Checkout flow redesign" (Deployed Tuesday)
+   - Related: DATA-567 (tracking pixel migration)
+
+2. ENG-1198: "A/B test framework update" (Deployed Monday)
+   - Affected 15% of users in test group
+
+Correlation: The checkout deployment (ENG-1234) coincides with your drop.
+```
+
+### Finding Related Issues
+
+Search for known data problems:
+
+```
+You: "Are there any known issues with the orders table?"
+
+SignalPilot: Searching Jira for orders table issues...
+
+Found DATA-432: "Duplicate orders in production" (In Progress)
+- Root cause: migration script ran twice
+- ETA: End of week
+- Recommendation: Filter to orders after 2024-01-01
+```
+
+### Understanding Change History
+
+Trace when and why data definitions changed:
+
+```
+You: "When did we change the MRR calculation?"
+
+SignalPilot: Searching Jira for MRR calculation changes...
+
+Found DATA-345: "Update MRR calculation to exclude credits" (2 months ago)
+- Before: MRR = price × quantity
+- After: MRR = (price × quantity) - credits
+- Deployed: 2024-01-15
+
+Note: If comparing MRR before/after 2024-01-15, the calculation differs.
+```
+
+---
+
+## Jira Commands
+
+| Command | Description |
+|---------|-------------|
+| `@jira recent <project>` | Get recent tickets |
+| `@jira search <term>` | Search tickets for a term |
+| `@jira ticket <key>` | Get full ticket details |
+| `@jira deployments` | Show recent deployments |
+| `@jira sprint` | Show current sprint status |
+
+---
+
+## Best Practices
+
+<Steps>
+<Step title="Use Consistent Labels">
+Label data-related tickets consistently (e.g., `data`, `pipeline`, `metrics`). This improves search relevance.
+</Step>
+
+<Step title="Link Related Issues">
+When a bug affects data, link it to the data ticket. SignalPilot follows these links to provide full context.
+</Step>
+
+<Step title="Document Deployments">
+Include deployment dates in ticket descriptions or comments. This helps correlate data changes with releases.
+</Step>
+</Steps>
+
+---
+
+## Related Resources
+
+<CardGroup cols={2}>
+<Card title="Slack Integration" icon="slack" href="/integrations/collaboration/slack">
+Combine with Slack for discussion context
 </Card>
+
+<Card title="dbt Integration" icon="diagram-project" href="/integrations/dbt-integration">
+Add data lineage to deployment context
+</Card>
+
+<Card title="Context Aggregation" icon="plug" href="/deep-dives/context-aggregation">
+How Jira fits into the MCP architecture
+</Card>
+</CardGroup>

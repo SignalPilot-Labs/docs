@@ -1,14 +1,204 @@
 ---
 title: "dbt Integration"
-description: "Connect SignalPilot to dbt Cloud or dbt Core for lineage and metadata"
+description: "Connect SignalPilot to dbt Cloud or dbt Core for model lineage, documentation, and test results"
 ---
 
 # dbt Integration
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 2 implementation.
-</Warning>
+SignalPilot integrates with dbt to bring your transformation layer context into data investigations. Access model lineage, documentation, test results, and column-level metadata without leaving your notebook.
 
-<Card title="Coming Soon" icon="diagram-project">
-Full dbt integration guide will be added during Phase 2 of documentation restructuring.
+## What dbt Integration Provides
+
+| Context Type | What You Get | Example Use |
+|--------------|--------------|-------------|
+| **Model Lineage** | Upstream/downstream dependencies | "What feeds into this metric?" |
+| **Documentation** | Model and column descriptions | "What does this column mean?" |
+| **Test Results** | Data quality test status | "Are there any failing tests?" |
+| **Column Lineage** | Field-level transformations | "Where does this field come from?" |
+| **Freshness** | Source freshness status | "When was this data last updated?" |
+
+---
+
+## Supported dbt Versions
+
+| dbt Type | Version | Features |
+|----------|---------|----------|
+| dbt Cloud | All tiers | Full API access, real-time sync |
+| dbt Core | 1.0+ | Manifest/catalog file parsing |
+
+---
+
+## Setup: dbt Cloud
+
+<Steps>
+<Step title="Get Your dbt Cloud API Token">
+1. Log in to dbt Cloud
+2. Go to **Account Settings** → **API Access**
+3. Generate a new **Service Token** with these permissions:
+   - `Metadata API` (required)
+   - `Job triggers` (optional, for freshness checks)
+4. Copy the token
+
+<Warning>
+Use a service token, not a personal token. Service tokens don't expire and aren't tied to individual users.
+</Warning>
+</Step>
+
+<Step title="Find Your Account and Project IDs">
+From your dbt Cloud URL: `https://cloud.getdbt.com/deploy/{account_id}/projects/{project_id}`
+</Step>
+
+<Step title="Configure SignalPilot">
+Add to your `signalpilot.config.json`:
+
+```json
+{
+  "mcp_servers": {
+    "dbt": {
+      "type": "dbt-cloud",
+      "api_token": "${DBT_CLOUD_API_TOKEN}",
+      "account_id": "12345",
+      "project_id": "67890"
+    }
+  }
+}
+```
+
+<Tip>
+Use environment variables for sensitive values. SignalPilot will read `${VAR_NAME}` from your environment.
+</Tip>
+</Step>
+
+<Step title="Verify Connection">
+In a SignalPilot notebook, test with: `@dbt show models`
+
+You should see a list of your dbt models.
+</Step>
+</Steps>
+
+---
+
+## Setup: dbt Core
+
+For dbt Core, SignalPilot reads your manifest and catalog files directly.
+
+<Steps>
+<Step title="Generate Manifest and Catalog">
+Run dbt to generate the required artifacts:
+
+```bash
+dbt docs generate
+```
+</Step>
+
+<Step title="Configure SignalPilot">
+Add to your `signalpilot.config.json`:
+
+```json
+{
+  "mcp_servers": {
+    "dbt": {
+      "type": "dbt-core",
+      "project_dir": "/path/to/your/dbt/project",
+      "target_dir": "target"
+    }
+  }
+}
+```
+</Step>
+</Steps>
+
+---
+
+## Using dbt Context
+
+### Model Lineage
+
+Ask about dependencies to understand data flow:
+
+```
+You: "What models feed into the revenue dashboard?"
+
+SignalPilot: Looking at dbt lineage for revenue_dashboard...
+
+Upstream models:
+├── stg_orders (staging)
+├── stg_customers (staging)
+├── int_order_items (intermediate)
+└── fct_revenue (fact)
+```
+
+### Test Results
+
+Check data quality before investigating:
+
+```
+You: "Are there any failing dbt tests?"
+
+SignalPilot: Checking dbt test results...
+
+⚠️ 2 tests failing:
+1. unique_orders_order_id (FAIL) - Found 47 duplicate order_ids
+2. not_null_customers_email (WARN) - Found 12 null emails
+```
+
+### Column Lineage
+
+Trace where data comes from:
+
+```
+You: "Where does the mrr column in fct_subscriptions come from?"
+
+SignalPilot: Tracing column lineage...
+
+fct_subscriptions.mrr
+└── int_subscription_mrr.mrr_amount
+    └── CASE statement combining:
+        ├── stg_subscriptions.plan_amount
+        ├── stg_discounts.discount_percent
+        └── stg_credits.credit_amount
+```
+
+---
+
+## dbt Commands
+
+| Command | Description |
+|---------|-------------|
+| `@dbt show models` | List all models |
+| `@dbt lineage <model>` | Show upstream/downstream |
+| `@dbt describe <model>` | Show model documentation |
+| `@dbt tests` | Show test results |
+| `@dbt freshness` | Check source freshness |
+
+---
+
+## Best Practices
+
+<Steps>
+<Step title="Document Your Models">
+Well-documented dbt models make SignalPilot investigations faster. Include column descriptions, especially for business logic.
+</Step>
+
+<Step title="Run Tests Before Investigating">
+Check `@dbt tests` before deep investigations. Failing tests might explain data anomalies.
+</Step>
+
+<Step title="Use Lineage for Root Cause">
+When data looks wrong, trace lineage upstream. The issue often originates in staging or source models.
+</Step>
+</Steps>
+
+---
+
+## Related Resources
+
+<CardGroup cols={2}>
+<Card title="Context Aggregation" icon="diagram-project" href="/deep-dives/context-aggregation">
+How dbt fits into the MCP architecture
 </Card>
+
+<Card title="Slack Integration" icon="slack" href="/integrations/collaboration/slack">
+Combine dbt context with Slack discussions
+</Card>
+</CardGroup>

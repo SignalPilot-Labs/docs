@@ -1,14 +1,327 @@
 ---
 title: "Multi-Session Memory"
-description: "What it stores, how it works, persistence"
+description: "How SignalPilot remembers past investigations to make future analysis faster and more accurate"
 ---
 
 # Multi-Session Memory
 
+Multi-session memory is SignalPilot's institutional knowledge layer. It captures insights from every investigation and applies them to future work—so you never rediscover the same data quirks or reinvent the same analysis patterns.
+
+## The Problem Without Memory
+
+Traditional AI tools have no memory between sessions:
+
+```
+❌ Session 1: "Revenue calculation uses net, not gross"
+   AI learns this, applies it correctly
+
+❌ Session 2: (new session)
+   AI forgets, makes gross revenue mistake again
+
+❌ Session 3: (new session)
+   AI forgets, makes gross revenue mistake AGAIN
+```
+
+With SignalPilot's memory:
+
+```
+✅ Session 1: "Revenue calculation uses net, not gross"
+   SignalPilot saves this as a validated assumption
+
+✅ Session 2: (new session)
+   SignalPilot recalls assumption, uses net revenue
+
+✅ Session 3: (new session)
+   SignalPilot still knows, applies correctly forever
+```
+
+---
+
+## What Gets Stored
+
+SignalPilot's memory captures four categories of knowledge:
+
+### 1. Validated Assumptions
+
+Business logic and domain knowledge confirmed during investigations:
+
+| Example | How It's Used |
+|---------|---------------|
+| "Revenue = (price × quantity) - discounts" | Applied to all revenue calculations |
+| "Active user = logged in within 30 days" | Used in user activity queries |
+| "Fiscal year starts April 1" | Applied to YoY comparisons |
+| "test_accounts should always be excluded" | Added as filter to all user queries |
+
+<Tip>
+Validated assumptions are captured when you confirm the AI's understanding during an investigation. Simply agreeing "yes, that's correct" stores the assumption.
+</Tip>
+
+### 2. Data Quirks
+
+Anomalies and gotchas discovered in your data:
+
+| Example | How It's Used |
+|---------|---------------|
+| "Orders table has duplicates before 2024-01-01" | Warns before querying historical data |
+| "user_id can be NULL for anonymous events" | Suggests LEFT JOIN instead of INNER |
+| "Timezone is UTC in events, PST in orders" | Highlights when joining these tables |
+| "pageviews spike every Monday (cron job)" | Filters out when analyzing daily patterns |
+
+<Note>
+Data quirks are captured when you explain why a result looks strange, or when you correct an AI assumption about the data.
+</Note>
+
+### 3. Investigation Patterns
+
+Successful approaches for common question types:
+
+| Question Pattern | Learned Approach |
+|-----------------|------------------|
+| "Why did X drop?" | Check for A/B tests → Compare cohorts → Analyze funnel |
+| "What caused the spike in Y?" | Check for one-time events → Look for tracking changes → Analyze by segment |
+| "Is this data correct?" | Compare to source of truth → Check for duplicates → Validate aggregation logic |
+
+### 4. Solution Templates
+
+Reusable analysis patterns from past investigations:
+
+```python
+# Stored as: "cohort_retention_analysis"
+# Triggered by questions about retention or cohorts
+
+def cohort_retention(df, cohort_col, date_col, periods=[7, 14, 30]):
+    """
+    Standard cohort retention analysis using team conventions.
+    Uses signup date as cohort, activity date for retention.
+    Excludes test accounts per team rule.
+    """
+    # ... implementation learned from past analyses
+```
+
+---
+
+## How Memory Works
+
+### Storage Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      MEMORY STORAGE                              │
+├─────────────────────────────────────────────────────────────────┤
+│  LOCAL STORAGE (your machine)                                    │
+│  ├── assumptions.json       # Validated business rules           │
+│  ├── quirks.json           # Data anomalies and warnings         │
+│  ├── patterns.json         # Investigation patterns              │
+│  └── templates/            # Reusable code templates             │
+│                                                                  │
+│  OPTIONAL: Team Sync (encrypted)                                 │
+│  └── Shared memory across team members                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+<Info>
+By default, memory is stored locally on your machine. Team sync is opt-in and uses end-to-end encryption.
+</Info>
+
+### Memory Recall
+
+When you start an investigation, SignalPilot queries memory for relevant knowledge:
+
+```
+Question: "Why did conversion drop 8% last week?"
+
+Memory Recall:
+├─ Assumption: "Conversion = completed_orders / started_checkouts"
+├─ Quirk: "Conversion tracking had issues 2024-01-15 to 2024-01-17"
+├─ Pattern: "Last conversion drop was caused by A/B test deployment"
+└─ Template: "conversion_funnel_analysis" from 2024-02-01 investigation
+```
+
+### Memory Persistence
+
+| Action | What Gets Saved |
+|--------|----------------|
+| Confirm AI understanding | "Yes, that's how we calculate X" → Assumption saved |
+| Explain data issue | "This is wrong because..." → Quirk saved |
+| Complete investigation | Successful approach → Pattern saved |
+| Refine analysis code | Finalized code → Template saved |
+
+---
+
+## Memory in Action
+
+### Example: Repeating Investigation
+
+**First time (5 minutes):**
+```
+Q: "Why did MRR drop last week?"
+
+SignalPilot:
+1. Discovers revenue formula (you confirm)
+2. Finds that test_accounts were included (you flag)
+3. Learns that churned accounts need 30-day lookback
+4. Creates working analysis
+
+Memory saves:
+- Revenue formula
+- test_accounts exclusion
+- Churn definition
+- Analysis pattern
+```
+
+**Second time (1 minute):**
+```
+Q: "Why did MRR drop this week?"
+
+SignalPilot recalls:
+- Uses correct revenue formula immediately
+- Excludes test_accounts automatically
+- Applies churn lookback window
+- Follows proven analysis pattern
+
+No rediscovery needed.
+```
+
+---
+
+## Managing Memory
+
+### Viewing Stored Memory
+
+```python
+# In your notebook
+signalpilot.memory.list_assumptions()
+signalpilot.memory.list_quirks()
+signalpilot.memory.list_patterns()
+```
+
+### Editing Memory
+
+```python
+# Update an assumption
+signalpilot.memory.update_assumption(
+    key="revenue_formula",
+    value="Revenue = (price × quantity) - discounts - refunds"
+)
+
+# Remove a quirk (data was fixed)
+signalpilot.memory.remove_quirk("duplicate_orders_before_2024")
+```
+
+### Exporting Memory
+
+```python
+# Export for backup or sharing
+signalpilot.memory.export("team_knowledge.json")
+
+# Import on another machine
+signalpilot.memory.import("team_knowledge.json")
+```
+
+---
+
+## Team Memory Sync
+
+For teams, SignalPilot can sync memory across members:
+
+### Benefits
+
+- **Onboarding Acceleration**: New analysts inherit team knowledge immediately
+- **Consistency**: Everyone uses the same business logic
+- **Knowledge Preservation**: Insights survive team changes
+
+### How It Works
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Analyst A  │     │   Analyst B  │     │   Analyst C  │
+│  discovers   │     │   discovers  │     │   inherits   │
+│  quirk       │────▶│   pattern    │────▶│   both       │
+└──────────────┘     └──────────────┘     └──────────────┘
+                            │
+                            ▼
+                    ┌──────────────┐
+                    │  Team Memory │
+                    │  (encrypted) │
+                    └──────────────┘
+```
+
+### Configuration
+
+```json
+// In signalpilot.config.json
+{
+  "memory": {
+    "sync": true,
+    "team_id": "your-team-id",
+    "sync_interval": "hourly"
+  }
+}
+```
+
 <Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
+Team sync requires all members to be on the same SignalPilot team plan. Memory is end-to-end encrypted and only accessible to team members.
 </Warning>
 
-<Card title="Coming Soon" icon="brain">
-Full deep dive will be added during Phase 3 of documentation restructuring.
+---
+
+## Memory Best Practices
+
+<Steps>
+<Step title="Confirm Understanding Explicitly">
+When the AI asks "Is this how you calculate X?", answer clearly. "Yes" saves the assumption; "No, actually..." triggers learning.
+</Step>
+
+<Step title="Explain Corrections">
+Don't just fix errors—explain why. "This is wrong because test accounts are included" teaches the quirk.
+</Step>
+
+<Step title="Review Memory Periodically">
+Business logic changes. Review stored assumptions quarterly to ensure they're still accurate.
+</Step>
+
+<Step title="Share Context">
+When working with teammates, export and share memory to avoid duplicated discovery.
+</Step>
+</Steps>
+
+---
+
+## Privacy Considerations
+
+Memory storage respects your privacy:
+
+| Data Type | Storage Location | Shared in Team Sync |
+|-----------|-----------------|---------------------|
+| Assumptions | Local | Yes (encrypted) |
+| Quirks | Local | Yes (encrypted) |
+| Patterns | Local | Yes (encrypted) |
+| Actual data values | Never stored | Never |
+| Query results | Never stored | Never |
+| Credentials | Never stored | Never |
+
+<Card title="Learn More: Security & Privacy" icon="shield-halved" href="/introduction/security-and-privacy">
+Complete privacy and security documentation
 </Card>
+
+---
+
+## Related Deep Dives
+
+<CardGroup cols={2}>
+<Card title="Agent Orchestration Loop" icon="rotate" href="/deep-dives/agent-orchestration-loop">
+How memory integrates with the investigation loop
+</Card>
+
+<Card title="Hooks System" icon="webhook" href="/deep-dives/hooks-system">
+Enforce memory-based rules automatically
+</Card>
+
+<Card title="Context Aggregation" icon="diagram-project" href="/deep-dives/context-aggregation">
+How context and memory work together
+</Card>
+
+<Card title="How It Works" icon="gears" href="/introduction/how-it-works">
+Overview of all foundational systems
+</Card>
+</CardGroup>

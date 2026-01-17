@@ -1,14 +1,331 @@
 ---
 title: "Understanding Context Aggregation"
-description: "Deep dive into MCP sidecar architecture internals"
+description: "Deep dive into how SignalPilot's MCP architecture aggregates context from your entire data stack"
 ---
 
 # Understanding Context Aggregation
 
-<Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
-</Warning>
+Context aggregation is SignalPilot's ability to gather and synthesize information from across your entire data stack—databases, notebooks, collaboration tools, and documentation—into a unified context for AI-powered investigations.
 
-<Card title="Coming Soon" icon="diagram-project">
-Full deep dive will be added during Phase 3 of documentation restructuring.
+## Why Context Matters
+
+Traditional AI tools require you to manually copy-paste context:
+
+```
+❌ Without Context Aggregation:
+1. Copy table schema from Snowflake
+2. Paste into ChatGPT
+3. Ask question
+4. Get answer with hallucinated column names
+5. Fix and retry
+6. Repeat for each new question
+```
+
+SignalPilot automatically aggregates context:
+
+```
+✅ With Context Aggregation:
+1. Ask question
+2. SignalPilot fetches relevant schemas, lineage, docs
+3. Get accurate answer that references real tables
+```
+
+---
+
+## The MCP Architecture
+
+SignalPilot uses the **Model Context Protocol (MCP)** to connect to your data stack. MCP provides a standardized way for AI systems to access external context sources.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     SIGNALPILOT CORE                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│    ┌─────────────────────────────────────────────────────────┐  │
+│    │              INTERNAL MCP SIDECAR                        │  │
+│    │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐        │  │
+│    │  │ Kernel  │ │ Schema  │ │  Query  │ │  File   │        │  │
+│    │  │ Context │ │ Explorer│ │ History │ │ System  │        │  │
+│    │  └─────────┘ └─────────┘ └─────────┘ └─────────┘        │  │
+│    └─────────────────────────────────────────────────────────┘  │
+│                              │                                   │
+│                              ▼                                   │
+│    ┌─────────────────────────────────────────────────────────┐  │
+│    │              EXTERNAL MCP SERVERS                        │  │
+│    │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐        │  │
+│    │  │   dbt   │ │  Slack  │ │  Jira   │ │ Notion  │        │  │
+│    │  │ Lineage │ │ Threads │ │ Tickets │ │  Docs   │        │  │
+│    │  └─────────┘ └─────────┘ └─────────┘ └─────────┘        │  │
+│    └─────────────────────────────────────────────────────────┘  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Internal Context Sources
+
+The internal MCP sidecar provides access to local context that doesn't require external connections:
+
+### Kernel Context
+
+Access to the current Jupyter kernel state:
+
+| Context Type | What It Provides | Example Use |
+|--------------|------------------|-------------|
+| Variables | Active dataframes, values | "What columns are in df?" |
+| Execution History | Recently run code | "What did I just calculate?" |
+| Outputs | Cell outputs, plots | "Explain this visualization" |
+| Errors | Stack traces, exceptions | "Why did this fail?" |
+
+### Schema Explorer
+
+Direct database introspection:
+
+| Context Type | What It Provides | Example Use |
+|--------------|------------------|-------------|
+| Tables | List of available tables | "What tables contain user data?" |
+| Columns | Column names, types, nullability | "What's the schema of orders?" |
+| Relationships | Foreign keys, joins | "How are users and orders related?" |
+| Indexes | Performance hints | "Is this query optimized?" |
+
+### Query History
+
+Recent database activity:
+
+| Context Type | What It Provides | Example Use |
+|--------------|------------------|-------------|
+| Past Queries | SQL that was previously run | "Run that revenue query again" |
+| Query Results | Cached result summaries | "What did we find yesterday?" |
+| Error History | Failed queries and reasons | "Why did this query fail before?" |
+
+### File System
+
+Local file access:
+
+| Context Type | What It Provides | Example Use |
+|--------------|------------------|-------------|
+| Notebooks | .ipynb files in workspace | "What analysis is in notebook X?" |
+| Data Files | CSVs, Parquet, JSON | "Load the customer_data.csv" |
+| Configs | Connection strings, settings | "What database am I connected to?" |
+
+---
+
+## External MCP Servers
+
+External MCP servers connect SignalPilot to your broader data ecosystem:
+
+<AccordionGroup>
+<Accordion title="dbt Integration" icon="diagram-project" defaultOpen>
+**What it provides:**
+- Model lineage (upstream/downstream dependencies)
+- Model documentation and descriptions
+- Test results and data quality status
+- Column-level lineage
+
+**Example queries:**
+- "What models feed into the revenue dashboard?"
+- "Show me the lineage for customer_lifetime_value"
+- "Are there any failing dbt tests?"
+
+<Card title="Setup Guide" icon="wrench" href="/integrations/dbt-integration">
+Configure dbt Cloud or dbt Core integration
 </Card>
+</Accordion>
+
+<Accordion title="Slack Integration" icon="slack">
+**What it provides:**
+- Channel discussions about data and metrics
+- Data team decisions and context
+- Recent incident threads
+- @mentions of specific metrics or tables
+
+**Example queries:**
+- "What did the team discuss about conversion last week?"
+- "Are there any known issues with the orders table?"
+- "Who owns the attribution model?"
+
+<Card title="Setup Guide" icon="wrench" href="/integrations/collaboration/slack">
+Configure Slack workspace integration
+</Card>
+</Accordion>
+
+<Accordion title="Jira Integration" icon="list-check">
+**What it provides:**
+- Tickets related to data issues
+- Deployment history affecting data
+- Sprint context for data projects
+- Issue status and assignments
+
+**Example queries:**
+- "Were there any deployments to the pipeline last week?"
+- "Is there a ticket for the missing data issue?"
+- "What's the status of the ETL fix?"
+
+<Card title="Setup Guide" icon="wrench" href="/integrations/collaboration/jira">
+Configure Jira project integration
+</Card>
+</Accordion>
+
+<Accordion title="Notion/GDocs Integration" icon="file-lines">
+**What it provides:**
+- Data dictionaries and glossaries
+- Design documents and specifications
+- Runbooks and troubleshooting guides
+- Meeting notes and decisions
+
+**Example queries:**
+- "What's the definition of 'active user' in our docs?"
+- "Is there a runbook for pipeline failures?"
+- "What decisions were made in the data review?"
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Parallel Context Resolution
+
+When you ask a question, SignalPilot resolves context from all relevant sources **simultaneously**:
+
+```
+Question: "Why did conversion drop last week?"
+
+Context Resolution (parallel):
+├─ Kernel: Check for existing conversion analysis
+├─ Schema: Fetch conversion_events table structure
+├─ Query History: Find recent conversion queries
+├─ dbt: Get model lineage for conversion metrics
+├─ Slack: Search for "conversion" in data channels
+└─ Jira: Look for related deployment tickets
+
+Total time: ~2 seconds (not 6x sequential)
+```
+
+<Tip>
+Parallel resolution means adding more context sources doesn't significantly increase latency. The total time is determined by the slowest source, not the sum of all sources.
+</Tip>
+
+---
+
+## Context Prioritization
+
+Not all context is equally relevant. SignalPilot uses semantic understanding to prioritize:
+
+| Priority | Context Type | When Used |
+|----------|--------------|-----------|
+| High | Direct mentions (table names, metrics) | Always included |
+| High | Recent query history | Always included |
+| Medium | Related schemas | Included if space allows |
+| Medium | dbt lineage | Included for data questions |
+| Low | General Slack discussions | Summarized if relevant |
+| Low | Old documentation | Referenced but not full text |
+
+<Note>
+Context prioritization ensures the AI focuses on the most relevant information without being overwhelmed by tangential details.
+</Note>
+
+---
+
+## Context Security
+
+All context aggregation respects your security boundaries:
+
+<AccordionGroup>
+<Accordion title="Read-Only Access" icon="eye" defaultOpen>
+SignalPilot only **reads** context—it cannot modify external systems. Database connections are read-only. Slack integration is read-only. No write access to any external MCP source.
+</Accordion>
+
+<Accordion title="Credential Management" icon="key">
+Database credentials and API tokens are stored locally in your environment. They are never transmitted to SignalPilot servers. Connection strings are processed locally.
+</Accordion>
+
+<Accordion title="Data Minimization" icon="filter">
+Only metadata and schemas are transmitted by default. Actual data values stay local unless explicitly included in a query. You control what context is shared.
+</Accordion>
+
+<Accordion title="Audit Trail" icon="list">
+All context resolutions are logged locally. You can see exactly what was fetched and when. Hooks can enforce additional access controls.
+</Accordion>
+</AccordionGroup>
+
+<Card title="Learn More: Security & Privacy" icon="shield-halved" href="/introduction/security-and-privacy">
+Complete security model documentation
+</Card>
+
+---
+
+## Configuring Context Sources
+
+### Adding a Database
+
+```python
+# In your notebook or config
+signalpilot.add_connection(
+    name="production",
+    type="snowflake",
+    connection_string="snowflake://user@account/database"
+)
+```
+
+### Adding an MCP Server
+
+```json
+// In signalpilot.config.json
+{
+  "mcp_servers": {
+    "dbt": {
+      "type": "dbt-cloud",
+      "account_id": "12345",
+      "project_id": "67890"
+    },
+    "slack": {
+      "type": "slack",
+      "workspace": "your-workspace"
+    }
+  }
+}
+```
+
+---
+
+## Best Practices
+
+<Steps>
+<Step title="Start with Core Sources">
+Begin with database and kernel context. Add external MCP sources as needed.
+</Step>
+
+<Step title="Use Descriptive Names">
+Name your connections clearly (e.g., "production-snowflake", "analytics-postgres") for easy reference.
+</Step>
+
+<Step title="Review Context in Plans">
+When approving investigation plans, check that the right context sources are being used.
+</Step>
+
+<Step title="Add Context Incrementally">
+If an investigation misses context, mention it. SignalPilot learns to include similar context next time.
+</Step>
+</Steps>
+
+---
+
+## Related Deep Dives
+
+<CardGroup cols={2}>
+<Card title="Agent Orchestration Loop" icon="rotate" href="/deep-dives/agent-orchestration-loop">
+How context flows through the investigation loop
+</Card>
+
+<Card title="Multi-Session Memory" icon="brain" href="/deep-dives/multi-session-memory">
+How context insights are stored for future use
+</Card>
+
+<Card title="dbt Integration" icon="diagram-project" href="/integrations/dbt-integration">
+Detailed dbt Cloud and Core setup
+</Card>
+
+<Card title="Slack Integration" icon="slack" href="/integrations/collaboration/slack">
+Connect your Slack workspace
+</Card>
+</CardGroup>

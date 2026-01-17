@@ -1,14 +1,250 @@
 ---
 title: "Agent Orchestration Loop"
-description: "Production-ready loop mechanics"
+description: "Deep dive into the production-ready agent loop that powers SignalPilot's multi-step data investigations"
 ---
 
 # Agent Orchestration Loop
 
+SignalPilot's agent loop is the core engine that transforms single questions into comprehensive data investigations. Unlike single-shot AI completions, this loop maintains context, executes multi-step plans, and keeps analysts in control throughout the process.
+
+## How the Loop Works
+
+The agent orchestration loop follows a 7-step process that repeats until the investigation is complete:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    AGENT ORCHESTRATION LOOP                      │
+├─────────────────────────────────────────────────────────────────┤
+│  1. CONTEXT RESOLUTION (Parallel)                                │
+│     └─ Fetch schemas, lineage, Slack threads, query history     │
+│                                                                  │
+│  2. SYSTEM PROMPT CONSTRUCTION                                   │
+│     └─ Build prompt with full organizational context             │
+│                                                                  │
+│  3. PLAN GENERATION                                              │
+│     └─ AI proposes multi-step investigation approach             │
+│                                                                  │
+│  4. 👤 ANALYST APPROVAL CHECKPOINT                               │
+│     └─ Review, modify, or reject before execution                │
+│                                                                  │
+│  5. TOOL EXECUTION (Parallel)                                    │
+│     └─ Run queries, update cells, generate plots                 │
+│                                                                  │
+│  6. COMPLETION CHECK                                             │
+│     └─ Evaluate if investigation goals are met                   │
+│                                                                  │
+│  7. MEMORY PERSISTENCE                                           │
+│     └─ Save findings and patterns for future investigations      │
+│                                                                  │
+│  ↺ Loop continues until complete or analyst stops                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Step-by-Step Breakdown
+
+### Step 1: Context Resolution (Parallel)
+
+When you ask a question, SignalPilot immediately fetches relevant context from multiple sources **in parallel**:
+
+<AccordionGroup>
+<Accordion title="Internal Context Sources" icon="database" defaultOpen>
+- **Kernel State**: Current variables, dataframes, and their schemas
+- **Database Schemas**: Table structures, column types, relationships
+- **Query History**: Recent queries and their results
+- **Notebook Content**: Code cells, markdown, and outputs
+- **Local Files**: CSVs, configs, and related notebooks
+</Accordion>
+
+<Accordion title="External MCP Sources" icon="plug">
+- **dbt**: Model lineage, documentation, test results
+- **Slack**: Recent discussions about relevant data or metrics
+- **Jira**: Related tickets, deployment history
+- **Notion/GDocs**: Design docs, runbooks, data dictionaries
+</Accordion>
+</AccordionGroup>
+
+<Tip>
+Context resolution happens in parallel to minimize latency. A typical resolution takes 1-3 seconds regardless of how many sources are queried.
+</Tip>
+
+---
+
+### Step 2: System Prompt Construction
+
+SignalPilot builds a comprehensive system prompt that includes:
+
+1. **Base Instructions**: How to investigate data problems
+2. **Available Tools**: What actions the agent can take
+3. **Resolved Context**: All fetched organizational knowledge
+4. **Memory Recall**: Relevant findings from past investigations
+5. **Active Rules**: Team-specific constraints and standards
+
+<Note>
+The system prompt is dynamically constructed based on the question type. A revenue question includes financial schemas and business logic; an ML question includes model metadata and feature definitions.
+</Note>
+
+---
+
+### Step 3: Plan Generation
+
+The AI analyzes your question and generates a structured investigation plan:
+
+```markdown
+## Investigation Plan: "Why did conversion drop 8% last week?"
+
+### Phase 1: Data Discovery
+- [ ] Query conversion_events table for last 14 days
+- [ ] Compare week-over-week conversion rates by segment
+
+### Phase 2: Hypothesis Testing
+- [ ] Check for A/B tests deployed last week
+- [ ] Analyze traffic source distribution changes
+- [ ] Look for tracking pixel issues
+
+### Phase 3: Root Cause Analysis
+- [ ] Deep dive into identified anomaly
+- [ ] Generate before/after comparison
+
+### Phase 4: Reporting
+- [ ] Create visualization of findings
+- [ ] Document root cause and recommendation
+```
+
+<Info>
+Plans are structured with phases to break complex investigations into manageable steps. Each phase has clear objectives that can be reviewed and modified.
+</Info>
+
+---
+
+### Step 4: Analyst Approval Checkpoint
+
+**This is what makes SignalPilot "analyst-in-the-loop" rather than fully autonomous.**
+
+Before executing any plan, SignalPilot presents it for your approval:
+
+- ✅ **Approve**: Execute the plan as proposed
+- ✏️ **Modify**: Adjust steps, add constraints, change approach
+- ❌ **Reject**: Provide new direction or ask a different question
+
 <Warning>
-This page is a placeholder. Content will be added during Phase 3 implementation.
+The approval checkpoint is mandatory in Agent Mode. This ensures you maintain control over what queries run, what data is accessed, and what actions are taken.
 </Warning>
 
-<Card title="Coming Soon" icon="rotate">
-Full deep dive will be added during Phase 3 of documentation restructuring.
+---
+
+### Step 5: Tool Execution (Parallel)
+
+Once approved, SignalPilot executes plan steps using available tools:
+
+| Tool | Purpose | Example |
+|------|---------|---------|
+| `execute_code` | Run Python/SQL in notebook cells | Query database, transform data |
+| `write_cell` | Create or update notebook cells | Add visualizations, documentation |
+| `read_schema` | Introspect database structure | Discover tables and relationships |
+| `search_context` | Query MCP sources | Find Slack discussions, Jira tickets |
+| `create_plot` | Generate visualizations | Charts, graphs, dashboards |
+
+<Tip>
+Independent operations execute in parallel. For example, querying two different tables runs simultaneously, reducing investigation time.
+</Tip>
+
+---
+
+### Step 6: Completion Check
+
+After each execution phase, SignalPilot evaluates:
+
+1. **Goal Achievement**: Did we answer the original question?
+2. **Data Quality**: Are results statistically significant?
+3. **Completeness**: Are there unexplored hypotheses?
+4. **Confidence Level**: How certain is the conclusion?
+
+If the investigation isn't complete, the loop returns to Step 3 to generate the next phase plan.
+
+---
+
+### Step 7: Memory Persistence
+
+When the investigation completes, SignalPilot saves:
+
+- **Findings**: What was discovered and concluded
+- **Validated Assumptions**: Business logic that was confirmed
+- **Data Quirks**: Anomalies or gotchas discovered
+- **Solution Patterns**: Approaches that worked for this type of question
+
+<Card title="Learn More: Multi-Session Memory" icon="brain" href="/deep-dives/multi-session-memory">
+See how memory makes future investigations faster and more accurate
 </Card>
+
+---
+
+## Why "Long-Running" Matters
+
+Traditional AI interactions are **single-shot**: you ask, AI responds, done. This fails for data investigations because:
+
+| Single-Shot Limitations | Long-Running Solution |
+|------------------------|----------------------|
+| Loses context between queries | Maintains full investigation state |
+| Can't adapt based on findings | Adjusts approach as data reveals patterns |
+| No memory of what was tried | Tracks hypotheses tested and ruled out |
+| Manual context management | Automatic context orchestration |
+
+**Real example**: When investigating a conversion drop, you might discover an A/B test was running. A single-shot AI would need you to manually provide this context. SignalPilot's long-running loop automatically incorporates this finding and adjusts the investigation plan.
+
+---
+
+## Performance Characteristics
+
+| Metric | Typical Value | Notes |
+|--------|---------------|-------|
+| Context resolution | 1-3 seconds | Parallel fetching from all sources |
+| Plan generation | 2-5 seconds | Depends on question complexity |
+| Tool execution | Varies | Database queries, code execution |
+| Completion check | <1 second | Lightweight evaluation |
+| Full investigation | 2-10 minutes | Complex questions with multiple phases |
+
+---
+
+## Best Practices
+
+<Steps>
+<Step title="Ask Clear Questions">
+Specific questions lead to focused investigation plans. "Why did MRR drop?" is better than "Something seems wrong with revenue."
+</Step>
+
+<Step title="Review Plans Carefully">
+Take time at the approval checkpoint to ensure the plan addresses your actual question. Modify if needed.
+</Step>
+
+<Step title="Let the Loop Complete">
+Resist the urge to interrupt mid-investigation. The loop is designed to reach conclusions, not just surface data.
+</Step>
+
+<Step title="Provide Feedback">
+If a plan doesn't work, tell SignalPilot why. This improves future investigations through memory.
+</Step>
+</Steps>
+
+---
+
+## Related Deep Dives
+
+<CardGroup cols={2}>
+<Card title="Context Aggregation" icon="diagram-project" href="/deep-dives/context-aggregation">
+How MCP enables multi-source context resolution
+</Card>
+
+<Card title="Multi-Session Memory" icon="brain" href="/deep-dives/multi-session-memory">
+What gets stored and how it improves over time
+</Card>
+
+<Card title="Hooks System" icon="webhook" href="/deep-dives/hooks-system">
+Custom constraints and validations
+</Card>
+
+<Card title="How It Works" icon="gears" href="/introduction/how-it-works">
+Overview of all 4 foundational systems
+</Card>
+</CardGroup>
